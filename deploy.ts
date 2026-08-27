@@ -17,7 +17,7 @@ async function deploy() {
   const FTP_HOST = process.env.FTP_HOST || "smartgarden.gr";
   const FTP_USER = process.env.FTP_USER || "smartgarden.gr_8p3lo1vph0t";
   const FTP_PASSWORD = process.env.FTP_PASSWORD || "Uc0Lptjan_j47Eg~";
-  const FTP_REMOTE_DIR = process.env.FTP_REMOTE_DIR || "/httpdocs";
+  const FTP_REMOTE_DIR = process.env.FTP_REMOTE_DIR || "./";
 
   const hosts = [FTP_HOST, "185.29.24.7", "ftp.smartgarden.gr"];
   let connected = false;
@@ -53,16 +53,15 @@ async function deploy() {
       for (const file of publicFiles) {
         const filePath = path.join(publicDir, file);
         if (fs.statSync(filePath).isFile()) {
-          console.log(`📤 Uploading public/${file} to ${FTP_REMOTE_DIR}/${file}...`);
-          await client.uploadFrom(filePath, `${FTP_REMOTE_DIR}/${file}`);
+          console.log(`📤 Uploading public/${file} to ${file}...`);
+          await client.uploadFrom(filePath, file);
         }
       }
     }
 
     // 2. Upload dist folder
-    console.log(`📤 Uploading build assets (${distDir}) to ${FTP_REMOTE_DIR}...`);
-    await client.ensureDir(FTP_REMOTE_DIR);
-    await client.uploadFromDir(distDir, FTP_REMOTE_DIR);
+    console.log(`📤 Uploading build assets (${distDir}) to root...`);
+    await client.uploadFromDir(distDir, "");
 
     console.log("\n🎉 ========================================================");
     console.log("🌟 DEPLOY SUCCESSFUL! Your changes are now LIVE at:");
