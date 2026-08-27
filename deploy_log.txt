@@ -1,0 +1,11 @@
+=== SMARTGARDEN DEPLOY LOG: 2026-08-21T20:21:51.280Z ===
+[11:21:51 PM] Target Host: smartgarden.gr
+[11:21:51 PM] Target User: smartgarden.gr_8p3lo1vph0t
+[11:21:51 PM] Remote Directory: /httpdocs
+[11:21:51 PM] Connecting to smartgarden.gr...
+[11:22:13 PM] ⚠️ Connection to smartgarden.gr failed:  (control socket)
+[11:22:13 PM] Connecting to ftp.smartgarden.gr...
+[11:22:13 PM] ✅ Successfully connected and authenticated to ftp.smartgarden.gr!
+[11:22:13 PM] Switching to remote directory: /httpdocs
+[11:22:14 PM] 🚀 Uploading contents of C:\Users\me\Desktop\smartgarden.gr_fixed\dist to /httpdocs...
+[11:22:16 PM] ✅ All files uploaded successfully to smartgarden.gr!

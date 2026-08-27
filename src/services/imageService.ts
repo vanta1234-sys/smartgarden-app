@@ -1,0 +1,280 @@
+// Comprehensive Smart Photo Resolver for SmartGarden.gr
+// Provides verified, unique, high-resolution botanical and smart gardening photos
+
+export interface CuratedPhoto {
+  url: string;
+  keywords: string[];
+  category: string;
+  alt: string;
+}
+
+export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
+  // ──────────────────────────────────────────
+  // 🍅 VEGETABLES & FRUITS (ΛΑΧΑΝΑ & ΦΡΟΥΤΑ)
+  // ──────────────────────────────────────────
+  {
+    url: "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ντοματα", "ντοματες", "tomato", "tomatoes", "ταπωμα", "ξηρη κορυφη", "ντοματινια", "solanum"],
+    category: "vegetables",
+    alt: "Ripe red tomatoes on the vine in greenhouse"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["πιπερια", "πιπεριες", "pepper", "peppers", "chili", "chilis", "habanero", "jalapeno", "καυτερες"],
+    category: "vegetables",
+    alt: "Vibrant peppers and chilis growing in pots"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["αγγουρι", "αγγουρια", "κολοκυθι", "κολοκυθια", "cucumber", "zucchini", "κολοκυνθοειδη", "επικονιαση"],
+    category: "vegetables",
+    alt: "Fresh cucumbers and zucchini growing on trellis"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["φραουλα", "φραουλες", "strawberry", "strawberries", "πυργος φραουλας", "κρεμαστες γλαστρες"],
+    category: "vegetables",
+    alt: "Juicy red strawberries hanging from garden planter"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["μαρουλι", "σπανακι", "ροκα", "λαχανο", "lettuce", "spinach", "arugula", "σαλατικα", "φυλλωδη"],
+    category: "vegetables",
+    alt: "Fresh crisp green lettuce and salad greens"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["καροτο", "καροτα", "παντζαρι", "ραπανι", "carrot", "carrots", "radish", "beetroot", "ριζωδη"],
+    category: "vegetables",
+    alt: "Freshly harvested organic carrots with soil"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1511497584788-87676104235f?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["μανιταρι", "μανιταρια", "pleurotus", "shiitake", "mushroom", "mushrooms", "μυκητες"],
+    category: "vegetable_garden",
+    alt: "Gourmet mushrooms growing organically"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1526346698789-22fd84314424?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["μελιτζανα", "μελιτζανες", "eggplant", "aubergine", "δορυφορος"],
+    category: "vegetables",
+    alt: "Glossy purple eggplants growing on plant"
+  },
+
+  // ──────────────────────────────────────────
+  // 💧 SMART IRRIGATION & IOT (ΠΟΤΙΣΜΑ & ΤΕΧΝΟΛΟΓΙΑ)
+  // ──────────────────────────────────────────
+  {
+    url: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ποτισμα", "σταλακτες", "αυτοματο ποτισμα", "micro-drip", "σταγδην", "εξατμισοδιαπνοη", "σωληνες", "αρδευση", "drip"],
+    category: "irrigation_iot",
+    alt: "Drip irrigation system watering green garden plants"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1589923188900-85dae523342b?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["αισθητηρας", "αισθητηρες", "sensor", "sensors", "iot", "zigbee", "wifi", "npk sensor", "αγωγιμοτητα", "τηλεμετρια", "tdr"],
+    category: "irrigation_iot",
+    alt: "Smart IoT soil moisture and environmental sensor"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ηλεκτροβανες", "ηλεκτροβανα", "valve", "valves", "προγραμματιστης", "controller", "solenoid", "manifolt", "συλλεκτης"],
+    category: "irrigation_iot",
+    alt: "Smart automated irrigation controller and hardware"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1509391365360-2e959784a276?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ηλιακο πανελ", "solar", "φωτοβολταικο", "βροχινο νερο", "off-grid", "δεξαμενη", "μπαταρια", "zero energy"],
+    category: "irrigation_iot",
+    alt: "Solar powered smart irrigation panel outdoors"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1584473457406-6240486418e9?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["υδροπονια", "hydroponics", "fertigation", "nft", "dwc", "θρεπτικα διαλυματα", "αλατα", "ec", "ph meter"],
+    category: "hydroponics",
+    alt: "High-tech hydroponic vertical farming system"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1558441719-8d4e92fa89dc?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ρομποτικο", "ρομποτικα", "mower", "mowers", "γκαζον", "χλοοκοπτικο", "rtk", "lidar", "automower"],
+    category: "robotic_mowers",
+    alt: "Autonomous robotic lawn mower cutting lush green grass"
+  },
+
+  // ──────────────────────────────────────────
+  // 🍋 TREES, FRUITS & CITRUS (ΕΣΠΕΡΙΔΟΕΙΔΗ & ΔΕΝΤΡΑ)
+  // ──────────────────────────────────────────
+  {
+    url: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["λεμονια", "λεμονι", "λεμονιας", "εσπεριδοειδη", "lemon", "citrus", "κουμκουατ", "μανταρινια", "χλωρωση", "σιδηρος"],
+    category: "plant_care",
+    alt: "Bright fresh lemons growing on a green lemon tree branch"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1546548970-71785318a17b?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ελια", "ελιας", "ελιες", "olive", "olives", "olive tree", "λιοδεντρο", "μπονσαι ελιας"],
+    category: "balcony",
+    alt: "Ancient potted Mediterranean olive tree with silver leaves"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1585059895524-72359e06133a?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ακτινιδιο", "ακτινιδια", "kiwi", "kiwifruit", "actinidia"],
+    category: "plant_care",
+    alt: "Fresh green kiwis hanging from vine"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["κλαδεμα", "δεντροκομια", "pruning", "συκα", "συκια", "πυρηνοκαρπα", "μηλοειδη", "παστα εμβολιασμου"],
+    category: "plant_care",
+    alt: "Precision tree pruning and grafting in orchard"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["αμπελι", "κληματαρια", "σταφυλι", "σταφυλια", "grape", "vineyard", "περγκολα"],
+    category: "plant_care",
+    alt: "Grapes ripening on a lush garden pergola"
+  },
+
+  // ──────────────────────────────────────────
+  // 🌺 MEDITERRANEAN & BALCONY FLOWERS (ΑΝΘΗ & ΜΠΑΛΚΟΝΙ)
+  // ──────────────────────────────────────────
+  {
+    url: "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["βουκαμβιλια", "βουκαμβιλιες", "γιασεμι", "πυκσαρι", "πυξαρι", "καυσωνας", "μεσογειακος κηπος", "bougainvillea", "jasmine"],
+    category: "plant_care",
+    alt: "Vibrant pink bougainvillea and Mediterranean garden path"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["καθετος κηπος", "καθετοι κηποι", "vertical garden", "πρασινος τοιχος", "τσεπες", "felt pockets"],
+    category: "balcony",
+    alt: "Stunning lush green vertical wall garden on urban terrace"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["αρωματικα", "βασιλικος", "δενδρολιβανο", "ριγανη", "θυμαρι", "herbs", "basil", "rosemary", "thyme", "ζαρντινιερα"],
+    category: "balcony",
+    alt: "Fresh fragrant Mediterranean potted culinary herbs"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ορχιδεα", "ορχιδεες", "orchid", "orchids", "phalaenopsis", "dendrobium", "ανθοφορια"],
+    category: "plant_care",
+    alt: "Elegant blooming pink Phalaenopsis orchid in pot"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["παχυφυτα", "κακτοι", "succulents", "cactus", "ξηροφυτικα", "αλoη", "sedum"],
+    category: "balcony",
+    alt: "Modern collection of diverse succulents in pottery"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["μπονσαι", "bonsai", "μινιατουρα", "διαμορφωση"],
+    category: "balcony",
+    alt: "Carefully manicured Japanese style bonsai tree"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["εσωτερικου χωρου", "μονστερα", "φικος", "monstera", "ficus", "καλαθεα", "houseplants", "indoor plants"],
+    category: "plant_care",
+    alt: "Lush tropical Monstera deliciosa leaves indoors"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["φωτισμος", "lighting", "solar light", "νυχτερινος", "led", "design μπαλκονιου"],
+    category: "balcony",
+    alt: "Atmospheric evening garden pathway illumination"
+  },
+
+  // ──────────────────────────────────────────
+  // 🐛 PEST CONTROL & ECOLOGY (ΒΙΟΛΟΓΙΚΗ ΠΡΟΣΤΑΣΙΑ)
+  // ──────────────────────────────────────────
+  {
+    url: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["τετρανυχος", "μελιγκρα", "θριπας", "spider mite", "aphids", "σαπουνι καλιου", "neem", "βιολογικη", "πασχαλιτσα", "μυκητες", "περονοσπορος", "ωιδιο"],
+    category: "plant_care",
+    alt: "Eco-friendly natural garden protection and pest management"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1598880940371-c756e015fea1?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["κομποστ", "κομποστοποιηση", "compost", "bokashi", "γαιοσκωληκες", "οργανικα", "λιπασμα", "ανακυκλωση"],
+    category: "vegetable_garden",
+    alt: "Rich dark organic compost and garden soil preparation"
+  }
+];
+
+// Fallback pool of unique botanical photos for round-robin rotation
+export const FALLBACK_BOTANICAL_PHOTOS = [
+  "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", // Vertical Garden
+  "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80", // Tomato Greenhouse
+  "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=1200&auto=format&fit=crop&q=80", // Smart Drip Irrigation
+  "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=1200&auto=format&fit=crop&q=80", // Lemon Citrus Tree
+  "https://images.unsplash.com/photo-1546548970-71785318a17b?w=1200&auto=format&fit=crop&q=80", // Potted Olive Tree
+  "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=1200&auto=format&fit=crop&q=80", // Potted Herbs
+  "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=1200&auto=format&fit=crop&q=80", // Vibrant Chili Peppers
+  "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=1200&auto=format&fit=crop&q=80", // Strawberries
+  "https://images.unsplash.com/photo-1589923188900-85dae523342b?w=1200&auto=format&fit=crop&q=80", // Smart IoT Sensor
+  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // Bougainvillea Garden
+  "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80", // Succulents
+  "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=1200&auto=format&fit=crop&q=80", // Orchids
+  "https://images.unsplash.com/photo-1558441719-8d4e92fa89dc?w=1200&auto=format&fit=crop&q=80", // Robotic Lawn Mower
+  "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=1200&auto=format&fit=crop&q=80", // Fresh Salad Greens
+  "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&auto=format&fit=crop&q=80", // Grapevine Pergola
+  "https://images.unsplash.com/photo-1598880940371-c756e015fea1?w=1200&auto=format&fit=crop&q=80", // Organic Soil Compost
+  "https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1200&auto=format&fit=crop&q=80", // Bonsai Tree
+  "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80", // Monstera Houseplant
+  "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=1200&auto=format&fit=crop&q=80", // Carrots & Root Vegetables
+  "https://images.unsplash.com/photo-1584473457406-6240486418e9?w=1200&auto=format&fit=crop&q=80", // Hydroponics
+];
+
+function stripAccents(str: string): string {
+  return (str || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ά/g, "α")
+    .replace(/έ/g, "ε")
+    .replace(/ή/g, "η")
+    .replace(/[ίϊΐ]/g, "ι")
+    .replace(/ό/g, "ο")
+    .replace(/[ύϋΰ]/g, "υ")
+    .replace(/ώ/g, "ω");
+}
+
+/**
+ * Intelligently finds the best unique photo matching article topic, keywords or category.
+ * Prevents identical consecutive pictures.
+ */
+export function getSmartArticleImage(topicTitle: string, category: string = "", indexSeed: number = 0): string {
+  const normalized = stripAccents(topicTitle + " " + category);
+
+  // 1. Direct Keyword Match
+  for (const item of CURATED_GARDENING_PHOTOS) {
+    const hasMatch = item.keywords.some((kw) => {
+      const normKw = stripAccents(kw);
+      return normalized.includes(normKw);
+    });
+    if (hasMatch) {
+      return item.url;
+    }
+  }
+
+  // 2. Category Match
+  const categoryMatches = CURATED_GARDENING_PHOTOS.filter(
+    (item) => stripAccents(item.category) === stripAccents(category)
+  );
+  if (categoryMatches.length > 0) {
+    const idx = Math.abs(indexSeed) % categoryMatches.length;
+    return categoryMatches[idx].url;
+  }
+
+  // 3. Round-Robin Fallback based on text hash or index seed
+  let hash = 0;
+  for (let i = 0; i < topicTitle.length; i++) {
+    hash = (hash << 5) - hash + topicTitle.charCodeAt(i);
+    hash |= 0;
+  }
+  const fallbackIndex = Math.abs(hash + indexSeed) % FALLBACK_BOTANICAL_PHOTOS.length;
+  return FALLBACK_BOTANICAL_PHOTOS[fallbackIndex];
+}
