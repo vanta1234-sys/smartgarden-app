@@ -17,6 +17,19 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      // Production is static PHP hosting (no local PHP server) — every *.php endpoint
+      // (tts-edge.php, tts-greek.php, cron-publish.php, tiktok-*.php, pinterest-*.php,
+      // article.php) 404s under local `vite dev` with no proxy, which silently breaks
+      // features that depend on them (e.g. TTS falls back to the browser's broken
+      // letter-by-letter voice). Proxy any root-level *.php request straight to the live
+      // site so local testing exercises the same backend production actually uses.
+      proxy: {
+        '^/[^/]+\\.php(\\?.*)?$': {
+          target: 'https://smartgarden.gr',
+          changeOrigin: true,
+          secure: true,
+        },
+      },
     },
   };
 });

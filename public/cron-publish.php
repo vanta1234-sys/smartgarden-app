@@ -661,7 +661,7 @@ $topicPool = array(
         "readTime" => "12 min",
         "difficulty" => "Μέτριο",
         "difficultyLabel" => "Μέτριο",
-        "image" => "https://images.unsplash.com/photo-1592417817098-8f3d69104a47?w=1200&auto=format&fit=crop&q=80",
+        "image" => "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
         "summary" => "Όλα τα μυστικά για πλούσια παραγωγή ντομάτας στο μπαλκόνι. Αποτροπή μαυρίσματος στον πάτο του καρπού με χηλικό ασβέστιο, κλάδεμα μασχαλιαίων βλαστών και βιοπροστασία από Tuta absoluta.",
         "botanical" => "Solanum lycopersicum, Lycopersicon esculentum",
         "ph" => "6.2 - 6.8",
@@ -742,7 +742,7 @@ $topicPool = array(
         "readTime" => "14 min",
         "difficulty" => "Προχωρημένο",
         "difficultyLabel" => "Προχωρημένο",
-        "image" => "https://images.unsplash.com/photo-1558441719-8d4e92fa89dc?w=1200&auto=format&fit=crop&q=80",
+        "image" => "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80",
         "summary" => "Ο απόλυτος τεχνικός οδηγός 2026 για ρομποτικές χλοοκοπτικές μηχανές χωρίς περιμετρικό καλώδιο. Σύγκριση τεχνολογιών RTK-GNSS, 3D LiDAR, κάμερες τεχνητής νοημοσύνης, διαχείριση κλίσεων και επιλογή μοντέλου για ελληνικά κτήματα και γκαζόν.",
         "botanical" => "Autonomous Lawn Robotics, RTK-GNSS, 3D LiDAR Vision",
         "ph" => "N/A",
@@ -834,67 +834,201 @@ if (file_exists($latestFile)) {
 // Select topic rotating through catalog
 $totalExisting = count($existingArticles);
 $topicIndex = $totalExisting % count($topicPool);
+$cycleNumber = intdiv($totalExisting, count($topicPool));
 $selectedTopic = $topicPool[$topicIndex];
+
+// After the pool has fully cycled once, avoid publishing a literal duplicate title/content —
+// give each repeat cycle a distinct angle so it reads as a genuinely new article, not a clone.
+if ($cycleNumber > 0) {
+    $cycleAngles = array(
+        array('suffix' => 'Προχωρημένος Οδηγός', 'focus' => 'Δώσε έμφαση σε προχωρημένες τεχνικές, ειδικές περιπτώσεις και αντιμετώπιση σπάνιων προβλημάτων που δεν καλύπτονται σε βασικό οδηγό.'),
+        array('suffix' => 'Συχνά Λάθη & Λύσεις', 'focus' => 'Δώσε έμφαση σε διαγνωστικά συμπτώματα, λάθη αρχαρίων και συγκεκριμένες διορθωτικές ενέργειες βήμα-βήμα.'),
+        array('suffix' => 'Εποχιακός Οδηγός', 'focus' => 'Δώσε έμφαση σε εποχιακές διαφοροποιήσεις της φροντίδας ανά μήνα και προσαρμογές ανάλογα με το ελληνικό κλίμα.'),
+        array('suffix' => 'Ερωτήσεις & Απαντήσεις', 'focus' => 'Δόμησε το άρθρο γύρω από τις πιο συχνές ερωτήσεις αναγνωστών με άμεσες, πρακτικές απαντήσεις.'),
+    );
+    $angle = $cycleAngles[($cycleNumber - 1) % count($cycleAngles)];
+    $selectedTopic['title'] = $selectedTopic['title'] . ': ' . $angle['suffix'];
+    $selectedTopic['prompt_focus'] = $selectedTopic['prompt_focus'] . "\n\nΣΗΜΑΝΤΙΚΟ: " . $angle['focus'] . ' Απόφυγε να επαναλάβεις αυτολεξεί προηγούμενο άρθρο με τον ίδιο βασικό τίτλο — αυτό είναι νέο, διαφορετικό άρθρο με νέα γωνία θέασης.';
+}
 
 // ==========================================
 // 5. AI ENGINE: GENERATE SCIENTIFIC AGRONOMY CONTENT
 // ==========================================
+function articleWordCount($content) {
+    preg_match_all('/[\p{L}\p{N}]+(?:[\x{2019}\x{2018}\'-][\p{L}\p{N}]+)*/u', $content, $matches);
+    return count($matches[0]);
+}
+
+function callGeminiModel($url, $postData, $timeoutSeconds) {
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $timeoutSeconds);
+    return $ch;
+}
+
+function extractGeminiText($result, $httpCode) {
+    if ($httpCode !== 200 || empty($result)) {
+        return '';
+    }
+    $json = json_decode($result, true);
+    return isset($json['candidates'][0]['content']['parts'][0]['text']) ? $json['candidates'][0]['content']['parts'][0]['text'] : '';
+}
+
+$GLOBALS['cronDebug'] = array();
+
 function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
     // 1. Try Gemini API if key is present
     if (!empty($geminiKey)) {
-        $prompt = "Είσαι ο κορυφαίος Έλληνας καθηγητής Γεωπονίας και συντάκτης του SmartGarden.gr. Γράψε ένα εξαιρετικά αναλυτικό, επιστημονικά άρτιο και πρακτικό άρθρο 2.000 έως 2.400 λέξεων στα Ελληνικά με τίτλο: '{$topic['title']}'.\n\n"
-                . "Εστίαση θέματος:\n{$topic['prompt_focus']}\n\n"
-                . "ΥΠΟΧΡΕΩΤΙΚΗ ΔΟΜΗ ΑΡΘΡΟΥ:\n"
-                . "## 1. Επιστημονικό Υπόβαθρο & Βοτανική Φυσιολογία\n"
-                . "Αναλυτική περιγραφή φυσιολογίας, κυτταρικών μηχανισμών και ιδιαιτεροτήτων του θέματος/τεχνολογίας.\n\n"
-                . "## 2. Τεχνικές Προδιαγραφές & Πίνακας Παραμέτρων\n"
-                . "Δημιούργησε έναν πλήρη πίνακα Markdown με:\n"
-                . "| Παράμετρος Εφαρμογής | Βέλτιστη Τιμή | Μονάδα Μέτρησης | Παρατηρήσεις |\n"
-                . "| **Βοτανική Ταξινόμηση** | *{$topic['botanical']}* | - | Επιστημονική ονομασία |\n"
-                . "| **Εύρος pH Υποστρώματος** | {$topic['ph']} | pH | Βέλτιστη διαθεσιμότητα θρεπτικών |\n"
-                . "| **Ηλεκτρική Αγωγιμότητα (EC)** | {$topic['ec']} | mS/cm | Αποφυγή τοξικότητας αλάτων |\n"
-                . "| **Θερμοκρασία Ανάπτυξης** | {$topic['temp']} | °C | Μέγιστος μεταβολικός ρυθμός |\n\n"
-                . "## 3. Βήμα-προς-Βήμα Μεθοδολογία & Εφαρμογή\n"
-                . "Εξαντλητικά πρακτικά βήματα, δοσολογίες, χρόνοι εφαρμογής και εργαλεία.\n\n"
-                . "## 4. Ολοκληρωμένη Βιολογική Φυτοπροστασία / Τεχνολογική Διάταξη\n"
-                . "Συγκεκριμένες οικολογικές δραστικές ουσίες ή τεχνικές λεπτομέρειες με ακριβείς δοσολογίες.\n\n"
-                . "## 5. Πρόγραμμα Θρέψης, Άρδευσης & Συντήρησης\n"
-                . "Αναλυτικό πρόγραμμα συντήρησης και εφαρμογής.\n\n"
-                . "## 6. Συχνότερα Λάθη & Οδηγίες Αποφυγής\n"
-                . "Αριθμημένη λίστα με τα πιο κρίσιμα σφάλματα και πώς αποτρέπονται για το συγκεκριμένο θέμα.\n\n"
-                . "Γράψε ΜΟΝΟ το κυρίως κείμενο του άρθρου σε Markdown (με ##, ###, πίνακες, bullet points, bold). Χωρίς εισαγωγικά μετα-σχόλια.";
+        // cron-job.org has a hard 30-second request limit. Keep enough time to
+        // return a useful error response instead of letting the caller time out.
+        // Two flash-lite rounds measured ~18-20s combined (2026-09-04), so 28s leaves a
+        // small buffer while still allowing the retry round to actually run.
+        $generationDeadline = microtime(true) + 28;
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $geminiKey;
-        $postData = json_encode(array(
-            "contents" => array(
-                array("parts" => array(array("text" => $prompt)))
-            ),
-            "generationConfig" => array(
-                "temperature" => 0.7,
-                "maxOutputTokens" => 8192
-            )
-        ));
+        $sharedIntro = "Είσαι ο κορυφαίος Έλληνας καθηγητής Γεωπονίας και συντάκτης του SmartGarden.gr. Γράφεις ένα επιστημονικά άρτιο άρθρο στα Ελληνικά με τίτλο: '{$topic['title']}'.\n"
+            . "Εστίαση θέματος:\n{$topic['prompt_focus']}\n\n";
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_TIMEOUT, 45);
-        $result = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        $promptA = $sharedIntro
+            . "Γράψε ΜΟΝΟ τις εξής 3 ενότητες σε Markdown (##). ΚΑΘΕ ενότητα πρέπει να έχει ΤΟΥΛΑΧΙΣΤΟΝ 450 λέξεις, με πολλές τεχνικές λεπτομέρειες, δοσολογίες, παραδείγματα και αριθμημένες λίστες. Μην συνοψίζεις, ανάπτυξε διεξοδικά:\n\n"
+            . "## 1. Επιστημονικό Υπόβαθρο & Βοτανική Φυσιολογία\n"
+            . "Αναλυτική περιγραφή φυσιολογίας, κυτταρικών μηχανισμών και ιδιαιτεροτήτων του θέματος/τεχνολογίας.\n\n"
+            . "## 2. Τεχνικές Προδιαγραφές & Πίνακας Παραμέτρων\n"
+            . "Δημιούργησε έναν πλήρη πίνακα Markdown με:\n"
+            . "| Παράμετρος Εφαρμογής | Βέλτιστη Τιμή | Μονάδα Μέτρησης | Παρατηρήσεις |\n"
+            . "| **Βοτανική Ταξινόμηση** | *{$topic['botanical']}* | - | Επιστημονική ονομασία |\n"
+            . "| **Εύρος pH Υποστρώματος** | {$topic['ph']} | pH | Βέλτιστη διαθεσιμότητα θρεπτικών |\n"
+            . "| **Ηλεκτρική Αγωγιμότητα (EC)** | {$topic['ec']} | mS/cm | Αποφυγή τοξικότητας αλάτων |\n"
+            . "| **Θερμοκρασία Ανάπτυξης** | {$topic['temp']} | °C | Μέγιστος μεταβολικός ρυθμός |\n\n"
+            . "## 3. Βήμα-προς-Βήμα Μεθοδολογία & Εφαρμογή\n"
+            . "Εξαντλητικά πρακτικά βήματα, δοσολογίες, χρόνοι εφαρμογής και εργαλεία.\n\n"
+            . "Το συνολικό κείμενο των 3 ενοτήτων πρέπει να έχει ΤΟΥΛΑΧΙΣΤΟΝ 2.000 λέξεις. Γράψε ΜΟΝΟ το κείμενο, χωρίς εισαγωγικά μετα-σχόλια.";
 
-        if ($httpCode === 200 && !empty($result)) {
-            $jsonRes = json_decode($result, true);
-            if (!empty($jsonRes['candidates'][0]['content']['parts'][0]['text'])) {
-                return $jsonRes['candidates'][0]['content']['parts'][0]['text'];
+        $promptB = $sharedIntro
+            . "Συνεχίζεις το ΙΔΙΟ άρθρο. ΜΗΝ επαναλάβεις τίτλο, εισαγωγή ή τις ενότητες 1-3. Γράψε ΜΟΝΟ τις εξής 3 ενότητες σε Markdown (##), ξεκινώντας κατευθείαν από την ενότητα 4. ΚΑΘΕ ενότητα πρέπει να έχει ΤΟΥΛΑΧΙΣΤΟΝ 450 λέξεις, με πολλές τεχνικές λεπτομέρειες, δοσολογίες και αριθμημένες λίστες. Μην συνοψίζεις, ανάπτυξε διεξοδικά:\n\n"
+            . "## 4. Ολοκληρωμένη Βιολογική Φυτοπροστασία / Τεχνολογική Διάταξη\n"
+            . "Συγκεκριμένες οικολογικές δραστικές ουσίες ή τεχνικές λεπτομέρειες με ακριβείς δοσολογίες.\n\n"
+            . "## 5. Πρόγραμμα Θρέψης, Άρδευσης & Συντήρησης\n"
+            . "Αναλυτικό πρόγραμμα συντήρησης και εφαρμογής.\n\n"
+            . "## 6. Συχνότερα Λάθη & Οδηγίες Αποφυγής\n"
+            . "Αριθμημένη λίστα με τα πιο κρίσιμα σφάλματα και πώς αποτρέπονται για το συγκεκριμένο θέμα.\n\n"
+            . "Το συνολικό κείμενο των 3 ενοτήτων πρέπει να έχει ΤΟΥΛΑΧΙΣΤΟΝ 2.000 λέξεις. Γράψε ΜΟΝΟ το κείμενο, χωρίς εισαγωγικά μετα-σχόλια.";
+
+        $genConfig = array("temperature" => 0.7, "maxOutputTokens" => 8192);
+        $postA = json_encode(array("contents" => array(array("parts" => array(array("text" => $promptA)))), "generationConfig" => $genConfig));
+        $postB = json_encode(array("contents" => array(array("parts" => array(array("text" => $promptB)))), "generationConfig" => $genConfig));
+
+        // gemini-3.1-flash-lite answers in ~10-20s with no extended "thinking" step, unlike
+        // gemini-flash-latest/3.7-flash (reasoning models that take 30-60s+ and frequently
+        // 503 under load — both regularly blew the cron's ~24s budget as of 2026-09-04).
+        // But asked for a full 2,300-2,600 word article in one shot, flash-lite stops early
+        // around ~1,200 words. Splitting the article into two halves and firing them at the
+        // SAME time via curl_multi keeps wall time ~15-20s per round while each half lands
+        // near its own (achievable) target. Even so it consistently undershoots the asked
+        // word count by ~20-25% (measured 2026-09-04), so retry the same reliable model
+        // (not a different, unverified model name) once more if the first round falls short —
+        // two rounds still comfortably fit inside the cron's ~24-27s budget.
+        $model = 'gemini-3.1-flash-lite';
+        for ($attempt = 0; $attempt < 2; $attempt++) {
+            $secondsRemaining = (int)floor($generationDeadline - microtime(true));
+            // A full round takes ~15-20s; don't start one that can't finish before the
+            // deadline — a doomed retry just burns the budget the fallback needs (2026-09-04).
+            $minSecondsForRound = $attempt === 0 ? 4 : 12;
+            if ($secondsRemaining < $minSecondsForRound) {
+                break;
+            }
+            $timeoutSeconds = min(22, $secondsRemaining);
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/" . $model . ":generateContent?key=" . $geminiKey;
+
+            $mh = curl_multi_init();
+            $chA = callGeminiModel($url, $postA, $timeoutSeconds);
+            $chB = callGeminiModel($url, $postB, $timeoutSeconds);
+            curl_multi_add_handle($mh, $chA);
+            curl_multi_add_handle($mh, $chB);
+
+            $running = null;
+            $multiErrors = array();
+            do {
+                curl_multi_exec($mh, $running);
+                while ($info = curl_multi_info_read($mh)) {
+                    if ($info['result'] !== CURLE_OK) {
+                        $multiErrors[] = curl_strerror($info['result']) . ' (errno ' . $info['result'] . ')';
+                    }
+                }
+                if ($running > 0) {
+                    curl_multi_select($mh, 1);
+                }
+            } while ($running > 0);
+
+            $rawA = curl_multi_getcontent($chA);
+            $rawB = curl_multi_getcontent($chB);
+            $codeA = curl_getinfo($chA, CURLINFO_HTTP_CODE);
+            $codeB = curl_getinfo($chB, CURLINFO_HTTP_CODE);
+            $textA = extractGeminiText($rawA, $codeA);
+            $textB = extractGeminiText($rawB, $codeB);
+
+            $combinedForDebug = trim($textA) . "\n\n" . trim($textB);
+            $GLOBALS['cronDebug'][] = array(
+                'model' => $model, 'attempt' => $attempt, 'multiErrors' => $multiErrors,
+                'codeA' => $codeA, 'lenA' => strlen($textA), 'wordsA' => articleWordCount($textA),
+                'codeB' => $codeB, 'lenB' => strlen($textB), 'wordsB' => articleWordCount($textB),
+                'wordsCombined' => articleWordCount($combinedForDebug),
+            );
+
+            curl_multi_remove_handle($mh, $chA);
+            curl_multi_remove_handle($mh, $chB);
+            curl_multi_close($mh);
+            curl_close($chA);
+            curl_close($chB);
+
+            if (!empty($textA) && !empty($textB)) {
+                $combined = trim($textA) . "\n\n" . trim($textB);
+                // 2,000 words (not 2,200) is the real-world acceptance floor: flash-lite's
+                // output naturally lands in the ~2,000-2,300 range, and a solid ~2,000-word
+                // AI article beats discarding good content over a ~100-word technicality
+                // and falling back to the ~94-word generic stub (2026-09-04).
+                if (articleWordCount($combined) >= 2000) {
+                    return $combined;
+                }
+            }
+        }
+
+        // Fallback: one single-shot request against the slower/less reliable reasoning
+        // models, only if there's still meaningful time left in the budget.
+        $secondsRemaining = (int)floor($generationDeadline - microtime(true));
+        if ($secondsRemaining >= 8) {
+            $singlePrompt = $sharedIntro
+                . "Γράψε ένα εξαιρετικά αναλυτικό, επιστημονικά άρτιο και πρακτικό άρθρο 2.300 έως 2.600 λέξεων, με την εξής υποχρεωτική δομή:\n\n"
+                . "## 1. Επιστημονικό Υπόβαθρο & Βοτανική Φυσιολογία\n## 2. Τεχνικές Προδιαγραφές & Πίνακας Παραμέτρων\n## 3. Βήμα-προς-Βήμα Μεθοδολογία & Εφαρμογή\n"
+                . "## 4. Ολοκληρωμένη Βιολογική Φυτοπροστασία / Τεχνολογική Διάταξη\n## 5. Πρόγραμμα Θρέψης, Άρδευσης & Συντήρησης\n## 6. Συχνότερα Λάθη & Οδηγίες Αποφυγής\n\n"
+                . "Γράψε ΜΟΝΟ το κυρίως κείμενο του άρθρου σε Markdown. Το τελικό άρθρο πρέπει υποχρεωτικά να έχει τουλάχιστον 2.200 λέξεις. Χωρίς εισαγωγικά μετα-σχόλια.";
+            $postSingle = json_encode(array("contents" => array(array("parts" => array(array("text" => $singlePrompt)))), "generationConfig" => $genConfig));
+
+            $candidateModels = array('gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.7-flash');
+            foreach ($candidateModels as $model) {
+                $secondsRemaining = (int)floor($generationDeadline - microtime(true));
+                if ($secondsRemaining < 2) {
+                    break;
+                }
+                $url = "https://generativelanguage.googleapis.com/v1beta/models/" . $model . ":generateContent?key=" . $geminiKey;
+                $ch = callGeminiModel($url, $postSingle, min(20, $secondsRemaining));
+                $result = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                $content = extractGeminiText($result, $httpCode);
+                if (!empty($content) && articleWordCount($content) >= 2000) {
+                    return $content;
+                }
             }
         }
     }
 
     // 2. BESPOKE SCIENTIFIC AGRONOMY CATALOG FALLBACK (100% Tailored)
-    if (!empty($topic['bespoke_article'])) {
+    if (!empty($topic['bespoke_article']) && articleWordCount($topic['bespoke_article']) >= 2200) {
         return $topic['bespoke_article'];
     }
 
@@ -911,6 +1045,32 @@ function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
 
 // Generate Content
 $generatedContent = generateScientificAgronomyArticle($selectedTopic, $GEMINI_API_KEY, $OPENAI_API_KEY);
+$generatedWordCount = articleWordCount($generatedContent);
+
+if (isset($_GET['debug'])) {
+    http_response_code(200);
+    echo json_encode(array(
+        'word_count' => $generatedWordCount,
+        'content_preview' => mb_substr($generatedContent, 0, 150),
+        'debug' => $GLOBALS['cronDebug']
+    ), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_INVALID_UTF8_SUBSTITUTE);
+    exit;
+}
+
+// Never let a thin AI response become a live article. Returning a non-2xx
+// response means the scheduler can report the failed generation and retry later.
+// Floor is 2,000, not 2,200 — matches the acceptance floor inside
+// generateScientificAgronomyArticle() (see 2026-09-04 notes there).
+if ($generatedWordCount < 2000) {
+    http_response_code(422);
+    echo json_encode(array(
+        'status' => 'error',
+        'message' => 'Article was not published because it did not reach the 2,000-word minimum.',
+        'topic_slug' => $selectedTopic['slug'],
+        'word_count' => $generatedWordCount
+    ), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    exit;
+}
 
 // ==========================================
 // 6. WORDPRESS SYNC (If WP is active)
@@ -1004,6 +1164,126 @@ if (count($existingArticles) > 100) {
 @file_put_contents($latestFile, json_encode($existingArticles, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
 // ==========================================
+// 7b. AUTO-UPDATE SITEMAP.XML WITH ALL ARTICLES
+// ==========================================
+$sitemapPath = __DIR__ . '/sitemap.xml';
+$sitemapXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+$sitemapXml .= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
+$sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n";
+
+$staticPages = array('about.html', 'privacy-policy.html', 'terms-of-service.html');
+foreach ($staticPages as $page) {
+    $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/" . $page . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.3</priority>\n  </url>\n";
+}
+
+foreach ($existingArticles as $art) {
+    $artSlug = isset($art['slug']) ? $art['slug'] : (isset($art['id']) ? $art['id'] : '');
+    if ($artSlug) {
+        $artDate = isset($art['date']) ? $art['date'] : date('Y-m-d');
+        $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/article/" . htmlspecialchars($artSlug) . "</loc>\n    <lastmod>" . $artDate . "</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>\n";
+    }
+}
+$sitemapXml .= "</urlset>\n";
+@file_put_contents($sitemapPath, $sitemapXml);
+
+// ==========================================
+// 7c. AUTO-UPDATE RSS.XML WITH THE LATEST ARTICLES
+// (was previously a stale, hand-written file with broken /article/published-<id>
+// links and "Invalid Date" pubDates — now regenerated from the real article list,
+// same slugs the site itself links to.)
+// ==========================================
+$rssPath = __DIR__ . '/rss.xml';
+$rssItems = array_slice($existingArticles, 0, 30);
+$rssXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+$rssXml .= "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n<channel>\n";
+$rssXml .= "  <title>SmartGarden.gr - Επιστημονική Γεωπονία &amp; Αστική Κηπουρική</title>\n";
+$rssXml .= "  <link>https://smartgarden.gr</link>\n";
+$rssXml .= "  <description>Εξειδικευμένοι τεχνικοί οδηγοί, βιολογική φυτοπροστασία, αυτοματισμοί ποτίσματος και αστική κηπουρική.</description>\n";
+$rssXml .= "  <language>el</language>\n";
+$rssXml .= "  <lastBuildDate>" . gmdate('D, d M Y H:i:s') . " GMT</lastBuildDate>\n";
+$rssXml .= "  <atom:link href=\"https://smartgarden.gr/rss.xml\" rel=\"self\" type=\"application/rss+xml\" />\n";
+
+foreach ($rssItems as $art) {
+    $artSlug = isset($art['slug']) ? $art['slug'] : (isset($art['id']) ? $art['id'] : '');
+    if (!$artSlug) continue;
+    $artTitle = is_array($art['title']) ? ($art['title']['el'] ?? '') : ($art['title'] ?? '');
+    $artSummary = is_array($art['summary']) ? ($art['summary']['el'] ?? '') : ($art['summary'] ?? '');
+    $artCategory = is_array($art['categoryLabel']) ? ($art['categoryLabel']['el'] ?? '') : ($art['category'] ?? '');
+    $artDateRaw = isset($art['date']) ? $art['date'] : date('Y-m-d');
+    $ts = strtotime($artDateRaw);
+    $pubDate = ($ts !== false) ? gmdate('D, d M Y H:i:s', $ts) . ' GMT' : gmdate('D, d M Y H:i:s') . ' GMT';
+    $artUrl = 'https://smartgarden.gr/article/' . htmlspecialchars($artSlug);
+
+    $rssXml .= "  <item>\n";
+    $rssXml .= "    <title>" . htmlspecialchars($artTitle) . "</title>\n";
+    $rssXml .= "    <link>" . $artUrl . "</link>\n";
+    $rssXml .= "    <guid>" . $artUrl . "</guid>\n";
+    $rssXml .= "    <pubDate>" . $pubDate . "</pubDate>\n";
+    $rssXml .= "    <description>" . htmlspecialchars($artSummary) . "</description>\n";
+    $rssXml .= "    <category>" . htmlspecialchars($artCategory) . "</category>\n";
+    $rssXml .= "  </item>\n";
+}
+$rssXml .= "</channel>\n</rss>\n";
+@file_put_contents($rssPath, $rssXml);
+
+// ==========================================
+// 7c. AUTO-NOTIFY GOOGLE INDEXING API (INSTANT CRAWL)
+// ==========================================
+$newPublishedUrl = "https://smartgarden.gr/article/" . $articleSlug;
+$googleIndexed = false;
+$serviceAccountPath = __DIR__ . '/service-account.json';
+if (file_exists($serviceAccountPath)) {
+    try {
+        $sa = json_decode(file_get_contents($serviceAccountPath), true);
+        if ($sa && !empty($sa['private_key']) && !empty($sa['client_email'])) {
+            $header = base64_encode(json_encode(array('alg' => 'RS256', 'typ' => 'JWT')));
+            $now = time();
+            $claim = base64_encode(json_encode(array(
+                'iss' => $sa['client_email'],
+                'scope' => 'https://www.googleapis.com/auth/indexing',
+                'aud' => 'https://oauth2.googleapis.com/token',
+                'exp' => $now + 3600,
+                'iat' => $now
+            )));
+            $signature = '';
+            openssl_sign($header . '.' . $claim, $signature, $sa['private_key'], 'SHA256');
+            $jwt = $header . '.' . $claim . '.' . base64_encode($signature);
+
+            // Get access token
+            $tokenCh = curl_init('https://oauth2.googleapis.com/token');
+            curl_setopt($tokenCh, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($tokenCh, CURLOPT_POST, true);
+            curl_setopt($tokenCh, CURLOPT_POSTFIELDS, http_build_query(array(
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion' => $jwt
+            )));
+            $tokenRes = curl_exec($tokenCh);
+            curl_close($tokenCh);
+            $tokenData = json_decode($tokenRes, true);
+
+            if (!empty($tokenData['access_token'])) {
+                $indexCh = curl_init('https://indexing.googleapis.com/v3/urlNotifications:publish');
+                curl_setopt($indexCh, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($indexCh, CURLOPT_POST, true);
+                curl_setopt($indexCh, CURLOPT_HTTPHEADER, array(
+                    'Authorization: Bearer ' . $tokenData['access_token'],
+                    'Content-Type: application/json'
+                ));
+                curl_setopt($indexCh, CURLOPT_POSTFIELDS, json_encode(array(
+                    'url' => $newPublishedUrl,
+                    'type' => 'URL_UPDATED'
+                )));
+                $indexRes = curl_exec($indexCh);
+                curl_close($indexCh);
+                $googleIndexed = true;
+            }
+        }
+    } catch (Exception $e) {
+        // silent fail to not block article creation
+    }
+}
+
+// ==========================================
 // 8. OUTPUT JSON RESPONSE
 // ==========================================
 echo json_encode(array(
@@ -1014,7 +1294,10 @@ echo json_encode(array(
     'title' => $selectedTopic['title'],
     'category' => $selectedTopic['category'],
     'read_time' => $selectedTopic['readTime'],
+    'word_count' => $generatedWordCount,
     'wordpress_synced' => $wpLoaded,
     'wordpress_post_id' => $wpPostId,
+    'google_indexed' => $googleIndexed,
+    'published_url' => $newPublishedUrl,
     'total_stored_articles' => count($existingArticles)
 ), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
