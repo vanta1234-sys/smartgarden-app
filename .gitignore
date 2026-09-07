@@ -11,4 +11,5 @@ service-account.json
 public/google-service-account.json
 public/plant_diagnosis_usage.json
 public/newsletter_signup_usage.json
+public/youtube_tokens.json
 public/.htaccess
