@@ -12,6 +12,7 @@ import { PlantDoctor } from './components/PlantDoctor';
 import { CategoryPage } from './components/CategoryPage';
 import { AuthorBioPage } from './components/AuthorBioPage';
 import { PlantingCalendarPage } from './components/PlantingCalendarPage';
+import { ClimateComparisonPage } from './components/ClimateComparisonPage';
 import { SoilCalculator } from './components/SoilCalculator';
 import { SymptomWizard } from './components/SymptomWizard';
 import { CompanionMatrix } from './components/CompanionMatrix';
@@ -192,8 +193,12 @@ export default function App() {
   // their own <title>/meta tags — the article-schema injection below must not clobber
   // them, since this effect still runs even when the JSX render short-circuits to one
   // of those pages (hooks always fire; only the returned tree changes).
+  // IMPORTANT: keep this prefix list in sync with the routing dispatch further down
+  // (search "Lightweight client-side routing") — adding a new static page there
+  // without adding it here silently breaks that page's <title>/meta tags, since this
+  // effect still runs and overwrites them regardless of what JSX actually renders.
   const isStaticPageRoute = typeof window !== 'undefined'
-    && /^\/(kategoria\/|syntaktis|imerologio-sporas)/.test(window.location.pathname);
+    && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy)/.test(window.location.pathname);
 
   // Auto-fetch live articles from latest_articles.json on mount & inject SEO Schema
   useEffect(() => {
@@ -863,6 +868,8 @@ pause
   // bio, planting calendar). No router library — the app is otherwise a single-page
   // modal-over-homepage experience, so these are rendered as full-page takeovers based on
   // the URL the visitor actually landed on, then handed back to the normal app on "back".
+  // IMPORTANT: any new route added here must also be added to `isStaticPageRoute`'s
+  // regex above, or that page's <title>/meta tags get silently overwritten.
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
   const handleOpenArticleFromStaticPage = (article: ArticleItem) => {
     window.history.pushState(null, '', `/article/${article.slug}`);
@@ -889,6 +896,9 @@ pause
   }
   if (pathname.match(/^\/imerologio-sporas\/?/)) {
     return <PlantingCalendarPage onBack={handleBackToHome} />;
+  }
+  if (pathname.match(/^\/klima-kipoy\/?/)) {
+    return <ClimateComparisonPage onBack={handleBackToHome} />;
   }
 
   return (
@@ -2780,6 +2790,14 @@ pause
               className="text-slate-400 hover:text-emerald-400 transition-colors"
             >
               Ο Συντάκτης
+            </a>
+
+            <a
+              href="/klima-kipoy"
+              onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/klima-kipoy'); window.location.reload(); }}
+              className="text-slate-400 hover:text-emerald-400 transition-colors"
+            >
+              Κλίμα &amp; ET₀ Πόλεων
             </a>
 
             <a href="/about.html" className="text-slate-400 hover:text-emerald-400 transition-colors">

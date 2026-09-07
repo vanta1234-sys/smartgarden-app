@@ -37,6 +37,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://smartgarden.gr/klima-kipoy</loc>
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://smartgarden.gr/kategoria/plant_care</loc>
     <lastmod>2026-09-07</lastmod>
     <changefreq>weekly</changefreq>
