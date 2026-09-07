@@ -149,10 +149,14 @@ export function injectArticleSchema(article: ArticleItem) {
         'datePublished': pubDate,
         'dateModified': pubDate,
         'inLanguage': 'el-GR',
+        // A real Person (with a bio page) is a much stronger E-E-A-T/Discover
+        // signal than a generic Organization byline — see /syntaktis (added
+        // 2026-09-07) for the actual bio content this links to.
         'author': {
-          '@type': 'Organization',
-          'name': 'SmartGarden.gr Agronomy Team',
-          'url': 'https://smartgarden.gr',
+          '@type': 'Person',
+          'name': article.author?.name || 'Κώστας Αναστασιάδης',
+          'url': 'https://smartgarden.gr/syntaktis',
+          'jobTitle': article.author?.role?.el || 'Γεωπόνος M.Sc. & Smart Farming Specialist',
         },
         'publisher': {
           '@type': 'Organization',
@@ -164,6 +168,7 @@ export function injectArticleSchema(article: ArticleItem) {
         },
         'mainEntityOfPage': url,
         'keywords': `${article.categoryLabel?.el || article.category}, κηπουρική, μπαλκόνι, φυτοπροστασία, λίπασμα`,
+        'wordCount': (article.content?.el || '').trim().split(/\s+/).filter(Boolean).length,
       },
       {
         '@type': 'BreadcrumbList',
