@@ -65,6 +65,14 @@ if (!$videoDataUri || strpos($videoDataUri, 'base64,') === false) {
     exit;
 }
 
+// Videos coming straight from TikTokStudio.tsx's MediaRecorder output are raw
+// video/webm, not mp4 — detect the real mime type from the data URI instead of
+// assuming mp4, so the multipart Content-Type below actually matches the bytes.
+$videoMimeType = 'video/mp4';
+if (preg_match('/^data:(video\/[a-zA-Z0-9.+-]+);base64,/', $videoDataUri, $mimeMatch)) {
+    $videoMimeType = $mimeMatch[1];
+}
+
 list(, $base64Data) = explode('base64,', $videoDataUri, 2);
 $videoBinary = base64_decode($base64Data);
 if ($videoBinary === false || strlen($videoBinary) < 1000) {
@@ -97,7 +105,7 @@ $multipartBody = "--{$boundary}\r\n"
     . "Content-Type: application/json; charset=UTF-8\r\n\r\n"
     . $metadata . "\r\n"
     . "--{$boundary}\r\n"
-    . "Content-Type: video/mp4\r\n\r\n"
+    . "Content-Type: {$videoMimeType}\r\n\r\n"
     . $videoBinary . "\r\n"
     . "--{$boundary}--";
 

@@ -445,6 +445,31 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
       setPublishSuccessMessage('✅ Το βίντεο ανέβηκε ως draft στο TikTok inbox — άνοιξε την εφαρμογή TikTok στο κινητό για να το δημοσιεύσεις.');
 
       fetchPublishedPosts();
+
+      // Best-effort: also publish the same rendered video as a YouTube Short.
+      // Deliberately doesn't block or fail the TikTok success path above — YouTube
+      // not being connected (or a transient upload error) shouldn't undo a TikTok
+      // publish that already succeeded.
+      if (videoBase64) {
+        fetch('/youtube-publish.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            videoBase64,
+            title: (currentArticle.title?.el || currentArticle.title || 'SmartGarden.gr Οδηγός').toString().slice(0, 90),
+            description: tikTokScript.tiktokCaption || '',
+          }),
+        })
+          .then((r) => r.json())
+          .then((ytData) => {
+            if (ytData.success) {
+              setPublishSuccessMessage((prev) => (prev || '') + `\n✅ Ανέβηκε και στο YouTube Shorts: ${ytData.url}`);
+            } else {
+              console.warn('YouTube upload failed:', ytData.error);
+            }
+          })
+          .catch((ytErr) => console.warn('YouTube upload failed:', ytErr));
+      }
     } catch (err: any) {
       setIsAutoPublishing(false);
       setPublishStep(0);
