@@ -1,12 +1,12 @@
 import React from 'react';
 import { Calendar, ShieldCheck, Sparkles, AlertTriangle, Droplets, Scissors, Sun, Award } from 'lucide-react';
 
-const MONTH_NAMES_EL = [
+export const MONTH_NAMES_EL = [
   'Ιανουάριος', 'Φεβρουάριος', 'Μάρτιος', 'Απρίλιος', 'Μάιος', 'Ιούνιος',
   'Ιούλιος', 'Αύγουστος', 'Σεπτέμβριος', 'Οκτώβριος', 'Νοέμβριος', 'Δεκέμβριος'
 ];
 
-interface MonthlyTask {
+export interface MonthlyTask {
   title: string;
   desc: string;
   icon: string;
@@ -14,7 +14,7 @@ interface MonthlyTask {
   tagColor: string;
 }
 
-const MONTHLY_GUIDES: Record<number, MonthlyTask[]> = {
+export const MONTHLY_GUIDES: Record<number, MonthlyTask[]> = {
   // January (0)
   0: [
     {

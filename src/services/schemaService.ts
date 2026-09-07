@@ -1,3 +1,5 @@
+import { CATEGORY_FAQS, DEFAULT_FAQS, FaqItem } from '../data/categoryFaqs';
+
 export interface ArticleItem {
   id: string;
   slug: string;
@@ -80,6 +82,10 @@ export function injectGlobalSiteSchema() {
   script.textContent = JSON.stringify(globalSchema);
 }
 
+export function getFaqsForArticle(article: ArticleItem): FaqItem[] {
+  return CATEGORY_FAQS[article.category] || DEFAULT_FAQS;
+}
+
 export function injectArticleSchema(article: ArticleItem) {
   if (typeof document === 'undefined' || !article) return;
 
@@ -156,24 +162,16 @@ export function injectArticleSchema(article: ArticleItem) {
       {
         '@type': 'FAQPage',
         '@id': `${url}#faq`,
-        'mainEntity': [
-          {
-            '@type': 'Question',
-            'name': `Ποια είναι η βέλτιστη μέθοδος εφαρμογής για «${title.slice(0, 60)}...»;`,
-            'acceptedAnswer': {
-              '@type': 'Answer',
-              'text': summary || 'Ακολουθήστε τις οδηγίες δοσολογίας, την κατάλληλη ώρα εφαρμογής (πρωί ή σούρουπο) και τον έλεγχο pH/αποστράγγισης.',
-            },
+        // Matches the visible FAQ accordion rendered under the article (FaqAccordion.tsx) —
+        // per Google's structured-data guidelines, FAQPage markup must reflect on-page content.
+        'mainEntity': getFaqsForArticle(article).map((faq) => ({
+          '@type': 'Question',
+          'name': faq.question,
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': faq.answer,
           },
-          {
-            '@type': 'Question',
-            'name': 'Ποια είναι τα συχνότερα λάθη που πρέπει να αποφευχθούν;',
-            'acceptedAnswer': {
-              '@type': 'Answer',
-              'text': 'Αποφύγετε υπερβολικές δοσολογίες, εφαρμογή υπό άμεσο μεσημεριανό ήλιο και ανάμειξη ασύμβατων σκευασμάτων χωρίς διαβρέκτη.',
-            },
-          },
-        ],
+        })),
       },
     ],
   };

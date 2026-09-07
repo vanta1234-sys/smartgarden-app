@@ -1176,6 +1176,20 @@ foreach ($staticPages as $page) {
     $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/" . $page . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.3</priority>\n  </url>\n";
 }
 
+// Client-rendered hub pages (category listings, author bio, planting calendar) — no
+// server-side route/file, but real crawlable URLs the SPA handles via pathname routing.
+$appRoutes = array('syntaktis', 'imerologio-sporas');
+foreach ($appRoutes as $route) {
+    $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/" . $route . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n";
+}
+$categoriesSeen = array();
+foreach ($existingArticles as $art) {
+    if (isset($art['category']) && !in_array($art['category'], $categoriesSeen)) {
+        $categoriesSeen[] = $art['category'];
+        $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/kategoria/" . rawurlencode($art['category']) . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n";
+    }
+}
+
 // Sitemap <loc> must contain a fully percent-encoded URL (per the sitemaps.org spec) —
 // a raw non-ASCII slug like "καλλιέργεια-μαρουλιού" 400s when Googlebot requests it
 // literally, which Search Console then reports as a not-found/unindexable URL.

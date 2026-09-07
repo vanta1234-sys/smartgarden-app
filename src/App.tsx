@@ -9,6 +9,15 @@ import { LiveWeatherData } from './services/weatherService';
 import { SocialShareBar } from './components/SocialShareBar';
 import { SprayDosageCalculator } from './components/SprayDosageCalculator';
 import { PlantDoctor } from './components/PlantDoctor';
+import { CategoryPage } from './components/CategoryPage';
+import { AuthorBioPage } from './components/AuthorBioPage';
+import { PlantingCalendarPage } from './components/PlantingCalendarPage';
+import { SoilCalculator } from './components/SoilCalculator';
+import { SymptomWizard } from './components/SymptomWizard';
+import { CompanionMatrix } from './components/CompanionMatrix';
+import { MyBalcony } from './components/MyBalcony';
+import { FaqAccordion } from './components/FaqAccordion';
+import { getFaqsForArticle } from './services/schemaService';
 import { ArticleMarkdown } from './components/ArticleMarkdown';
 
 // Admin-only tools: kept out of the main bundle so regular readers never download
@@ -178,6 +187,13 @@ export default function App() {
     }
   };
 
+  // Static, non-article routes (category hubs, author bio, planting calendar) manage
+  // their own <title>/meta tags — the article-schema injection below must not clobber
+  // them, since this effect still runs even when the JSX render short-circuits to one
+  // of those pages (hooks always fire; only the returned tree changes).
+  const isStaticPageRoute = typeof window !== 'undefined'
+    && /^\/(kategoria\/|syntaktis|imerologio-sporas)/.test(window.location.pathname);
+
   // Auto-fetch live articles from latest_articles.json on mount & inject SEO Schema
   useEffect(() => {
     injectGlobalSiteSchema();
@@ -189,18 +205,30 @@ export default function App() {
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setArticles(data);
-          setSelectedArticle(data[0]);
-          injectArticleSchema(data[0]);
+          // Respect a direct /article/<slug> link (Google, Pinterest, social shares) —
+          // without this, every inbound article visit silently landed on the homepage
+          // instead of the article the visitor actually clicked through for.
+          const pathMatch = typeof window !== 'undefined' ? window.location.pathname.match(/^\/article\/([^/]+)\/?$/) : null;
+          const slugFromUrl = pathMatch ? decodeURIComponent(pathMatch[1]) : null;
+          const linkedArticle = slugFromUrl ? data.find((a: ArticleItem) => a.slug === slugFromUrl) : null;
+          if (linkedArticle) {
+            setSelectedArticle(linkedArticle);
+            setIsReadingModalOpen(true);
+            if (!isStaticPageRoute) injectArticleSchema(linkedArticle);
+          } else {
+            setSelectedArticle(data[0]);
+            if (!isStaticPageRoute) injectArticleSchema(data[0]);
+          }
         }
       })
       .catch(() => {
         // Use default initial articles if offline
-        injectArticleSchema(INITIAL_ARTICLES[0]);
+        if (!isStaticPageRoute) injectArticleSchema(INITIAL_ARTICLES[0]);
       });
   }, []);
 
   useEffect(() => {
-    if (selectedArticle) {
+    if (selectedArticle && !isStaticPageRoute) {
       injectArticleSchema(selectedArticle);
     }
   }, [selectedArticle]);
@@ -830,6 +858,38 @@ pause
     URL.revokeObjectURL(url);
   };
 
+  // Lightweight client-side routing for the new static-ish pages (category hubs, author
+  // bio, planting calendar). No router library — the app is otherwise a single-page
+  // modal-over-homepage experience, so these are rendered as full-page takeovers based on
+  // the URL the visitor actually landed on, then handed back to the normal app on "back".
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const handleOpenArticleFromStaticPage = (article: ArticleItem) => {
+    window.history.pushState(null, '', `/article/${article.slug}`);
+    setSelectedArticle(article);
+    setIsReadingModalOpen(true);
+  };
+  const handleBackToHome = () => {
+    window.history.pushState(null, '', '/');
+    window.location.reload();
+  };
+  const categoryMatch = pathname.match(/^\/kategoria\/([^/]+)\/?$/);
+  if (categoryMatch) {
+    return (
+      <CategoryPage
+        articles={articles}
+        categorySlug={decodeURIComponent(categoryMatch[1])}
+        onOpenArticle={handleOpenArticleFromStaticPage}
+        onBack={handleBackToHome}
+      />
+    );
+  }
+  if (pathname.match(/^\/syntaktis\/?/)) {
+    return <AuthorBioPage articles={articles} onOpenArticle={handleOpenArticleFromStaticPage} onBack={handleBackToHome} />;
+  }
+  if (pathname.match(/^\/imerologio-sporas\/?/)) {
+    return <PlantingCalendarPage onBack={handleBackToHome} />;
+  }
+
   return (
     <div id="smartgarden-app-root" className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
       {/* Top Control Bar: Visible ONLY in Studio / Admin / Dev Environment */}
@@ -1016,6 +1076,14 @@ pause
                       <Sparkles className="w-4 h-4 text-amber-400" />
                       AI Διάγνωση Φυτού από Φωτογραφία
                     </button>
+                    <button
+                      id="btn-jump-calendar"
+                      onClick={() => { window.location.href = '/imerologio-sporas'; }}
+                      className="bg-gradient-to-r from-lime-950/80 to-emerald-950/80 hover:from-lime-900 hover:to-emerald-900 text-lime-300 font-bold px-5 py-3 rounded-xl border border-lime-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
+                    >
+                      <Sparkles className="w-4 h-4 text-lime-400" />
+                      Ημερολόγιο Σποράς &amp; Εργασιών
+                    </button>
                     {isAdmin && (
                       <button
                         onClick={() => setViewMode('article_editor')}
@@ -1057,6 +1125,23 @@ pause
             {/* AI Plant Health Diagnosis from Photo */}
             <PlantDoctor />
 
+            {/* Quick symptom decision-tree diagnosis (no photo needed) */}
+            <SymptomWizard
+              onJumpToDosageCalculator={() => {
+                const el = document.getElementById('spray-dosage-calculator');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+            />
+
+            {/* Personal balcony/garden tracker — localStorage only, no login */}
+            <MyBalcony currentWeather={currentWeather} />
+
+            {/* Companion planting matrix */}
+            <CompanionMatrix />
+
+            {/* Soil / pot size calculator */}
+            <SoilCalculator />
+
             {/* Articles Grid Preview */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -1065,6 +1150,27 @@ pause
                   Δημοσιευμένα Άρθρα & Οδηγοί
                 </h3>
                 <span className="text-xs text-slate-400">{articles.length} άρθρα διαθέσιμα</span>
+              </div>
+
+              {/* Category hub links — real crawlable landing pages per topic */}
+              <div className="flex flex-wrap gap-2">
+                {Array.from(new Set(articles.map((a) => a.category))).map((cat) => {
+                  const catLabel = articles.find((a) => a.category === cat)?.categoryLabel?.el || cat;
+                  return (
+                    <a
+                      key={cat}
+                      href={`/kategoria/${cat}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.history.pushState(null, '', `/kategoria/${cat}`);
+                        window.location.reload();
+                      }}
+                      className="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors cursor-pointer"
+                    >
+                      {catLabel}
+                    </a>
+                  );
+                })}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1835,7 +1941,17 @@ pause
                     className="w-10 h-10 rounded-full object-cover border border-slate-700"
                   />
                   <div>
-                    <div className="font-bold text-white text-xs">{selectedArticle.author.name}</div>
+                    <a
+                      href="/syntaktis"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.history.pushState(null, '', '/syntaktis');
+                        window.location.reload();
+                      }}
+                      className="font-bold text-white text-xs hover:text-emerald-400 transition-colors cursor-pointer"
+                    >
+                      {selectedArticle.author.name}
+                    </a>
                     <div className="text-[11px] text-slate-400">{selectedArticle.author.role.el} • {selectedArticle.date}</div>
                   </div>
                 </div>
@@ -2036,6 +2152,8 @@ pause
                 image={selectedArticle.image}
                 url={typeof window !== 'undefined' ? `${window.location.origin}/article/${selectedArticle.slug}` : `https://smartgarden.gr/article/${selectedArticle.slug}`}
               />
+
+              <FaqAccordion faqs={getFaqsForArticle(selectedArticle)} />
 
               {/* Related Articles: keeps readers on-site longer + spreads internal link equity */}
               {(() => {
