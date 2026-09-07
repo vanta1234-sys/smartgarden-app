@@ -2766,6 +2766,22 @@ pause
               <span>RSS Feed</span>
             </a>
 
+            <a
+              href="/imerologio-sporas"
+              onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/imerologio-sporas'); window.location.reload(); }}
+              className="text-slate-400 hover:text-emerald-400 transition-colors"
+            >
+              Ημερολόγιο Σποράς
+            </a>
+
+            <a
+              href="/syntaktis"
+              onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/syntaktis'); window.location.reload(); }}
+              className="text-slate-400 hover:text-emerald-400 transition-colors"
+            >
+              Ο Συντάκτης
+            </a>
+
             <a href="/about.html" className="text-slate-400 hover:text-emerald-400 transition-colors">
               Σχετικά & Επικοινωνία
             </a>

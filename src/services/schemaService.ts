@@ -86,6 +86,34 @@ export function getFaqsForArticle(article: ArticleItem): FaqItem[] {
   return CATEGORY_FAQS[article.category] || DEFAULT_FAQS;
 }
 
+interface HowToStepData {
+  name: string;
+  text: string;
+}
+
+// Every generated article's "Βήμα-προς-Βήμα" section already follows a consistent
+// "**Βήμα N: <title>**\n<description>" markdown pattern (see cron-publish.php's
+// prompt) — parse it directly instead of hand-authoring separate HowTo content,
+// so the schema always matches what the reader actually sees in the article body.
+export function getHowToStepsForArticle(article: ArticleItem): HowToStepData[] {
+  const content = article.content?.el || '';
+  const steps: HowToStepData[] = [];
+  const regex = /\*\*Βήμα\s*\d+[:.]?\s*([^*\n]+)\*\*\s*\n+([\s\S]*?)(?=\n\*\*Βήμα\s*\d+|\n##|\n\*\*Εργαλεία|$)/g;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(content)) !== null) {
+    const name = match[1].trim();
+    const text = match[2]
+      .replace(/[*_#]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 500);
+    if (name && text) {
+      steps.push({ name, text });
+    }
+  }
+  return steps.slice(0, 12);
+}
+
 export function injectArticleSchema(article: ArticleItem) {
   if (typeof document === 'undefined' || !article) return;
 
@@ -103,6 +131,7 @@ export function injectArticleSchema(article: ArticleItem) {
   const url = `https://smartgarden.gr/article/${article.slug}`;
   const imgUrl = article.imageUrl || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200';
   const pubDate = article.date || '2026-08-25';
+  const howToSteps = getHowToStepsForArticle(article);
 
   // Dynamic FAQ questions extracted or tailored to the article
   const articleSchema = {
@@ -149,7 +178,7 @@ export function injectArticleSchema(article: ArticleItem) {
             '@type': 'ListItem',
             'position': 2,
             'name': article.categoryLabel?.el || 'Άρθρα',
-            'item': `https://smartgarden.gr/category/${article.category}`,
+            'item': `https://smartgarden.gr/kategoria/${article.category}`,
           },
           {
             '@type': 'ListItem',
@@ -173,6 +202,18 @@ export function injectArticleSchema(article: ArticleItem) {
           },
         })),
       },
+      // Only emitted when the article body actually has a parsed "Βήμα N" sequence —
+      // an empty/fake HowTo would violate Google's "must match visible content" rule.
+      ...(howToSteps.length >= 2 ? [{
+        '@type': 'HowTo',
+        '@id': `${url}#howto`,
+        'name': title,
+        'step': howToSteps.map((s) => ({
+          '@type': 'HowToStep',
+          'name': s.name,
+          'text': s.text,
+        })),
+      }] : []),
     ],
   };
 
