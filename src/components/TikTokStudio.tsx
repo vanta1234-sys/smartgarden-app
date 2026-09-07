@@ -469,6 +469,27 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
             }
           })
           .catch((ytErr) => console.warn('YouTube upload failed:', ytErr));
+
+        // Same best-effort treatment for Facebook — uploads to the Page's Videos
+        // tab (not the feed) via facebook-publish.php's "video" type.
+        fetch('/facebook-publish.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'video',
+            videoBase64,
+            description: tikTokScript.tiktokCaption || '',
+          }),
+        })
+          .then((r) => r.json())
+          .then((fbData) => {
+            if (fbData.success) {
+              setPublishSuccessMessage((prev) => (prev || '') + `\n✅ Ανέβηκε και στο Facebook (Βίντεο).`);
+            } else {
+              console.warn('Facebook video upload failed:', fbData.error);
+            }
+          })
+          .catch((fbErr) => console.warn('Facebook video upload failed:', fbErr));
       }
     } catch (err: any) {
       setIsAutoPublishing(false);

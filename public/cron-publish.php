@@ -1163,6 +1163,29 @@ if (count($existingArticles) > 100) {
 
 @file_put_contents($latestFile, json_encode($existingArticles, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
+// Auto-share the freshly published article to the Facebook Page as a link post —
+// Facebook renders its own preview card from the article's OG title/description/
+// image (via article.php), so this is deliberately just a link + short caption,
+// not a duplicate of the article body.
+$fbPageId = getenv('FACEBOOK_PAGE_ID');
+$fbPageToken = getenv('FACEBOOK_PAGE_ACCESS_TOKEN');
+if ($fbPageId && $fbPageToken) {
+    $articleUrl = 'https://smartgarden.gr/article/' . rawurlencode($newArticleObj['slug']);
+    $fbCh = curl_init("https://graph.facebook.com/v26.0/{$fbPageId}/feed");
+    curl_setopt_array($fbCh, array(
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => http_build_query(array(
+            'message' => $newArticleObj['title']['el'],
+            'link' => $articleUrl,
+            'access_token' => $fbPageToken,
+        )),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 15,
+    ));
+    curl_exec($fbCh); // best-effort — a Facebook hiccup must never fail article publishing
+    curl_close($fbCh);
+}
+
 // ==========================================
 // 7b. AUTO-UPDATE SITEMAP.XML WITH ALL ARTICLES
 // ==========================================
