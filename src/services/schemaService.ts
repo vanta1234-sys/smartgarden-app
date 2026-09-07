@@ -58,8 +58,9 @@ export function injectGlobalSiteSchema() {
         },
         'description': 'Επιστημονική Γεωπονία, Αστική Κηπουρική, Τηλεμετρία & Αυτοματισμοί Άρδευσης.',
         'sameAs': [
-          'https://facebook.com/smartgarden.gr',
-          'https://instagram.com/smartgarden.gr',
+          // Real Page ID (2026-09-08) — the site never claimed the "smartgarden.gr"
+          // vanity username, so that placeholder URL didn't point at the real Page.
+          'https://www.facebook.com/profile.php?id=1340919395764582',
           'https://tiktok.com/@smartgarden.gr',
         ],
       },
