@@ -1,0 +1,25 @@
+{
+  "name": "SmartGarden.gr | Επιστημονική Γεωπονία & Αστική Κηπουρική",
+  "short_name": "SmartGarden",
+  "description": "Ολοκληρωμένοι επιστημονικοί οδηγοί κηπουρικής, βιολογική φυτοπροστασία, υπολογιστές άρδευσης & λιπασμάτων και ζωντανή τηλεμετρία για την Ελλάδα.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "el",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

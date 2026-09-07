@@ -1,6 +1,10 @@
 {
-  "name": "SmartGarden Visual Studio",
+  "name": "Remix SmartGarden Visual Studio",
   "description": "Interactive visual article manager, live garden site preview, and 1-click publisher for SmartGarden.gr.",
-  "requestFramePermissions": ["geolocation"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

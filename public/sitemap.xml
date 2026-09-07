@@ -2,27 +2,39 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://smartgarden.gr/</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/about.html</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/privacy-policy.html</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/terms-of-service.html</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://smartgarden.gr/article/kladema-anazwoogonisi-geraniwn-pelargoniwn-kafsonas-20260907</loc>
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260906</loc>
+    <lastmod>2026-09-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260904</loc>
@@ -67,8 +79,8 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://smartgarden.gr/article/καλλιέργεια-μαρουλιού</loc>
-    <lastmod>20 Αυγούστου 2026</lastmod>
+    <loc>https://smartgarden.gr/article/%CE%BA%CE%B1%CE%BB%CE%BB%CE%B9%CE%AD%CF%81%CE%B3%CE%B5%CE%B9%CE%B1-%CE%BC%CE%B1%CF%81%CE%BF%CF%85%CE%BB%CE%B9%CE%BF%CF%8D</loc>
+    <lastmod>2026-08-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -146,331 +158,331 @@
   </url>
   <url>
     <loc>https://smartgarden.gr/article/published-1787659939763</loc>
-    <lastmod>25 Αυγούστου 2026</lastmod>
+    <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/published-1787634040863</loc>
-    <lastmod>25 Αυγούστου 2026</lastmod>
+    <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/published-1787605240857</loc>
-    <lastmod>24 Αυγούστου 2026</lastmod>
+    <lastmod>2026-08-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/cron-published-1724576400000</loc>
-    <lastmod>23 Αυγούστου 2026</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/cron-published-1724662800000</loc>
-    <lastmod>22 Αυγούστου 2026</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/cron-published-1724749200000</loc>
-    <lastmod>21 Αυγούστου 2026</lastmod>
+    <lastmod>2026-08-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/cron-published-1724835600000</loc>
-    <lastmod>20 Αυγούστου 2026</lastmod>
+    <lastmod>2026-08-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-1-vegetables</loc>
-    <lastmod>24/8/2026</lastmod>
+    <lastmod>2026-08-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-2-plant_care</loc>
-    <lastmod>23/8/2026</lastmod>
+    <lastmod>2026-08-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-3-balcony</loc>
-    <lastmod>22/8/2026</lastmod>
+    <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-4-plant_care</loc>
-    <lastmod>21/8/2026</lastmod>
+    <lastmod>2026-08-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-5-irrigation_iot</loc>
-    <lastmod>20/8/2026</lastmod>
+    <lastmod>2026-08-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-6-plant_care</loc>
-    <lastmod>19/8/2026</lastmod>
+    <lastmod>2026-08-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-9-robotic_mowers</loc>
-    <lastmod>16/8/2026</lastmod>
+    <lastmod>2026-08-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-10-irrigation_iot</loc>
-    <lastmod>15/8/2026</lastmod>
+    <lastmod>2026-08-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-11-hydroponics</loc>
-    <lastmod>14/8/2026</lastmod>
+    <lastmod>2026-08-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-12-balcony</loc>
-    <lastmod>13/8/2026</lastmod>
+    <lastmod>2026-08-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-13-vegetables</loc>
-    <lastmod>12/8/2026</lastmod>
+    <lastmod>2026-08-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-14-vegetables</loc>
-    <lastmod>11/8/2026</lastmod>
+    <lastmod>2026-08-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-15-plant_care</loc>
-    <lastmod>10/8/2026</lastmod>
+    <lastmod>2026-08-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-16-plant_care</loc>
-    <lastmod>9/8/2026</lastmod>
+    <lastmod>2026-08-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-17-plant_care</loc>
-    <lastmod>8/8/2026</lastmod>
+    <lastmod>2026-08-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-18-vegetables</loc>
-    <lastmod>7/8/2026</lastmod>
+    <lastmod>2026-08-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-19-plant_care</loc>
-    <lastmod>6/8/2026</lastmod>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-20-irrigation_iot</loc>
-    <lastmod>5/8/2026</lastmod>
+    <lastmod>2026-08-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-21-vegetables</loc>
-    <lastmod>4/8/2026</lastmod>
+    <lastmod>2026-08-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-22-balcony</loc>
-    <lastmod>3/8/2026</lastmod>
+    <lastmod>2026-08-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-23-plant_care</loc>
-    <lastmod>2/8/2026</lastmod>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-24-plant_care</loc>
-    <lastmod>1/8/2026</lastmod>
+    <lastmod>2026-08-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-25-irrigation_iot</loc>
-    <lastmod>31/7/2026</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-26-vegetables</loc>
-    <lastmod>30/7/2026</lastmod>
+    <lastmod>2026-07-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-27-balcony</loc>
-    <lastmod>29/7/2026</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-28-plant_care</loc>
-    <lastmod>28/7/2026</lastmod>
+    <lastmod>2026-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-29-plant_care</loc>
-    <lastmod>27/7/2026</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-30-vegetable_garden</loc>
-    <lastmod>26/7/2026</lastmod>
+    <lastmod>2026-07-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-31-balcony</loc>
-    <lastmod>25/7/2026</lastmod>
+    <lastmod>2026-07-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-32-vegetables</loc>
-    <lastmod>24/7/2026</lastmod>
+    <lastmod>2026-07-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-33-irrigation_iot</loc>
-    <lastmod>23/7/2026</lastmod>
+    <lastmod>2026-07-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-34-vegetables</loc>
-    <lastmod>22/7/2026</lastmod>
+    <lastmod>2026-07-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-35-balcony</loc>
-    <lastmod>21/7/2026</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-36-plant_care</loc>
-    <lastmod>20/7/2026</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-37-balcony</loc>
-    <lastmod>19/7/2026</lastmod>
+    <lastmod>2026-07-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-38-vegetables</loc>
-    <lastmod>18/7/2026</lastmod>
+    <lastmod>2026-07-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-39-plant_care</loc>
-    <lastmod>17/7/2026</lastmod>
+    <lastmod>2026-07-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-40-vegetables</loc>
-    <lastmod>16/7/2026</lastmod>
+    <lastmod>2026-07-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-41-irrigation_iot</loc>
-    <lastmod>15/7/2026</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-42-plant_care</loc>
-    <lastmod>14/7/2026</lastmod>
+    <lastmod>2026-07-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-43-vegetables</loc>
-    <lastmod>13/7/2026</lastmod>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-44-vegetable_garden</loc>
-    <lastmod>12/7/2026</lastmod>
+    <lastmod>2026-07-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-45-plant_care</loc>
-    <lastmod>11/7/2026</lastmod>
+    <lastmod>2026-07-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-46-irrigation_iot</loc>
-    <lastmod>10/7/2026</lastmod>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-47-vegetables</loc>
-    <lastmod>9/7/2026</lastmod>
+    <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-48-plant_care</loc>
-    <lastmod>8/7/2026</lastmod>
+    <lastmod>2026-07-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-49-balcony</loc>
-    <lastmod>7/7/2026</lastmod>
+    <lastmod>2026-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://smartgarden.gr/article/guide-50-plant_care</loc>
-    <lastmod>6/7/2026</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>

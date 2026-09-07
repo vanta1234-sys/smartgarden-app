@@ -1,13 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { generateBotanicalArticle } from './services/botanicalAiEngine';
 import { getSmartArticleImage, CURATED_GARDENING_PHOTOS, FALLBACK_BOTANICAL_PHOTOS } from './services/imageService';
 import { AnimatedShortVideo } from './components/AnimatedShortVideo';
 import { SmartBalconyCalculator } from './components/SmartBalconyCalculator';
 import { SeasonalAdviceBar } from './components/SeasonalAdviceBar';
-import { TikTokStudio } from './components/TikTokStudio';
-import { PinGenerator } from './components/PinGenerator';
 import { LiveTelemetryCard } from './components/LiveTelemetryCard';
 import { LiveWeatherData } from './services/weatherService';
+import { SocialShareBar } from './components/SocialShareBar';
+import { SprayDosageCalculator } from './components/SprayDosageCalculator';
+import { PlantDoctor } from './components/PlantDoctor';
+import { ArticleMarkdown } from './components/ArticleMarkdown';
+
+// Admin-only tools: kept out of the main bundle so regular readers never download
+// the Remotion/video-rendering and SEO-audit code paths they'll never use.
+const TikTokStudio = lazy(() => import('./components/TikTokStudio').then(m => ({ default: m.TikTokStudio })));
+const SeoMetadataAuditor = lazy(() => import('./components/SeoMetadataAuditor').then(m => ({ default: m.SeoMetadataAuditor })));
+import { injectGlobalSiteSchema, injectArticleSchema } from './services/schemaService';
 import {
   Globe,
   AlertTriangle,
@@ -41,6 +49,7 @@ import {
   Volume2,
   Sliders,
   Send,
+  Droplets,
   Layers,
   CheckSquare,
   Clock,
@@ -50,58 +59,11 @@ import {
   Upload,
   X
 } from 'lucide-react';
-
-
-interface ArticleItem {
-  id: string;
-  slug: string;
-  title: {
-    el: string;
-    en: string;
-  };
-  category: string;
-  categoryLabel: {
-    el: string;
-    en: string;
-  };
-  readTime: string;
-  difficulty: string;
-  difficultyLabel: {
-    el: string;
-    en: string;
-  };
-  date: string;
-  author: {
-    name: string;
-    role: {
-      el: string;
-      en: string;
-    };
-    avatar: string;
-  };
-  image: string;
-  videoUrl?: string;
-  summary: {
-    el: string;
-    en: string;
-  };
-  content: {
-    el: string;
-    en: string;
-  };
-  keyTakeaways: {
-    el: string[];
-    en: string[];
-  };
-  socialScriptReady?: boolean;
-  likes?: number;
-  featured?: boolean;
-  views?: number;
-  tags?: string[];
-}
-
+import { ArticleItem } from './types';
 import { WEEKLY_TRENDING_TOPICS, TrendingTopic } from './data/trendingTopics';
 import { build50MasterArticles } from './data/master50Articles';
+import { cleanGreekTextForSpeech } from './utils/greekSpeechSanitizer';
+import { speakGreekTextWithWebSpeech, stopWebSpeech, VoiceProfile } from './utils/greekSpeechSynthesizer';
 
 const INITIAL_ARTICLES: ArticleItem[] = build50MasterArticles();
 
@@ -122,7 +84,7 @@ export default function App() {
     );
   });
 
-  const [viewMode, setViewMode] = useState<'live_preview' | 'article_editor' | 'tiktok_studio' | 'json_export' | 'pinterest_studio'>('live_preview');
+  const [viewMode, setViewMode] = useState<'live_preview' | 'article_editor' | 'tiktok_studio' | 'json_export'>('live_preview');
   const [currentWeather, setCurrentWeather] = useState<LiveWeatherData | null>(null);
   const [articles, setArticles] = useState<ArticleItem[]>(INITIAL_ARTICLES);
   const [selectedArticle, setSelectedArticle] = useState<ArticleItem>(INITIAL_ARTICLES[0]);
@@ -134,10 +96,49 @@ export default function App() {
   const [showCronScheduleModal, setShowCronScheduleModal] = useState(false);
   const [cronTriggerLoading, setCronTriggerLoading] = useState(false);
   const [cronTriggerResult, setCronTriggerResult] = useState<string | null>(null);
+  const [isGoogleIndexingLoading, setIsGoogleIndexingLoading] = useState(false);
+  const [googleIndexingResults, setGoogleIndexingResults] = useState<{
+    total?: number;
+    successCount?: number;
+    failCount?: number;
+    results?: Array<{ url: string; success: boolean; data?: any; error?: string }>;
+    rawError?: string;
+  } | null>(null);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [articleToDelete, setArticleToDelete] = useState<ArticleItem | null>(null);
   const [hoveredArticleId, setHoveredArticleId] = useState<string | null>(null);
   const [isModalImageHovered, setIsModalImageHovered] = useState<boolean>(false);
+  const [isArticleReadingAudioActive, setIsArticleReadingAudioActive] = useState<boolean>(false);
+  const [readingVoiceProfile, setReadingVoiceProfile] = useState<VoiceProfile>('deep_male');
+  const [readingSpeed, setReadingSpeed] = useState<number>(1.0);
+  const [showReadingVoiceSettings, setShowReadingVoiceSettings] = useState<boolean>(false);
+
+  const handleToggleArticleSpeech = (
+    textToRead: string,
+    overrideProfile?: VoiceProfile,
+    overrideRate?: number
+  ) => {
+    if (isArticleReadingAudioActive && !overrideProfile && !overrideRate) {
+      stopWebSpeech();
+      setIsArticleReadingAudioActive(false);
+      return;
+    }
+
+    stopWebSpeech();
+
+    const profile = overrideProfile || readingVoiceProfile;
+    const rate = overrideRate || readingSpeed;
+
+    const started = speakGreekTextWithWebSpeech(
+      textToRead,
+      () => setIsArticleReadingAudioActive(false),
+      rate,
+      1.0,
+      profile
+    );
+
+    setIsArticleReadingAudioActive(started);
+  };
 
   // Custom Topic Form state
   const [customTopicTitle, setCustomTopicTitle] = useState('');
@@ -177,8 +178,9 @@ export default function App() {
     }
   };
 
-  // Auto-fetch live articles from latest_articles.json on mount
+  // Auto-fetch live articles from latest_articles.json on mount & inject SEO Schema
   useEffect(() => {
+    injectGlobalSiteSchema();
     fetch(`/latest_articles.json?t=${Date.now()}`)
       .then((res) => {
         if (res.ok) return res.json();
@@ -188,12 +190,20 @@ export default function App() {
         if (Array.isArray(data) && data.length > 0) {
           setArticles(data);
           setSelectedArticle(data[0]);
+          injectArticleSchema(data[0]);
         }
       })
       .catch(() => {
         // Use default initial articles if offline
+        injectArticleSchema(INITIAL_ARTICLES[0]);
       });
   }, []);
+
+  useEffect(() => {
+    if (selectedArticle) {
+      injectArticleSchema(selectedArticle);
+    }
+  }, [selectedArticle]);
 
   // Edit Form State
   const [editTitle, setEditTitle] = useState(selectedArticle.title.el);
@@ -262,6 +272,8 @@ export default function App() {
           if (json.success && json.data) {
             aiData = json.data;
           }
+        } else {
+          console.warn('Backend API returned non-200, activating specialized botanical AI generator...');
         }
       } catch (networkErr) {
         console.warn('Backend API unavailable or slow, activating specialized botanical AI generator...', networkErr);
@@ -506,6 +518,28 @@ export default function App() {
     } catch (err: any) {
       setDeployLog((prev) => prev + `\n❌ ${err.message}`);
       setDeployStatus('error');
+    }
+  };
+
+  // Google Instant Indexing via Service Account
+  const handleGoogleIndexAll = async () => {
+    setIsGoogleIndexingLoading(true);
+    setGoogleIndexingResults(null);
+    try {
+      const res = await fetch('/api/google-index-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setGoogleIndexingResults(data);
+      } else {
+        setGoogleIndexingResults({ rawError: data.error || 'Σφάλμα κατά το Google Indexing' });
+      }
+    } catch (err: any) {
+      setGoogleIndexingResults({ rawError: err?.message || 'Σφάλμα επικοινωνίας με το backend' });
+    } finally {
+      setIsGoogleIndexingLoading(false);
     }
   };
   const handleAddNewArticle = () => {
@@ -872,19 +906,6 @@ pause
               </button>
 
               <button
-                id="btn-view-pinterest"
-                onClick={() => setViewMode('pinterest_studio')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                  viewMode === 'pinterest_studio'
-                    ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow font-bold'
-                    : 'text-red-300 hover:text-white hover:bg-red-950/40 border border-red-500/20'
-                }`}
-              >
-                <ImageIcon className="w-3.5 h-3.5" />
-                📌 5. Pinterest Pins
-              </button>
-
-              <button
                 id="btn-top-quick-deploy"
                 onClick={() => {
                   setViewMode('json_export');
@@ -973,6 +994,28 @@ pause
                       <Sparkles className="w-4 h-4 text-emerald-400" />
                       Υπολογιστής Ποτίσματος & Γλάστρας
                     </button>
+                    <button
+                      id="btn-jump-spray-calc"
+                      onClick={() => {
+                        const el = document.getElementById('spray-dosage-calculator');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 text-cyan-300 font-bold px-5 py-3 rounded-xl border border-cyan-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
+                    >
+                      <Droplets className="w-4 h-4 text-cyan-400" />
+                      Υπολογιστής Δοσολογιών Ψεκαστήρα
+                    </button>
+                    <button
+                      id="btn-jump-plant-doctor"
+                      onClick={() => {
+                        const el = document.getElementById('plant-doctor');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="bg-gradient-to-r from-rose-950/80 to-amber-950/80 hover:from-rose-900 hover:to-amber-900 text-amber-300 font-bold px-5 py-3 rounded-xl border border-amber-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
+                    >
+                      <Sparkles className="w-4 h-4 text-amber-400" />
+                      AI Διάγνωση Φυτού από Φωτογραφία
+                    </button>
                     {isAdmin && (
                       <button
                         onClick={() => setViewMode('article_editor')}
@@ -997,6 +1040,22 @@ pause
 
             {/* Interactive Smart Balcony Pot & Irrigation Calculator */}
             <SmartBalconyCalculator />
+
+            {/* Interactive Spray & Dosage Fertilizer Calculator */}
+            <SprayDosageCalculator
+              onOpenArticle={(slug) => {
+                const target = articles.find(a => a.slug === slug);
+                if (target) {
+                  setSelectedArticle(target);
+                  setIsReadingModalOpen(true);
+                } else {
+                  setIsReadingModalOpen(true);
+                }
+              }}
+            />
+
+            {/* AI Plant Health Diagnosis from Photo */}
+            <PlantDoctor />
 
             {/* Articles Grid Preview */}
             <div className="space-y-4">
@@ -1058,6 +1117,7 @@ pause
                         <img
                           src={art.author.avatar}
                           alt={art.author.name}
+                          loading="lazy"
                           referrerPolicy="no-referrer"
                           onError={(e) => {
                             (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80";
@@ -1175,7 +1235,8 @@ pause
                     >
                       <img
                         src={art.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80"}
-                        alt=""
+                        alt={art.title?.el || art.title || ''}
+                        loading="lazy"
                         referrerPolicy="no-referrer"
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80";
@@ -1210,6 +1271,14 @@ pause
                   Φόρμα Επεξεργασίας: {selectedArticle?.title?.el || 'Νέο Άρθρο'}
                 </span>
                 <div className="flex items-center gap-2">
+                  <button
+                    id="btn-save-article-header"
+                    onClick={handleSaveArticle}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    Αποθήκευση
+                  </button>
                   <button
                     id="btn-ai-expand"
                     onClick={handleAiExpand}
@@ -1442,6 +1511,51 @@ pause
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-emerald-300 font-mono focus:outline-none focus:border-emerald-500 leading-relaxed"
                   ></textarea>
                 </div>
+
+                {/* SEO METADATA AUDITOR SECTION */}
+                <div className="pt-2">
+                  <Suspense fallback={<div className="text-xs text-slate-500 py-4">Φόρτωση εργαλείου SEO...</div>}>
+                    <SeoMetadataAuditor
+                      article={selectedArticle}
+                      title={editTitle}
+                      summary={editSummary}
+                      content={editContent}
+                      category={editCategory}
+                      image={editImage}
+                      slug={selectedArticle.slug}
+                      onUpdateTitle={(newTitle) => setEditTitle(newTitle)}
+                      onUpdateSummary={(newSummary) => setEditSummary(newSummary)}
+                      onUpdateContent={(newContent) => setEditContent(newContent)}
+                      onSave={handleSaveArticle}
+                    />
+                  </Suspense>
+                </div>
+
+                {/* Bottom Save & Preview Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-800">
+                  <div className="text-xs text-slate-400">
+                    Επεξεργασία άρθρου ID: <span className="font-mono text-slate-300">{selectedArticle.id}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setViewMode('live_preview')}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2.5 rounded-xl border border-slate-700 flex items-center gap-1.5 cursor-pointer transition-colors"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-slate-400" />
+                      Ζωντανή Προεπισκόπηση
+                    </button>
+                    <button
+                      id="btn-save-article-bottom"
+                      type="button"
+                      onClick={handleSaveArticle}
+                      className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-extrabold px-6 py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                    >
+                      <Check className="w-4 h-4" />
+                      Αποθήκευση Αλλαγών Άρθρου
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1507,6 +1621,100 @@ pause
               </div>
             </div>
 
+            {/* GOOGLE INSTANT INDEXING API SUITE */}
+            <div className="bg-slate-950 p-6 rounded-2xl border border-sky-500/30 shadow-2xl space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center">
+                    <Globe className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-extrabold text-white">Google Instant Indexing API</h3>
+                      <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[10px] font-bold">
+                        DIRECT CRAWL BOT
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Απευθείας ειδοποίηση των Google Bots για άμεσο crawling όλων των {articles.length} άρθρων.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleGoogleIndexAll}
+                  disabled={isGoogleIndexingLoading}
+                  className="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-black px-5 py-2.5 rounded-xl shadow-lg shadow-sky-500/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {isGoogleIndexingLoading ? 'Αποστολή στη Google...' : `⚡ Google Index All (${articles.length + 1} URLs)`}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
+                <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800/80 space-y-1.5">
+                  <span className="text-[11px] font-bold text-sky-400 uppercase tracking-wider block">Συνδεδεμένο Service Account:</span>
+                  <div className="font-mono text-[11px] text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800 break-all select-all">
+                    smartgarden-indexer@zippy-facility-507018-f6.iam.gserviceaccount.com
+                  </div>
+                  <span className="text-[11px] text-slate-400 block">
+                    Προσθέστε το παραπάνω email στο <strong>Search Console ➡️ Ρυθμίσεις ➡️ Χρήστες (Owner)</strong> για πλήρη αυτοματοποίηση.
+                  </span>
+                </div>
+
+                <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800/80 space-y-1.5 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">Αυτοματισμός Cron Publish:</span>
+                    <p className="text-[11px] text-slate-300 mt-1">
+                      Κάθε φορά που δημιουργείται αυτόματα νέο άρθρο μέσω του <code>cron-publish.php</code>, καλείται αυτόματα το Google Indexing API χωρίς καμία δική σας ενέργεια.
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Ενεργό & Ενσωματωμένο
+                  </span>
+                </div>
+              </div>
+
+              {/* Indexing Results Panel */}
+              {googleIndexingResults && (
+                <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2 mt-3">
+                  {googleIndexingResults.rawError ? (
+                    <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
+                      <span className="text-base">⚠️</span>
+                      <div>
+                        <strong>Σημείωση Google API:</strong> {googleIndexingResults.rawError}
+                        <p className="text-[11px] text-slate-400 mt-1">
+                          Βεβαιωθείτε ότι προσθέσατε το email <code>smartgarden-indexer@zippy-facility-507018-f6.iam.gserviceaccount.com</code> ως <strong>Owner</strong> στο Google Search Console.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-white">Αποτελέσματα Google Indexing:</span>
+                        <span className="text-emerald-400">
+                          ✅ Επιτυχία: {googleIndexingResults.successCount} / {googleIndexingResults.total}
+                        </span>
+                      </div>
+                      <div className="max-h-48 overflow-y-auto space-y-1 font-mono text-[11px]">
+                        {googleIndexingResults.results?.slice(0, 10).map((res, i) => (
+                          <div key={i} className={`p-1.5 rounded flex items-center justify-between ${res.success ? 'bg-emerald-950/40 text-emerald-300' : 'bg-rose-950/40 text-rose-300'}`}>
+                            <span className="truncate max-w-md">{res.url}</span>
+                            <span>{res.success ? 'OK 200' : res.error || 'Failed'}</span>
+                          </div>
+                        ))}
+                        {(googleIndexingResults.results?.length || 0) > 10 && (
+                          <div className="text-center text-slate-500 text-[10px] pt-1">
+                            + άλλα {(googleIndexingResults.results?.length || 0) - 10} URLs υποβλήθηκαν
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {deployStatus !== 'idle' && (
               <div className="bg-slate-950 p-4 rounded-2xl border border-emerald-500/50 shadow-2xl space-y-2">
                 <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
@@ -1553,29 +1761,20 @@ pause
       {viewMode === 'tiktok_studio' && (
         <div id="tiktok-studio-view" className="flex-1 bg-slate-950 py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
-            <TikTokStudio
-              articles={articles}
-              selectedArticleId={selectedArticle?.id}
-              onUpdateArticle={(updatedArt) => {
-                const updatedList = articles.map(a => a.id === updatedArt.id ? updatedArt : a);
-                setArticles(updatedList);
-                if (selectedArticle.id === updatedArt.id) {
-                  setSelectedArticle(updatedArt);
-                }
-              }}
-              onDeploy={handleDeployNow}
-            />
-          </div>
-        </div>
-      )}
-
-      {viewMode === 'pinterest_studio' && (
-        <div id="pinterest-studio-view" className="flex-1 bg-slate-950 py-8 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-6xl mx-auto">
-            <PinGenerator
-              articlesList={articles}
-              lang="el"
-            />
+            <Suspense fallback={<div className="text-sm text-slate-400 py-12 text-center">Φόρτωση TikTok Studio...</div>}>
+              <TikTokStudio
+                articles={articles}
+                selectedArticleId={selectedArticle?.id}
+                onUpdateArticle={(updatedArt) => {
+                  const updatedList = articles.map(a => a.id === updatedArt.id ? updatedArt : a);
+                  setArticles(updatedList);
+                  if (selectedArticle.id === updatedArt.id) {
+                    setSelectedArticle(updatedArt);
+                  }
+                }}
+                onDeploy={handleDeployNow}
+              />
+            </Suspense>
           </div>
         </div>
       )}
@@ -1607,7 +1806,11 @@ pause
                 </span>
               </div>
               <button
-                onClick={() => setIsReadingModalOpen(false)}
+                onClick={() => {
+                  stopWebSpeech();
+                  setIsArticleReadingAudioActive(false);
+                  setIsReadingModalOpen(false);
+                }}
                 className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-950/80 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold border border-slate-700 cursor-pointer z-20"
               >
                 ✕
@@ -1636,16 +1839,146 @@ pause
                     <div className="text-[11px] text-slate-400">{selectedArticle.author.role.el} • {selectedArticle.date}</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700">
-                    <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                    Άκουσε το
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => handleToggleArticleSpeech(`${selectedArticle.title.el}. ${selectedArticle.summary.el}`)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                      isArticleReadingAudioActive
+                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold animate-pulse shadow-md shadow-emerald-500/30'
+                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                    }`}
+                    title={isArticleReadingAudioActive ? 'Διακοπή εκφώνησης' : 'Άκουσε το άρθρο με AI φωνή'}
+                  >
+                    <Volume2 className={`w-3.5 h-3.5 ${isArticleReadingAudioActive ? 'text-slate-950' : 'text-emerald-400'}`} />
+                    {isArticleReadingAudioActive ? 'Παύση Ήχου' : 'Άκουσε το'}
                   </button>
+
+                  <button
+                    onClick={() => setShowReadingVoiceSettings(!showReadingVoiceSettings)}
+                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
+                      showReadingVoiceSettings
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                        : 'bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border-slate-700/80'
+                    }`}
+                    title="Ρυθμίσεις Φωνής & Ταχύτητας"
+                  >
+                    <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="hidden sm:inline">Ρυθμίσεις Φωνής</span>
+                  </button>
+
                   <span className="text-xs text-rose-400 font-semibold flex items-center gap-1 bg-rose-500/10 px-2.5 py-1.5 rounded-lg border border-rose-500/20">
                     ❤️ {selectedArticle.likes}
                   </span>
                 </div>
               </div>
+
+              {/* Voice & Speed Settings Box */}
+              {showReadingVoiceSettings && (
+                <div className="bg-slate-950/80 border border-slate-800/90 rounded-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+                    {/* Voice Profile Selector */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-400 font-semibold flex items-center gap-1">
+                        🎙️ Φωνή:
+                      </span>
+                      <div className="inline-flex rounded-lg bg-slate-900 p-0.5 border border-slate-800">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReadingVoiceProfile('deep_male');
+                            if (isArticleReadingAudioActive) {
+                              handleToggleArticleSpeech(
+                                `${selectedArticle.title.el}. ${selectedArticle.summary.el}`,
+                                'deep_male',
+                                readingSpeed
+                              );
+                            }
+                          }}
+                          className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all cursor-pointer ${
+                            readingVoiceProfile === 'deep_male'
+                              ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm'
+                              : 'text-slate-300 hover:text-white'
+                          }`}
+                        >
+                          🧔 Ανδρική Βαθιά
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReadingVoiceProfile('light_female');
+                            if (isArticleReadingAudioActive) {
+                              handleToggleArticleSpeech(
+                                `${selectedArticle.title.el}. ${selectedArticle.summary.el}`,
+                                'light_female',
+                                readingSpeed
+                              );
+                            }
+                          }}
+                          className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all cursor-pointer ${
+                            readingVoiceProfile === 'light_female'
+                              ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm'
+                              : 'text-slate-300 hover:text-white'
+                          }`}
+                        >
+                          👩 Γυναικεία Clear
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReadingVoiceProfile('warm_female');
+                            if (isArticleReadingAudioActive) {
+                              handleToggleArticleSpeech(
+                                `${selectedArticle.title.el}. ${selectedArticle.summary.el}`,
+                                'warm_female',
+                                readingSpeed
+                              );
+                            }
+                          }}
+                          className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all cursor-pointer ${
+                            readingVoiceProfile === 'warm_female'
+                              ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm'
+                              : 'text-slate-300 hover:text-white'
+                          }`}
+                        >
+                          🎙️ Γυναικεία Ζεστή
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Speed Selector */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-400 font-semibold flex items-center gap-1">
+                        ⚡ Ταχύτητα:
+                      </span>
+                      <div className="inline-flex rounded-lg bg-slate-900 p-0.5 border border-slate-800 gap-0.5">
+                        {[0.8, 1.0, 1.2, 1.5].map((speed) => (
+                          <button
+                            key={speed}
+                            type="button"
+                            onClick={() => {
+                              setReadingSpeed(speed);
+                              if (isArticleReadingAudioActive) {
+                                handleToggleArticleSpeech(
+                                  `${selectedArticle.title.el}. ${selectedArticle.summary.el}`,
+                                  readingVoiceProfile,
+                                  speed
+                                );
+                              }
+                            }}
+                            className={`px-2 py-0.5 rounded font-mono text-[11px] font-semibold transition-all cursor-pointer ${
+                              readingSpeed === speed
+                                ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                                : 'text-slate-300 hover:text-white'
+                            }`}
+                          >
+                            {speed}x
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Connected Video Guide (if available) */}
               {selectedArticle.videoUrl && (
@@ -1678,9 +2011,7 @@ pause
               </blockquote>
 
               {/* Full Content */}
-              <div className="space-y-4 text-xs sm:text-sm leading-relaxed text-slate-300 whitespace-pre-line font-sans">
-                {selectedArticle.content.el}
-              </div>
+              <ArticleMarkdown content={selectedArticle.content.el} />
 
               {/* Key Takeaways Card */}
               <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-2xl p-5 space-y-3">
@@ -1697,12 +2028,60 @@ pause
                   ))}
                 </ul>
               </div>
+
+              {/* 1-Click Social Sharing Bar */}
+              <SocialShareBar
+                title={selectedArticle.title.el}
+                summary={selectedArticle.summary.el}
+                image={selectedArticle.image}
+                url={typeof window !== 'undefined' ? `${window.location.origin}/article/${selectedArticle.slug}` : `https://smartgarden.gr/article/${selectedArticle.slug}`}
+              />
+
+              {/* Related Articles: keeps readers on-site longer + spreads internal link equity */}
+              {(() => {
+                const related = articles
+                  .filter(a => a.id !== selectedArticle.id && a.category === selectedArticle.category)
+                  .slice(0, 3);
+                if (related.length === 0) return null;
+                return (
+                  <div className="pt-4 border-t border-slate-800 space-y-3">
+                    <div className="font-bold text-slate-200 text-xs flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-emerald-400" />
+                      ΣΧΕΤΙΚΑ ΑΡΘΡΑ
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {related.map(r => (
+                        <button
+                          key={r.id}
+                          onClick={() => setSelectedArticle(r)}
+                          className="text-left bg-slate-950 border border-slate-800 hover:border-emerald-500/50 rounded-xl overflow-hidden transition-colors group"
+                        >
+                          <img
+                            src={r.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&auto=format&fit=crop&q=80"}
+                            alt={r.title?.el || ''}
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                            className="w-full h-20 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="p-2.5">
+                            <div className="text-xs font-semibold text-slate-200 line-clamp-2">{r.title?.el}</div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Modal Footer */}
             <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between">
               <button
-                onClick={() => setIsReadingModalOpen(false)}
+                onClick={() => {
+                  stopWebSpeech();
+                  setIsArticleReadingAudioActive(false);
+                  setIsReadingModalOpen(false);
+                }}
                 className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
               >
                 Κλείσιμο
@@ -2003,6 +2382,7 @@ pause
                     <img
                       src={trend.suggestedImage || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1000&auto=format&fit=crop&q=80"}
                       alt={trend.title}
+                      loading="lazy"
                       referrerPolicy="no-referrer"
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1000&auto=format&fit=crop&q=80";
@@ -2233,15 +2613,58 @@ pause
       )}
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-950 py-4 px-4 text-center text-xs text-slate-500 flex items-center justify-between max-w-6xl mx-auto w-full">
-        <p>© 2026 SmartGarden.gr • Ψηφιακό Περιοδικό Κηπουρικής & IoT</p>
-        <button
-          onClick={() => setIsAdmin(!isAdmin)}
-          className="text-[11px] text-slate-600 hover:text-emerald-400 transition-colors cursor-pointer"
-          title="Εναλλαγή προβολής διαχειριστή / επισκέπτη"
-        >
-          {isAdmin ? '🔒 Λειτουργία Επισκέπτη' : '⚙️ Visual Studio Admin'}
-        </button>
+      <footer className="border-t border-slate-800/80 bg-slate-950 py-6 px-4 text-xs text-slate-500 max-w-6xl mx-auto w-full space-y-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-400">SmartGarden.gr</span>
+            <span>•</span>
+            <span>© 2026 Επιστημονική Γεωπονία, Αστική Κηπουρική & Τηλεμετρία</span>
+          </div>
+
+          <div className="flex items-center gap-4 text-[11px]">
+            <a
+              href="/sitemap.xml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-emerald-400 flex items-center gap-1 transition-colors"
+              title="Google Search Console XML Sitemap"
+            >
+              <FileCode className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Sitemap XML (58+ Άρθρα)</span>
+            </a>
+
+            <a
+              href="/rss.xml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-amber-400 flex items-center gap-1 transition-colors"
+              title="Google News & Feedly RSS Feed"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-amber-500" />
+              <span>RSS Feed</span>
+            </a>
+
+            <a href="/about.html" className="text-slate-400 hover:text-emerald-400 transition-colors">
+              Σχετικά & Επικοινωνία
+            </a>
+
+            <a href="/privacy-policy.html" className="text-slate-400 hover:text-emerald-400 transition-colors">
+              Πολιτική Απορρήτου
+            </a>
+
+            <a href="/terms-of-service.html" className="text-slate-400 hover:text-emerald-400 transition-colors">
+              Όροι Χρήσης
+            </a>
+
+            <button
+              onClick={() => setIsAdmin(!isAdmin)}
+              className="text-slate-400 hover:text-emerald-300 transition-colors cursor-pointer border-l border-slate-800 pl-3"
+              title="Εναλλαγή προβολής διαχειριστή / επισκέπτη"
+            >
+              {isAdmin ? '🔒 Λειτουργία Επισκέπτη' : '⚙️ Visual Studio Admin'}
+            </button>
+          </div>
+        </div>
       </footer>
     </div>
   );

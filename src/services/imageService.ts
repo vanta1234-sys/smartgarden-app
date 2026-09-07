@@ -49,7 +49,7 @@ export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
     alt: "Freshly harvested organic carrots with soil"
   },
   {
-    url: "https://images.unsplash.com/photo-1511497584788-87676104235f?w=1200&auto=format&fit=crop&q=80",
+    url: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=1200&auto=format&fit=crop&q=80",
     keywords: ["μανιταρι", "μανιταρια", "pleurotus", "shiitake", "mushroom", "mushrooms", "μυκητες"],
     category: "vegetable_garden",
     alt: "Gourmet mushrooms growing organically"
@@ -83,7 +83,7 @@ export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
     alt: "Smart automated irrigation controller and hardware"
   },
   {
-    url: "https://images.unsplash.com/photo-1509391365360-2e959784a276?w=1200&auto=format&fit=crop&q=80",
+    url: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80",
     keywords: ["ηλιακο πανελ", "solar", "φωτοβολταικο", "βροχινο νερο", "off-grid", "δεξαμενη", "μπαταρια", "zero energy"],
     category: "irrigation_iot",
     alt: "Solar powered smart irrigation panel outdoors"
@@ -95,7 +95,7 @@ export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
     alt: "High-tech hydroponic vertical farming system"
   },
   {
-    url: "https://images.unsplash.com/photo-1558441719-8d4e92fa89dc?w=1200&auto=format&fit=crop&q=80",
+    url: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80",
     keywords: ["ρομποτικο", "ρομποτικα", "mower", "mowers", "γκαζον", "χλοοκοπτικο", "rtk", "lidar", "automower"],
     category: "robotic_mowers",
     alt: "Autonomous robotic lawn mower cutting lush green grass"
@@ -218,7 +218,7 @@ export const FALLBACK_BOTANICAL_PHOTOS = [
   "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // Bougainvillea Garden
   "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80", // Succulents
   "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=1200&auto=format&fit=crop&q=80", // Orchids
-  "https://images.unsplash.com/photo-1558441719-8d4e92fa89dc?w=1200&auto=format&fit=crop&q=80", // Robotic Lawn Mower
+  "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80", // Robotic Lawn Mower
   "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=1200&auto=format&fit=crop&q=80", // Fresh Salad Greens
   "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&auto=format&fit=crop&q=80", // Grapevine Pergola
   "https://images.unsplash.com/photo-1598880940371-c756e015fea1?w=1200&auto=format&fit=crop&q=80", // Organic Soil Compost

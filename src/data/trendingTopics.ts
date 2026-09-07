@@ -162,7 +162,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #7",
     searchIntent: "Καλύτερο ρομπότ γκαζόν χωρίς περιμετρικό σύρμα για Ελλάδα",
     readTime: "13 min",
-    suggestedImage: "https://images.unsplash.com/photo-1558441719-8d4e92fa89dc?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80",
     summary: "Ο απόλυτος τεχνικός οδηγός 2026 για ρομποτικά mowers χωρίς περιμετρικό καλώδιο με δορυφορικό εντοπισμό εκατοστού και AI αποφυγή εμποδίων.",
     keyPoints: [
       "Πλήρης κατάργηση καλωδίου με τεχνολογία RTK-GNSS & 3D LiDAR",
@@ -238,7 +238,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #11",
     searchIntent: "Πότισμα χωρίς βρύση και ρεύμα με ηλιακό πάνελ και αντλία 12V",
     readTime: "13 min",
-    suggestedImage: "https://images.unsplash.com/photo-1509391365360-2e959784a276?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80",
     summary: "Πλήρης οδηγός κατασκευής αυτόνομου συστήματος άρδευσης με φωτοβολταϊκό πάνελ, μπαταρία λιθίου, αντλία 12V και δεξαμενή νερού για απομακρυσμένα μπαλκόνια και κτήματα.",
     keyPoints: [
       "Ηλιακό πάνελ 20W με ρυθμιστή φόρτισης MPPT και μπαταρία LiFePO4",
@@ -314,7 +314,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #15",
     searchIntent: "Κίτρινο ξερό γκαζόν μετά το καλοκαίρι - πώς φτιάχνει με επανασπορά",
     readTime: "12 min",
-    suggestedImage: "https://images.unsplash.com/photo-1558441719-8d4e92fa89dc?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80",
     summary: "Οδηγός φθινοπωρινής αποκατάστασης χλοοτάπητα. Εξαέρωση (aeration), απομάκρυνση νεκρού γρασιδιού (verticutting), σπορά με θερμόφιλες/ψυχρόφιλες ποικιλίες και φωσφορούχα λίπανση.",
     keyPoints: [
       "Εξαέρωση και κάθετη κοπή για διάνοιξη του εδάφους",

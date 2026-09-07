@@ -269,6 +269,26 @@ export const LiveTelemetryCard: React.FC<LiveTelemetryCardProps> = ({
         </div>
       </div>
 
+      {/* Severe Weather Alert Banner — only shown for real heatwave/frost risk */}
+      {weatherData?.heatAlert && (
+        <div className="bg-rose-950/50 border border-rose-500/40 p-3 rounded-xl text-xs text-rose-200 leading-relaxed flex items-start gap-2.5 shadow-inner animate-pulse">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+          <div>
+            <span className="font-extrabold text-rose-300 mr-1.5">🔥 Προειδοποίηση Καύσωνα:</span>
+            <span>Απαιτείται πότισμα στη ρίζα πριν τις 08:00 & τοποθέτηση δίχτυ σκίασης στα ευαίσθητα φυτά. Αποφύγετε μεσημεριανό πότισμα.</span>
+          </div>
+        </div>
+      )}
+      {weatherData?.frostAlert && (
+        <div className="bg-blue-950/50 border border-blue-500/40 p-3 rounded-xl text-xs text-blue-200 leading-relaxed flex items-start gap-2.5 shadow-inner animate-pulse">
+          <AlertCircle className="w-4 h-4 text-blue-300 shrink-0 mt-0.5" />
+          <div>
+            <span className="font-extrabold text-blue-300 mr-1.5">❄️ Κίνδυνος Παγετού:</span>
+            <span>Αναμένεται ελάχιστη θερμοκρασία {weatherData.minTempToday}°C απόψε. Μεταφέρετε αμέσως ευαίσθητα φυτά (εσπεριδοειδή, φίκους, βασιλικό) σε προστατευμένο εσωτερικό χώρο ή καλύψτε τα με αντιπαγετική μεμβράνη.</span>
+          </div>
+        </div>
+      )}
+
       {/* Dynamic Botanical Smart Tip */}
       <div className="bg-emerald-950/40 border border-emerald-500/25 p-3 rounded-xl text-xs text-emerald-200 leading-relaxed flex items-start gap-2.5 shadow-inner">
         <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />

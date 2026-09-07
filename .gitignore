@@ -8,3 +8,6 @@ coverage/
 !.env.example
 .claude/settings.local.json
 service-account.json
+public/google-service-account.json
+public/plant_diagnosis_usage.json
+public/.htaccess

@@ -1176,11 +1176,40 @@ foreach ($staticPages as $page) {
     $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/" . $page . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.3</priority>\n  </url>\n";
 }
 
+// Sitemap <loc> must contain a fully percent-encoded URL (per the sitemaps.org spec) —
+// a raw non-ASCII slug like "καλλιέργεια-μαρουλιού" 400s when Googlebot requests it
+// literally, which Search Console then reports as a not-found/unindexable URL.
+function sitemapSlugToUrl($slug) {
+    // Encode each path segment separately so a literal "/" in an id (e.g. "article/x") isn't escaped.
+    return implode('/', array_map('rawurlencode', explode('/', $slug)));
+}
+
+// Normalize whatever date format an article happens to carry (ISO, "d/m/Y", or a
+// Greek "20 Αυγούστου 2026" string) into the "YYYY-MM-DD" the sitemap spec requires.
+function sitemapNormalizeDate($raw) {
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw)) {
+        return $raw;
+    }
+    if (preg_match('#^(\d{1,2})/(\d{1,2})/(\d{4})$#', $raw, $m)) {
+        return sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+    }
+    $greekMonths = array(
+        'Ιανουαρίου' => 1, 'Φεβρουαρίου' => 2, 'Μαρτίου' => 3, 'Απριλίου' => 4,
+        'Μαΐου' => 5, 'Ιουνίου' => 6, 'Ιουλίου' => 7, 'Αυγούστου' => 8,
+        'Σεπτεμβρίου' => 9, 'Οκτωβρίου' => 10, 'Νοεμβρίου' => 11, 'Δεκεμβρίου' => 12,
+    );
+    if (preg_match('/^(\d{1,2})\s+(\S+)\s+(\d{4})$/u', trim($raw), $m) && isset($greekMonths[$m[2]])) {
+        return sprintf('%04d-%02d-%02d', $m[3], $greekMonths[$m[2]], $m[1]);
+    }
+    $ts = strtotime($raw);
+    return $ts !== false ? date('Y-m-d', $ts) : date('Y-m-d');
+}
+
 foreach ($existingArticles as $art) {
     $artSlug = isset($art['slug']) ? $art['slug'] : (isset($art['id']) ? $art['id'] : '');
     if ($artSlug) {
-        $artDate = isset($art['date']) ? $art['date'] : date('Y-m-d');
-        $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/article/" . htmlspecialchars($artSlug) . "</loc>\n    <lastmod>" . $artDate . "</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>\n";
+        $artDate = sitemapNormalizeDate(isset($art['date']) ? $art['date'] : date('Y-m-d'));
+        $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/article/" . htmlspecialchars(sitemapSlugToUrl($artSlug)) . "</loc>\n    <lastmod>" . $artDate . "</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>\n";
     }
 }
 $sitemapXml .= "</urlset>\n";

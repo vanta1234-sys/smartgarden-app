@@ -1,9 +1,13 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
 import { execSync } from "child_process";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Auto-load .env file safely from workspace or local disk without crashing
 function loadEnv() {
@@ -113,6 +117,345 @@ app.post("/api/upload-video", async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────────────────────
+// 🎵 REAL TikTok OAuth + Content Posting API Integration
+// ─────────────────────────────────────────────────────────────
+const TIKTOK_TOKENS_PATH = path.join(process.cwd(), "tiktok_tokens.json");
+
+function readTikTokTokens(): { access_token?: string; refresh_token?: string; open_id?: string; expires_at?: number } | null {
+  try {
+    if (!fs.existsSync(TIKTOK_TOKENS_PATH)) return null;
+    return JSON.parse(fs.readFileSync(TIKTOK_TOKENS_PATH, "utf-8"));
+  } catch {
+    return null;
+  }
+}
+
+function writeTikTokTokens(tokens: any) {
+  fs.writeFileSync(TIKTOK_TOKENS_PATH, JSON.stringify(tokens, null, 2), "utf-8");
+}
+
+async function refreshTikTokTokenIfNeeded(): Promise<string | null> {
+  loadEnv();
+  const tokens = readTikTokTokens();
+  if (!tokens?.access_token) return null;
+
+  if (tokens.expires_at && Date.now() < tokens.expires_at - 60_000) {
+    return tokens.access_token;
+  }
+
+  if (!tokens.refresh_token) return tokens.access_token;
+
+  try {
+    const resp = await fetch("https://open.tiktokapis.com/v2/oauth/token/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded", "Cache-Control": "no-cache" },
+      body: new URLSearchParams({
+        client_key: process.env.TIKTOK_CLIENT_KEY || "",
+        client_secret: process.env.TIKTOK_CLIENT_SECRET || "",
+        grant_type: "refresh_token",
+        refresh_token: tokens.refresh_token,
+      }),
+    });
+    const data = await resp.json();
+    if (data.access_token) {
+      const updated = {
+        access_token: data.access_token,
+        refresh_token: data.refresh_token || tokens.refresh_token,
+        open_id: data.open_id || tokens.open_id,
+        expires_at: Date.now() + (data.expires_in || 3600) * 1000,
+      };
+      writeTikTokTokens(updated);
+      return updated.access_token;
+    }
+  } catch (err) {
+    console.error("TikTok token refresh failed:", err);
+  }
+  return tokens.access_token;
+}
+
+// Step 1: Redirect the account owner to TikTok's consent screen
+app.get("/api/tiktok/auth/login", (req, res) => {
+  loadEnv();
+  const clientKey = process.env.TIKTOK_CLIENT_KEY;
+  const redirectUri = process.env.TIKTOK_REDIRECT_URI || "https://smartgarden.gr/api/tiktok/auth/callback";
+  if (!clientKey) {
+    return res.status(500).send("TIKTOK_CLIENT_KEY is not configured in .env");
+  }
+  const state = Math.random().toString(36).slice(2);
+  const params = new URLSearchParams({
+    client_key: clientKey,
+    scope: "user.info.basic,video.upload",
+    response_type: "code",
+    redirect_uri: redirectUri,
+    state,
+  });
+  res.redirect(`https://www.tiktok.com/v2/auth/authorize/?${params.toString()}`);
+});
+
+// Step 2: TikTok redirects back here with a ?code= to exchange for tokens
+app.get("/api/tiktok/auth/callback", async (req, res) => {
+  loadEnv();
+  const { code, error } = req.query as { code?: string; error?: string };
+  if (error || !code) {
+    return res.status(400).send(`TikTok authorization failed: ${error || "no code returned"}`);
+  }
+  try {
+    const redirectUri = process.env.TIKTOK_REDIRECT_URI || "https://smartgarden.gr/api/tiktok/auth/callback";
+    const resp = await fetch("https://open.tiktokapis.com/v2/oauth/token/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded", "Cache-Control": "no-cache" },
+      body: new URLSearchParams({
+        client_key: process.env.TIKTOK_CLIENT_KEY || "",
+        client_secret: process.env.TIKTOK_CLIENT_SECRET || "",
+        code,
+        grant_type: "authorization_code",
+        redirect_uri: redirectUri,
+      }),
+    });
+    const data = await resp.json();
+    if (!data.access_token) {
+      console.error("TikTok token exchange failed:", data);
+      return res.status(500).send(`TikTok token exchange failed: ${JSON.stringify(data)}`);
+    }
+    writeTikTokTokens({
+      access_token: data.access_token,
+      refresh_token: data.refresh_token,
+      open_id: data.open_id,
+      expires_at: Date.now() + (data.expires_in || 3600) * 1000,
+    });
+    return res.send("✅ Ο λογαριασμός TikTok συνδέθηκε επιτυχώς! Μπορείς να κλείσεις αυτή την καρτέλα.");
+  } catch (err: any) {
+    console.error("TikTok callback error:", err);
+    return res.status(500).send(`Σφάλμα σύνδεσης TikTok: ${err?.message}`);
+  }
+});
+
+app.get("/api/tiktok/auth/status", async (req, res) => {
+  const tokens = readTikTokTokens();
+  return res.json({ connected: !!tokens?.access_token, openId: tokens?.open_id || null });
+});
+
+// Direct TikTok Auto-Publishing API Endpoint (REAL — uploads as draft via Content Posting API)
+app.post("/api/tiktok/publish", async (req, res) => {
+  try {
+    const { articleId, title, caption, videoUrl, videoBase64, hashtags } = req.body;
+
+    const accessToken = await refreshTikTokTokenIfNeeded();
+    if (!accessToken) {
+      return res.status(401).json({
+        success: false,
+        connected: false,
+        error: "Ο λογαριασμός TikTok δεν είναι συνδεδεμένος ακόμα.",
+        loginUrl: "/api/tiktok/auth/login",
+      });
+    }
+
+    // Resolve raw video bytes: prefer base64, else fetch from provided URL
+    let videoBuffer: Buffer;
+    if (videoBase64) {
+      videoBuffer = Buffer.from(videoBase64.replace(/^data:video\/[a-z0-9]+;base64,/, ""), "base64");
+    } else if (videoUrl) {
+      const absoluteUrl = videoUrl.startsWith("http") ? videoUrl : `https://smartgarden.gr${videoUrl}`;
+      const videoResp = await fetch(absoluteUrl);
+      if (!videoResp.ok) throw new Error(`Δεν ήταν δυνατή η λήψη του βίντεο από ${absoluteUrl}`);
+      videoBuffer = Buffer.from(await videoResp.arrayBuffer());
+    } else {
+      return res.status(400).json({ success: false, error: "Missing videoBase64 or videoUrl" });
+    }
+
+    // Step 1: initialize upload (draft/inbox — creator manually posts from the TikTok app)
+    const initResp = await fetch("https://open.tiktokapis.com/v2/post/publish/inbox/video/init/", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+      body: JSON.stringify({
+        source_info: {
+          source: "FILE_UPLOAD",
+          video_size: videoBuffer.length,
+          chunk_size: videoBuffer.length,
+          total_chunk_count: 1,
+        },
+      }),
+    });
+    const initData = await initResp.json();
+    if (!initData.data?.upload_url) {
+      console.error("TikTok init failed:", initData);
+      return res.status(500).json({ success: false, error: "TikTok init failed", details: initData });
+    }
+
+    // Step 2: upload the video bytes
+    const uploadResp = await fetch(initData.data.upload_url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "video/mp4",
+        "Content-Range": `bytes 0-${videoBuffer.length - 1}/${videoBuffer.length}`,
+      },
+      body: videoBuffer,
+    });
+    if (!uploadResp.ok) {
+      const uploadErrText = await uploadResp.text();
+      console.error("TikTok video upload failed:", uploadErrText);
+      return res.status(500).json({ success: false, error: "TikTok video upload failed", details: uploadErrText });
+    }
+
+    // Log locally for the Studio's history view
+    const tiktokLogPath = path.join(process.cwd(), "public", "tiktok_posts.json");
+    let tiktokPosts: any[] = [];
+    if (fs.existsSync(tiktokLogPath)) {
+      try {
+        tiktokPosts = JSON.parse(fs.readFileSync(tiktokLogPath, "utf-8"));
+      } catch (e) {
+        tiktokPosts = [];
+      }
+    }
+    const newPost = {
+      id: initData.data.publish_id || `tt-post-${Date.now()}`,
+      articleId: articleId || "custom",
+      title: title || "SmartGarden Daily Tip",
+      caption: caption || `🌿 ${title} | Tips & Οδηγοί στο smartgarden.gr`,
+      hashtags: hashtags || ["#smartgarden", "#plants", "#gardening", "#fyp", "#fygr"],
+      videoUrl: videoUrl || "",
+      status: "draft_uploaded",
+      platform: "TikTok",
+      publishedAt: new Date().toISOString(),
+      tiktokUrl: `https://www.tiktok.com/`,
+    };
+    tiktokPosts.unshift(newPost);
+    fs.writeFileSync(tiktokLogPath, JSON.stringify(tiktokPosts, null, 2), "utf-8");
+
+    return res.json({
+      success: true,
+      post: newPost,
+      message: "✅ Το βίντεο ανέβηκε ως draft στο TikTok inbox — άνοιξε την εφαρμογή TikTok για να το δημοσιεύσεις.",
+    });
+  } catch (err: any) {
+    console.error("TikTok publish error:", err);
+    return res.status(500).json({ success: false, error: err?.message || "Σφάλμα αυτόματης δημοσίευσης στο TikTok" });
+  }
+});
+
+// TikTok Posts History API Endpoint
+app.get("/api/tiktok/posts", (req, res) => {
+  try {
+    const tiktokLogPath = path.join(process.cwd(), "public", "tiktok_posts.json");
+    if (fs.existsSync(tiktokLogPath)) {
+      const posts = JSON.parse(fs.readFileSync(tiktokLogPath, "utf-8"));
+      return res.json({ success: true, posts });
+    }
+    return res.json({ success: true, posts: [] });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, posts: [] });
+  }
+});
+
+// Helper for splitting long Greek text into natural spoken phrases
+function chunkGreekText(text: string, maxLen = 140): string[] {
+  const sanitized = text
+    .replace(/[*_#`~«»"'\(\)\[\]\{\}]/g, " ")
+    .replace(/\b1ον\b|\b1ο\b/gi, "Πρώτον, ")
+    .replace(/\b2ον\b|\b2ο\b/gi, "Δεύτερον, ")
+    .replace(/\b3ον\b|\b3ο\b/gi, "Τρίτον, ")
+    .replace(/\b4ον\b|\b4ο\b/gi, "Τέταρτον, ")
+    .replace(/\bΝο1\b|\bNo1\b|\bΝο\.1\b/gi, "νούμερο ένα")
+    .replace(/\bπ\.χ\./gi, "για παράδειγμα")
+    .replace(/\bδηλ\./gi, "δηλαδή")
+    .replace(/\bεκ\./gi, "εκατοστά")
+    .replace(/\bSmartGarden\.gr\b/gi, "Smart Garden")
+    .replace(/\.gr\b/gi, "")
+    .replace(/\bpH\b/gi, "πε χα")
+    .replace(/\bTDR\/FDR\b/gi, "αισθητήρων")
+    .replace(/\bVPD\b/gi, "υγρασίας")
+    .replace(/\btip burn\b/gi, "ξηράνσεων")
+    .replace(/\bEC\b/gi, "αγωγιμότητας")
+    .replace(/[•|—–\-_/\\+=<>~@$%^&]/g, " ")
+    .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!sanitized) return [];
+
+  const sentences = sanitized.split(/(?<=[.!?;:])\s+/);
+  const chunks: string[] = [];
+
+  for (const sentence of sentences) {
+    if (sentence.length <= maxLen) {
+      if (sentence.trim()) chunks.push(sentence.trim());
+    } else {
+      const words = sentence.split(/\s+/);
+      let cur = "";
+      for (const w of words) {
+        if ((cur + " " + w).length > maxLen) {
+          if (cur) chunks.push(cur.trim());
+          cur = w;
+        } else {
+          cur = cur ? `${cur} ${w}` : w;
+        }
+      }
+      if (cur.trim()) chunks.push(cur.trim());
+    }
+  }
+
+  return chunks;
+}
+
+// Studio Quality Native Greek TTS Audio Synthesizer
+async function generateGreekStudioAudio(text: string): Promise<Buffer> {
+  const chunks = chunkGreekText(text);
+  if (!chunks.length) {
+    throw new Error("Δεν υπάρχει κείμενο για εκφώνηση");
+  }
+
+  const audioBuffers: Buffer[] = [];
+  for (const chunk of chunks) {
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunk)}&tl=el&client=tw-ob`;
+    const resp = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Referer": "https://translate.google.com/",
+      },
+    });
+
+    if (!resp.ok) {
+      throw new Error(`Google TTS Greek engine error (${resp.status})`);
+    }
+
+    const arrayBuf = await resp.arrayBuffer();
+    audioBuffers.push(Buffer.from(arrayBuf));
+  }
+
+  return Buffer.concat(audioBuffers);
+}
+
+// REAL Greek Audio TTS API Endpoint
+app.post("/api/tts/greek", async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || typeof text !== "string") {
+      return res.status(400).json({ success: false, error: "Missing text parameter" });
+    }
+
+    const audioBuffer = await generateGreekStudioAudio(text);
+    const audioBase64 = audioBuffer.toString("base64");
+    const audioDataUrl = `data:audio/mp3;base64,${audioBase64}`;
+
+    return res.json({
+      success: true,
+      audioUrl: audioDataUrl,
+      audioBase64,
+      mimeType: "audio/mp3",
+    });
+  } catch (err: any) {
+    console.error("Greek TTS Audio synthesis error:", err);
+    return res.status(500).json({
+      success: false,
+      error: err?.message || "Σφάλμα παραγωγής ελληνικής φωνής",
+    });
+  }
+});
+
 // Dynamic Google Gemini Client with automatic .env reload and fallback
 function getGemini(): GoogleGenAI {
   loadEnv();
@@ -123,7 +466,46 @@ function getGemini(): GoogleGenAI {
   return new GoogleGenAI({ apiKey });
 }
 
-// REAL AI Article Generation API Endpoint with Gemini 2.5 Flash
+// Helper to call Gemini with candidate models in sequence
+async function generateGeminiContentWithFallback(prompt: string, jsonMode: boolean = true) {
+  const ai = getGemini();
+  // Valid active models in @google/genai (no deprecated or forbidden model names)
+  const candidateModels = [
+    "gemini-3.7-flash",
+    "gemini-flash-latest",
+    "gemini-3.1-flash-lite",
+  ];
+  let lastError: any = null;
+
+  for (const model of candidateModels) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: jsonMode
+          ? {
+              responseMimeType: "application/json",
+              maxOutputTokens: 8192,
+            }
+          : {
+              maxOutputTokens: 8192,
+            },
+      });
+
+      const raw = response.text || "";
+      if (raw.trim()) {
+        return raw;
+      }
+    } catch (err: any) {
+      console.warn(`Model ${model} attempt failed:`, err?.message || err);
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error("All Gemini candidate models failed to generate content.");
+}
+
+// REAL AI Article Generation API Endpoint with Gemini 3.7 Flash
 app.post("/api/generate-article", async (req, res) => {
   try {
     const { topic, category, difficulty, details } = req.body;
@@ -132,9 +514,7 @@ app.post("/api/generate-article", async (req, res) => {
       return res.status(400).json({ error: "Το θέμα (topic) είναι υποχρεωτικό." });
     }
 
-    const ai = getGemini();
-
-    const prompt = `Είσαι ένας κορυφαίος Έλληνας Καθηγητής Γεωπονίας & Ειδικός Αγροτεχνολογίας IoT (Smart Agriculture).
+    const prompt = `Είσαι ένας κορυφαίος Έλληνας Καθηγητής Γεωπονίας & Ειδικός Αγροτεχνολογίας IoT (Smart Agriculture) στο smartgarden.gr.
 
 Γράψε ένα ΕΞΑΝΤΛΗΤΙΚΟ, ΠΛΗΡΕΣ, ΑΠΟΛΥΤΑ ΕΞΕΙΔΙΚΕΥΜΕΝΟ ΚΑΙ ΕΠΙΣΤΗΜΟΝΙΚΟ ΕΓΧΕΙΡΙΔΙΟ στα Ελληνικά για το θέμα:
 "${topic}"
@@ -145,10 +525,11 @@ app.post("/api/generate-article", async (req, res) => {
 
 ΑΥΣΤΗΡΕΣ ΠΡΟΔΙΑΓΡΑΦΕΣ ΕΚΤΑΣΗΣ & ΠΕΡΙΕΧΟΜΕΝΟΥ (ΥΠΟΧΡΕΩΤΙΚΟ 2.200 - 3.000+ ΛΕΞΕΙΣ):
 1. ΕΚΤΑΣΗ: Το άρθρο ΠΡΕΠΕΙ ΝΑ ΕΙΝΑΙ ΤΟΥΛΑΧΙΣΤΟΝ 2.200 ΛΕΞΕΙΣ. Ανέπτυξε σε μέγιστο βάθος κάθε υποενότητα με πραγματικές αριθμητικές τιμές (pH, EC, ppm, λίτρα/ώρα, γραμμάρια ανά λίτρο νερού).
-2. 100% ΕΣΤΙΑΣΜΕΝΟ στο θέμα "${topic}". Μην γράφεις γενικολογίες.
+2. 100% ΕΣΤΙΑΣΜΕΝΟ στο θέμα "${topic}". Μην γράφεις γενικολογίες ή τετριμμένα κλισέ.
+3. ΒΟΤΑΝΙΚΗ ΑΚΡΙΒΕΙΑ: Ανάφερε τη σωστή λατινική επιστημονική ονομασία και βοτανική οικογένεια στα ελληνικά (π.χ. *Lactuca sativa* - Asteraceae για μαρούλι, *Solanum lycopersicum* - Solanaceae για ντομάτα).
 
 ΔΟΜΗ ΠΟΥ ΠΡΕΠΕΙ ΝΑ ΑΝΑΠΤΥΞΕΙΣ ΑΝΑΛΥΤΙΚΑ ΣΤΟ MARKDOWN CONTENT:
-## Εισαγωγή: Βοτανική Ταξινόμηση, Φυσιολογία & Οικολογικός Ρόλος του ${topic}
+## Εισαγωγή: Βοτανική Ταξινόμηση, Φυσιολογία & Οικολογικός Ρόλος
 (300+ λέξεις: Βοτανική ονοματολογία, προέλευση, κυτταρική φυσιολογία, διαπνοή, φωτοσυνθετική ικανότητα)
 
 ### 1. Εδαφοκλιματικές Απαιτήσεις, Προετοιμασία Υποστρώματος & Φωτισμός
@@ -178,7 +559,7 @@ app.post("/api/generate-article", async (req, res) => {
 ### 9. Master Quality Control Checklist
 (Λίστα ελέγχου [ ] για όλα τα κρίσιμα σημεία)
 
-ΤΙΤΛΟΣ SEO: Γράψε συγκεκριμένο τίτλο σε φυσικό στυλ αναζήτησης Google (π.χ. "Πώς να Φροντίσετε Επιτυχημένα το...", "Γιατί Κιτρινίζουν τα Φύλλα...").
+ΤΙΤΛΟΣ SEO: Γράψε συγκεκριμένο τίτλο σε φυσικό στυλ αναζήτησης Google (π.χ. "Πώς να Καλλιεργήσετε Επιτυχημένα: ${topic}", "Γιατί Κιτρινίζουν τα Φύλλα...").
 
 Επέστρεψε ΜΟΝΟ αυστηρό JSON:
 {
@@ -190,17 +571,17 @@ app.post("/api/generate-article", async (req, res) => {
   "searchKeywordImage": "unsplash image search keyword in english"
 }`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        maxOutputTokens: 8192,
-      },
-    });
+    const jsonText = await generateGeminiContentWithFallback(prompt, true);
+    
+    // Clean any markdown formatting wrap if returned
+    let cleanJson = jsonText.trim();
+    if (cleanJson.startsWith("```json")) {
+      cleanJson = cleanJson.replace(/^```json/, "").replace(/```$/, "").trim();
+    } else if (cleanJson.startsWith("```")) {
+      cleanJson = cleanJson.replace(/^```/, "").replace(/```$/, "").trim();
+    }
 
-    const jsonText = response.text || "{}";
-    const parsed = JSON.parse(jsonText);
+    const parsed = JSON.parse(cleanJson);
 
     return res.json({
       success: true,
@@ -219,7 +600,6 @@ app.post("/api/generate-article", async (req, res) => {
 app.post("/api/expand-article", async (req, res) => {
   try {
     const { title, currentContent, category } = req.body;
-    const ai = getGemini();
 
     const prompt = `Είσαι κορυφαίος Καθηγητής Γεωπονίας. Πάρε το παρακάτω άρθρο με τίτλο "${title}" και ανάπτυξέ το σε ένα υπερ-αναλυτικό, επιστημονικό εγχειρίδιο ΤΟΥΛΑΧΙΣΤΟΝ 2.200 ΛΕΞΕΩΝ.
 Υπάρχον κείμενο: ${currentContent}
@@ -241,16 +621,15 @@ app.post("/api/expand-article", async (req, res) => {
   "keyTakeaways": ["Σημείο 1", "Σημείο 2", "Σημείο 3", "Σημείο 4"]
 }`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        maxOutputTokens: 8192,
-      },
-    });
+    const jsonText = await generateGeminiContentWithFallback(prompt, true);
+    let cleanJson = jsonText.trim();
+    if (cleanJson.startsWith("```json")) {
+      cleanJson = cleanJson.replace(/^```json/, "").replace(/```$/, "").trim();
+    } else if (cleanJson.startsWith("```")) {
+      cleanJson = cleanJson.replace(/^```/, "").replace(/```$/, "").trim();
+    }
 
-    const parsed = JSON.parse(response.text || "{}");
+    const parsed = JSON.parse(cleanJson);
     return res.json({ success: true, data: parsed });
   } catch (err: any) {
     console.error("AI Expand Error:", err);
@@ -533,6 +912,17 @@ app.all("/api/cron-publish", async (req, res) => {
       client.close();
     }
 
+    // Auto-notify Google Indexing API for instant crawl
+    let indexingResult = null;
+    try {
+      const { requestGoogleIndex } = await import("./server/googleIndexing.ts");
+      const newArticleUrl = `https://smartgarden.gr/article/${newArticle.slug || newId}`;
+      indexingResult = await requestGoogleIndex(newArticleUrl, "URL_UPDATED");
+      console.log(`[CRON] Google Indexing API notified for ${newArticleUrl}`);
+    } catch (e: any) {
+      console.warn(`[CRON] Google Indexing API warning: ${e?.message}`);
+    }
+
     return res.json({
       success: true,
       message: `🎉 Νέο άρθρο 2.200+ λέξεων "${nextTopic.title.el}" δημιουργήθηκε και ανέβηκε επιτυχώς στο smartgarden.gr!`,
@@ -540,12 +930,71 @@ app.all("/api/cron-publish", async (req, res) => {
       articleTitle: nextTopic.title.el,
       totalArticles: updatedArticles.length,
       publishedAt: new Date().toISOString(),
+      googleIndexing: indexingResult,
     });
   } catch (err: any) {
     console.error("[CRON ERROR]:", err);
     return res.status(500).json({
       success: false,
       error: err?.message || "Σφάλμα κατά την εκτέλεση του cron auto-publish",
+    });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// 🚀 GOOGLE INDEXING API ENDPOINTS
+// ─────────────────────────────────────────────────────────────
+app.post("/api/google-index", async (req, res) => {
+  try {
+    const { url, type = "URL_UPDATED" } = req.body;
+    if (!url) {
+      return res.status(400).json({ success: false, error: "Missing url parameter" });
+    }
+    const { requestGoogleIndex } = await import("./server/googleIndexing.ts");
+    const data = await requestGoogleIndex(url, type);
+    return res.json({ success: true, url, data });
+  } catch (err: any) {
+    const message = err.response?.data?.error?.message || err.message;
+    return res.status(err.response?.status || 500).json({
+      success: false,
+      error: message,
+      details: err.response?.data || null,
+    });
+  }
+});
+
+app.post("/api/google-index-all", async (req, res) => {
+  try {
+    const jsonPath = path.join(process.cwd(), "public", "latest_articles.json");
+    let articles: any[] = [];
+    if (fs.existsSync(jsonPath)) {
+      try {
+        articles = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+      } catch (e) {}
+    }
+
+    const urls = [
+      "https://smartgarden.gr/",
+      ...articles.map(a => `https://smartgarden.gr/article/${a.slug || a.id}`),
+    ];
+
+    const { indexAllSiteUrls } = await import("./server/googleIndexing.ts");
+    const results = await indexAllSiteUrls(urls);
+
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.filter(r => !r.success).length;
+
+    return res.json({
+      success: true,
+      total: urls.length,
+      successCount,
+      failCount,
+      results,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      error: err.message,
     });
   }
 });

@@ -40,6 +40,9 @@ export interface LiveWeatherData {
   lastUpdated: string;
   smartTip: string;
   isLive: boolean;
+  minTempToday: number;
+  heatAlert: boolean;
+  frostAlert: boolean;
 }
 
 function getWeatherCondition(code: number, isDay: boolean): { desc: string; icon: string } {
@@ -109,7 +112,7 @@ export async function fetchLiveWeatherData(
   const nowTime = new Date().toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit' });
 
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&daily=uv_index_max,et0_fao_evapotranspiration&timezone=auto`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&daily=uv_index_max,et0_fao_evapotranspiration,temperature_2m_min&timezone=auto`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Weather API returned ${res.status}`);
     const data = await res.json();
@@ -128,6 +131,10 @@ export async function fetchLiveWeatherData(
     const evapotranspiration = daily.et0_fao_evapotranspiration?.[0] !== undefined
       ? Math.round(daily.et0_fao_evapotranspiration[0] * 10) / 10
       : Math.round((temp * 0.18 + 1.2) * 10) / 10;
+
+    const minTempToday = daily.temperature_2m_min?.[0] !== undefined
+      ? Math.round(daily.temperature_2m_min[0] * 10) / 10
+      : temp - 8;
 
     const cond = getWeatherCondition(weatherCode, isDay);
     const smartTip = generateSmartTip(temp, humidity, uvIndex, evapotranspiration, windSpeed, weatherCode);
@@ -148,12 +155,16 @@ export async function fetchLiveWeatherData(
       lastUpdated: nowTime,
       smartTip,
       isLive: true,
+      minTempToday,
+      heatAlert: temp >= 33 || evapotranspiration >= 6.5,
+      frostAlert: minTempToday <= 3,
     };
   } catch (error) {
     console.warn('Live weather fetch failed, using realistic fallback:', error);
     // Calculated realistic fallback based on month and time
     const month = new Date().getMonth(); // 0-11
     const baseTemp = [12, 13, 16, 20, 25, 30, 33, 33, 28, 23, 17, 13][month] || 25;
+    const baseMinTemp = baseTemp - 8;
     const tip = generateSmartTip(baseTemp, 48, 7.2, 5.8, 14, 0);
 
     return {
@@ -172,6 +183,9 @@ export async function fetchLiveWeatherData(
       lastUpdated: nowTime,
       smartTip: tip,
       isLive: false,
+      minTempToday: baseMinTemp,
+      heatAlert: baseTemp >= 33,
+      frostAlert: baseMinTemp <= 3,
     };
   }
 }

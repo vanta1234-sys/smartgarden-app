@@ -219,11 +219,15 @@ export const TikTokStudio: React.FC<TikTokStudioProps> = ({
         time: '0:24 - 0:30',
         tag: 'CALL TO ACTION',
         visual: 'Πανέμορφο καταπράσινο μπαλκόνι & Logo SmartGarden',
-        // Spoken text differs from the on-screen text here on purpose: Greek TTS reads the
-        // brand name "SmartGarden.gr" awkwardly as-is, so the audio uses a phonetic Greek
-        // spelling ("Σμαρτ Γκάρντεν") while the caption still shows the real spelling.
+        // Spoken text differs from the displayed subtitle here on purpose: Greek TTS reads
+        // the brand name "SmartGarden.gr" awkwardly as-is, so the audio uses a phonetic Greek
+        // spelling ("Σμαρτ Γκάρντεν") while both on-screen texts show the real spelling.
+        // captionDisplay overrides the small subtitle strip (see step 6 in the render loop),
+        // which otherwise echoes `voiceover` verbatim and would leak the phonetic spelling
+        // onto the screen too (2026-09-06 fix, caught by a user watching the actual video).
         voiceover: `«Αποθήκευσε το για αργότερα και δες τον πλήρη οδηγό στο Σμαρτ Γκάρντεν τελεία τζι-αρ»`,
-        onScreenText: `Αποθήκευσέ το για αργότερα`
+        onScreenText: `Αποθήκευσέ το για αργότερα`,
+        captionDisplay: `Αποθήκευσε το για αργότερα και δες τον πλήρη οδηγό στο SmartGarden.gr`
       }
     ];
 
@@ -808,8 +812,12 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
           hookY += 68;
         }
 
-        // 6. Smaller synced caption line (mimics auto-generated subtitle style)
-        const capLines = wrapLines(scene.voiceover.replace(/[«»]/g, ''), 34, 700, canvas.width - 180);
+        // 6. Smaller synced caption line (mimics auto-generated subtitle style).
+        // Uses captionDisplay when a scene sets one (so a spoken-only phonetic hack, like the
+        // CTA scene's brand-name pronunciation fix, never leaks onto the screen) — falls back
+        // to the raw voiceover text for every scene that doesn't need the two to differ.
+        const captionSource = (scene as any).captionDisplay || scene.voiceover;
+        const capLines = wrapLines(captionSource.replace(/[«»]/g, ''), 34, 700, canvas.width - 180);
         let capY = 1080;
         for (const l of capLines.slice(0, 2)) {
           drawOutlinedText(l, canvas.width / 2, capY, 34, 700);
