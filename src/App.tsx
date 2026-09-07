@@ -16,6 +16,7 @@ import { SoilCalculator } from './components/SoilCalculator';
 import { SymptomWizard } from './components/SymptomWizard';
 import { CompanionMatrix } from './components/CompanionMatrix';
 import { MyBalcony } from './components/MyBalcony';
+import { NewsletterSignup } from './components/NewsletterSignup';
 import { FaqAccordion } from './components/FaqAccordion';
 import { getFaqsForArticle } from './services/schemaService';
 import { ArticleMarkdown } from './components/ArticleMarkdown';
@@ -1141,6 +1142,9 @@ pause
 
             {/* Soil / pot size calculator */}
             <SoilCalculator />
+
+            {/* Email newsletter capture */}
+            <NewsletterSignup />
 
             {/* Articles Grid Preview */}
             <div className="space-y-4">
