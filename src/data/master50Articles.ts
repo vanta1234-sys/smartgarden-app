@@ -99,7 +99,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1632771094865-5760e61c04f9?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-09-01",
     "dateFormatted": {
       "el": "1 Σεπτεμβρίου 2026",
@@ -163,7 +163,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1621928805940-32212f98b339?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-09-01",
     "dateFormatted": {
       "el": "1 Σεπτεμβρίου 2026",
@@ -281,7 +281,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1432457990754-c8b5f21448de?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-31",
     "dateFormatted": {
       "el": "31 Αυγούστου 2026",
@@ -345,7 +345,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1683320553264-e31acd4196e7?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-31",
     "dateFormatted": {
       "el": "31 Αυγούστου 2026",
@@ -409,7 +409,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1621496654772-c66c48290259?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-31",
     "dateFormatted": {
       "el": "31 Αυγούστου 2026",
@@ -473,7 +473,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1766430497661-bcfb8c90bf1b?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-30",
     "dateFormatted": {
       "el": "30 Αυγούστου 2026",
@@ -537,7 +537,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1432457990754-c8b5f21448de?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-30",
     "dateFormatted": {
       "el": "30 Αυγούστου 2026",
@@ -601,7 +601,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1683320553264-e31acd4196e7?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-30",
     "dateFormatted": {
       "el": "30 Αυγούστου 2026",
@@ -665,7 +665,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1621496654772-c66c48290259?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-29",
     "dateFormatted": {
       "el": "29 Αυγούστου 2026",
@@ -729,7 +729,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1645620352297-edef980f7e75?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-29",
     "dateFormatted": {
       "el": "29 Αυγούστου 2026",
@@ -793,7 +793,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1741326757602-186060c5d5b5?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-29",
     "dateFormatted": {
       "el": "29 Αυγούστου 2026",
@@ -921,7 +921,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1632771094865-5760e61c04f9?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-28",
     "dateFormatted": {
       "el": "28 Αυγούστου 2026",
@@ -985,7 +985,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1621928805940-32212f98b339?w=1200&auto=format&fit=crop&q=80",
     "date": "2026-08-28",
     "dateFormatted": {
       "el": "28 Αυγούστου 2026",
@@ -1042,7 +1042,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1621496654772-c66c48290259?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Ολοκληρωμένος Τεχνικός Οδηγός: Κομποστοποίηση στο Μπαλκόνι με Κάδους Bokashi & Γαιοσκώληκες: Μηδενικές Οσμές & Υγρό Λίπασμα (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Ολοκληρωμένος Τεχνικός Οδηγός: Κομποστοποίηση στο Μπαλκόνι με Κάδους Bokashi & Γαιοσκώληκες: Μηδενικές Οσμές & Υγρό Λίπασμα (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)\"."
@@ -1099,7 +1099,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1683320553264-e31acd4196e7?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Ολοκληρωμένος Τεχνικός Οδηγός: Ελιά σε Γλάστρα & Μπονσάι Ελιάς: Κλάδεμα Διαμόρφωσης, Μεταφύτευση & Λίπανση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Ολοκληρωμένος Τεχνικός Οδηγός: Ελιά σε Γλάστρα & Μπονσάι Ελιάς: Κλάδεμα Διαμόρφωσης, Μεταφύτευση & Λίπανση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)\"."
@@ -1156,7 +1156,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1432457990754-c8b5f21448de?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Ολοκληρωμένος Τεχνικός Οδηγός: Εσπεριδοειδή στο Μπαλκόνι (Λεμονιά, Κουμκουάτ, Μανταρινιά): Χλώρωση Σιδήρου & Καρπόδεση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Ολοκληρωμένος Τεχνικός Οδηγός: Εσπεριδοειδή στο Μπαλκόνι (Λεμονιά, Κουμκουάτ, Μανταρινιά): Χλώρωση Σιδήρου & Καρπόδεση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)\"."
@@ -1213,7 +1213,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1645620352297-edef980f7e75?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Εξειδικευμένος Τεχνικός Οδηγός: Βιολογική Αντιμετώπιση Αγριόχορτων και Ζιζανίων με Βιολογικό Ξύδι & Corn Gluten (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Εξειδικευμένος Τεχνικός Οδηγός: Βιολογική Αντιμετώπιση Αγριόχορτων και Ζιζανίων με Βιολογικό Ξύδι & Corn Gluten (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)\"."
@@ -1270,7 +1270,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1621928805940-32212f98b339?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Εξειδικευμένος Τεχνικός Οδηγός: Υπερυψωμένα Παρτέρια (Raised Beds): Κατασκευή, Στρωμάτωση Hugelkultur & Αποστράγγιση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Εξειδικευμένος Τεχνικός Οδηγός: Υπερυψωμένα Παρτέρια (Raised Beds): Κατασκευή, Στρωμάτωση Hugelkultur & Αποστράγγιση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)\"."
@@ -1327,7 +1327,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1632771094865-5760e61c04f9?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Εξειδικευμένος Τεχνικός Οδηγός: Αυτόματο Πότισμα σε Ταράτσες με Υψηλό Άνεμο & Έντονη Εξάτμιση: Σταλάκτες & Ανεμοφράκτες (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Εξειδικευμένος Τεχνικός Οδηγός: Αυτόματο Πότισμα σε Ταράτσες με Υψηλό Άνεμο & Έντονη Εξάτμιση: Σταλάκτες & Ανεμοφράκτες (Επιστημονική Διαχείριση, Άρδευση, Θρέψη & Προστασία)\"."
@@ -1384,7 +1384,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Ντομάτας σε Γλάστρα: Ολοκληρωμένος Οδηγός Άρδευσης, Θρέψης & Πρόληψης Ασθενειών». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Ντομάτας σε Γλάστρα: Ολοκληρωμένος Οδηγός Άρδευσης, Θρέψης & Πρόληψης Ασθενειών\"."
@@ -1498,7 +1498,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1620055494738-248ba57ed714?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Βιολογική Αντιμετώπιση Τετρανύχου, Μελίγκρας & Θρίπα με Φυσικά Σκευάσματα 2026». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Βιολογική Αντιμετώπιση Τετρανύχου, Μελίγκρας & Θρίπα με Φυσικά Σκευάσματα 2026\"."
@@ -1555,7 +1555,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1758372120921-29d4569f609a?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Κάθετοι Κήποι (Vertical Gardens) σε Μικρά Μπαλκόνια: Πάνελ, Συστήματα Τσέπης & Αυτόματη Άρδευση». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Κάθετοι Κήποι (Vertical Gardens) σε Μικρά Μπαλκόνια: Πάνελ, Συστήματα Τσέπης & Αυτόματη Άρδευση\"."
@@ -1612,7 +1612,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1687936682320-93480a2a69bf?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Μεσογειακός Κήπος & Ανθε��τικά Φυτά στον Καύσωνα: Βουκαμβίλιες, Γιασεμί & Πυξάρι». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Μεσογειακός Κήπος & Ανθεκτικά Φυτά στον Καύσωνα: Βουκαμβίλιες, Γιασεμί & Πυξάρι\"."
@@ -1669,7 +1669,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1584795962384-dce385272216?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Έξυπνοι Αισθητήρες Εδάφους Zigbee & WiFi: Μέτρηση NPK, Υγρασίας, Αγωγιμότητας (EC) & Φωτός». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Έξυπνοι Αισθητήρες Εδάφους Zigbee & WiFi: Μέτρηση NPK, Υγρασίας, Αγωγιμότητας (EC) & Φωτός\"."
@@ -1726,7 +1726,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1432457990754-c8b5f21448de?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Εσπεριδοειδή στο Μπαλκόνι (Λεμονιά, Κουμκουάτ, Μανταρινιά): Χλώρωση Σιδήρου & Καρπόδεση». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Εσπεριδοειδή στο Μπαλκόνι (Λεμονιά, Κουμκουάτ, Μανταρινιά): Χλώρωση Σιδήρου & Καρπόδεση\"."
@@ -1783,7 +1783,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1741326757602-186060c5d5b5?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Ρομποτικά Χλοοκοπτικά 2026: Χωρίς Καλώδιο με RTK-GNSS, 3D LiDAR & AI Vision». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Ρομποτικά Χλοοκοπτικά 2026: Χωρίς Καλώδιο με RTK-GNSS, 3D LiDAR & AI Vision\"."
@@ -1840,7 +1840,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1558449028-b53a39d100fc?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Αυτόματο Πότισμα με Ηλιακό Πάνελ & Συλλογή Βρόχινου Νερού: Zero Energy Off-Grid». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Αυτόματο Πότισμα με Ηλιακό Πάνελ & Συλλογή Βρόχινου Νερού: Zero Energy Off-Grid\"."
@@ -1897,7 +1897,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1682629088818-1ec55d0cf45b?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Συστήματα Υδροπονίας & Fertigation: Οδηγός pH, Αγωγιμότητας EC και Θρεπτικών Διαλυμάτων NPK». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Συστήματα Υδροπονίας & Fertigation: Οδηγός pH, Αγωγιμότητας EC και Θρεπτικών Διαλυμάτων NPK\"."
@@ -1954,7 +1954,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1556929361-f0763cc59812?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Αρωματικών Φυτών σε Ζαρντινιέρα: Βασιλικός, Δενδρολίβανο, Ρίγανη & Θυμάρι». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Αρωματικών Φυτών σε Ζαρντινιέρα: Βασιλικός, Δενδρολίβανο, Ρίγανη & Θυμάρι\"."
@@ -2182,7 +2182,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1680124744736-859f16257ef0?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Κλάδεμα Καρποφόρων Δέντρων: Ελιές, Εσπεριδοειδή, Πυρηνόκαρπα & Μηλοειδή». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Κλάδεμα Καρποφόρων Δέντρων: Ελιές, Εσπεριδοειδή, Πυρηνόκαρπα & Μηλοειδή\"."
@@ -2296,7 +2296,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1676043966926-c575c1ef320a?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Αγγουριού & Κολοκυθιού σε Μεγάλα Δοχεία: Υποστύλωση & Επικονίαση». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Αγγουριού & Κολοκυθιού σε Μεγάλα Δοχεία: Υποστύλωση & Επικονίαση\"."
@@ -2353,7 +2353,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1533460004989-cef01064af7e?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Χλοοτάπητας (Γκαζόν) στη Μεσόγειο: Επιλογή Ποικιλίας (Bermuda, Paspalum, Festuca) & Άρδευση». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Χλοοτάπητας (Γκαζόν) στη Μεσόγειο: Επιλογή Ποικιλίας (Bermuda, Paspalum, Festuca) & Άρδευση\"."
@@ -2410,7 +2410,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1738598665698-7fd7af4b5e0c?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Συστήματα Έξυπνου Ποτίσματος με Μετεωρολογικό Σταθμό (Weather-Based Irrigation)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Συστήματα Έξυπνου Ποτίσματος με Μετεωρολογικό Σταθμό (Weather-Based Irrigation)\"."
@@ -2467,7 +2467,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1613881553903-4543f5f2cac9?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Μελιτζάνας σε Γλάστρα: Επικονίαση, Στήριξη & Φυτοπροστασία από Δορυφόρο». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Μελιτζάνας σε Γλάστρα: Επικονίαση, Στήριξη & Φυτοπροστασία από Δορυφόρο\"."
@@ -2638,7 +2638,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1616075278464-3f3d5f03c6b4?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Βιολογική Αντιμετώπιση Μυκήτων (Περονόσπορος, Ωίδιο, Σκωρίαση) με Χαλκό & Θειάφι». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Βιολογική Αντιμετώπιση Μυκήτων (Περονόσπορος, Ωίδιο, Σκωρίαση) με Χαλκό & Θειάφι\"."
@@ -2695,7 +2695,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1697165927010-a966c1456ea7?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Αυτόματοι Ηλεκτροβάνες & Προγραμματιστές Bluetooth/WiFi: Οδηγός Εγκατάστασης». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Αυτόματοι Ηλεκτροβάνες & Προγραμματιστές Bluetooth/WiFi: Οδηγός Εγκατάστασης\"."
@@ -2809,7 +2809,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1587402943166-9b469af488d9?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Ανθοφόροι Θάμνοι για Φράχτες (Πικροδάφνη, Λιγούστρο, Φωτίνια, Πυράκανθος)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Ανθοφόροι Θάμνοι για Φράχτες (Πικροδάφνη, Λιγούστρο, Φωτίνια, Πυράκανθος)\"."
@@ -2923,7 +2923,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1588516231474-2e1cc85c262e?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Σύκου (Συκιά) σε Μεγάλη Γλάστρα & Μικρό Κήπο: Ποικιλίες & Κλάδεμα». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Σύκου (Συκιά) σε Μεγάλη Γλάστρα & Μικρό Κήπο: Ποικιλίες & Κλάδεμα\"."
@@ -2980,7 +2980,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1542913235-1f46ce06443d?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Μανιταριών στο Σπίτι με Έτοιμα Μπλοκ (Pleurotus & Shiitake)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Μανιταριών στο Σπίτι με Έτοιμα Μπλοκ (Pleurotus & Shiitake)\"."
@@ -3037,7 +3037,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1594353162824-a8b237f9adae?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Έξυπνος Φωτισμός Κήπου & Μπαλκονιού (Solar & Smart 12V Low Voltage)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Έξυπνος Φωτισμός Κήπου & Μπαλκονιού (Solar & Smart 12V Low Voltage)\"."
@@ -3151,7 +3151,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1738598665806-7ecc32c3594c?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Συντήρηση & Καθαρισμός Συστημάτων Άρδευσης: Αφαίρεση Αλάτων & Βουλωμένων Σταλακτών». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Συντήρηση & Καθαρισμός Συστημάτων Άρδευσης: Αφαίρεση Αλάτων & Βουλωμένων Σταλακτών\"."
@@ -3265,7 +3265,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1565011523534-747a8601f10a?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Φυσικά Απωθητικά Κουνουπιών: Φυτά που Διώχνουν Έντομα (Σιτρονέλα, Αρμπαρόριζα, Λεβάντα)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Φυσικά Απωθητικά Κουνουπιών: Φυτά που Διώχνουν Έντομα (Σιτρονέλα, Αρμπαρόριζα, Λεβάντα)\"."
@@ -3322,7 +3322,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1601767770428-265b2c67780c?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Ροδιάς σε Γλάστρα & Κήπο: Πλούσια Ανθοφορία & Ζουμερά Ρόδια». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Ροδιάς σε Γλάστρα & Κήπο: Πλούσια Ανθοφορία & Ζουμερά Ρόδια\"."
@@ -3379,7 +3379,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1671366666921-a2899f18049b?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Δημιουργία Οικολογικής Λιμνούλας (Pond) στον Κήπο: Νούφαρα, Υδρόβια Φυτά & Ψάρια». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Δημιουργία Οικολογικής Λιμνούλας (Pond) στον Κήπο: Νούφαρα, Υδρόβια Φυτά & Ψάρια\"."
@@ -3436,7 +3436,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1661760194787-1f4d523f2eec?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Σκόρδου & Κρεμμυδιού σε Ζαρντινιέρες: Φθινοπωρινή Φύτευση & Συγκομιδή». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Σκόρδου & Κρεμμυδιού σε Ζαρντινιέρες: Φθινοπωρινή Φύτευση & Συγκομιδή\"."
@@ -3550,7 +3550,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1598860691285-8c308eb41e7c?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Φασολιών & Μπιζελιών: Δέσμευση Αζώτου & Υποστύλωση Αναρριχώμενων». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Φασολιών & Μπιζελιών: Δέσμευση Αζώτου & Υποστύλωση Αναρριχώμενων\"."
@@ -3607,7 +3607,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1692369584496-3216a88f94c1?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Αυτόματοι Δοσομετρητές Λιπάσματος (Venturi & Dosatron): Οδηγός Υδρολίπανσης». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Αυτόματοι Δοσομετρητές Λιπάσματος (Venturi & Dosatron): Οδηγός Υδρολίπανσης\"."
@@ -3664,7 +3664,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1585242902894-e8a65ecbe1ef?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Αβοκάντο (Avocado) από Κουκούτσι σε Δέντρο: Εμβολιασμός & Φροντίδα». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Αβοκάντο (Avocado) από Κουκούτσι σε Δέντρο: Εμβολιασμός & Φροντίδα\"."
@@ -3778,7 +3778,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1624668430039-0175a0fbf006?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Συγκαλλιέργεια Φυτών (Companion Planting): Ποια Φυτά Αγαπιούνται και Ποια Μισιούνται». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Συγκαλλιέργεια Φυτών (Companion Planting): Ποια Φυτά Αγαπιούνται και Ποια Μισιούνται\"."
@@ -3835,7 +3835,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1630179187569-93863f16be42?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Μπανανιάς (Musa Basjoo & Dwarf Cavendish) σε Ελληνικό Μπαλκόνι & Κήπο». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Μπανανιάς (Musa Basjoo & Dwarf Cavendish) σε Ελληνικό Μπαλκόνι & Κήπο\"."
@@ -3949,7 +3949,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1602769515559-e15133a7e992?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Κρεμμυδιού Σαλάτας & Σχοινόπρασου σε Μικρές Γλάστρες Κουζίνας». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Καλλιέργεια Κρεμμυδιού Σαλάτας & Σχοινόπρασου σε Μικρές Γλάστρες Κουζίνας\"."
@@ -4006,7 +4006,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1787963787813-3254234363d6?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Φυσική Καταπολέμηση Σαλιγκαριών & Γυμνοσαλιάγκων Χωρίς Δηλητήρια». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Φυσική Καταπολέμηση Σαλιγκαριών & Γυμνοσαλιάγκων Χωρίς Δηλητήρια\"."
@@ -4120,7 +4120,7 @@ export const MASTER_50_ARTICLES: ArticleItem[] = [
       },
       "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80"
     },
-    "image": "https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1200&auto=format&fit=crop&q=80",
+    "image": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
     "summary": {
       "el": "Ολοκληρωμένος επιστημονικός οδηγός για «Ετήσιος Οδηγός Συντήρησης Κήπου & Μπαλκονιού: Μήνας προς Μήνα Εργασίες 2026». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.",
       "en": "Comprehensive scientific agronomy guide for \"Ετήσιος Οδηγός Συντήρησης Κήπου & Μπαλκονιού: Μήνας προς Μήνα Εργασίες 2026\"."
