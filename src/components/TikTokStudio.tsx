@@ -669,15 +669,20 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
       // only have one image on file.
       const backgroundPhotoPool = [
         currentArticle.image,
-        // photo-1534766555764 was pulled after a user report confirmed it now shows an
-        // unrelated dessert/cake photo, not the citrus branch its old label claimed
-        // (Unsplash IDs can get reassigned/replaced) — verified-safe replacements only below.
+        // This pool was found 2026-09-08 to still contain 3 of the ~25 IDs confirmed
+        // wrong-content during the site-wide visual audit the same day (Unsplash IDs can
+        // get reassigned by photographers to unrelated content — a status-code check never
+        // catches this, only actually viewing the image does). Caught live on a real
+        // published YouTube Short: a Hugelkultur/composting video showed a citrus-fruit-slice
+        // photo as its background. All entries below are now from the audit's confirmed-good
+        // 9-photo pool (see src/data/verifiedImages.ts) — do not add an ID here without
+        // visually confirming its actual content first.
         "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80", // ripe tomatoes on vine
-        "https://images.unsplash.com/photo-1546548970-71785318a17b?w=1200&auto=format&fit=crop&q=80", // potted olive/citrus tree
-        "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // Mediterranean garden flowers
+        "https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1200&auto=format&fit=crop&q=80", // bonsai tree in pot
+        "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // tomato greenhouse interior
         "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", // lush vertical garden
-        "https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?w=1200&auto=format&fit=crop&q=80", // pruning shears in orchard
-        "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=1200&auto=format&fit=crop&q=80", // fig/fruit tree branches
+        "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1200&auto=format&fit=crop&q=80", // seedling tray with sprouts
+        "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80", // monstera indoor plant
       ].filter((url): url is string => !!url);
 
       const preloadImage = (src: string): Promise<HTMLImageElement> => {
