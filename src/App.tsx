@@ -68,7 +68,9 @@ import {
   Dices,
   Image as ImageIcon,
   Upload,
-  X
+  X,
+  Youtube,
+  Facebook
 } from 'lucide-react';
 import { ArticleItem } from './types';
 import { WEEKLY_TRENDING_TOPICS, TrendingTopic } from './data/trendingTopics';
@@ -2754,6 +2756,28 @@ pause
           </div>
 
           <div className="flex items-center gap-4 text-[11px]">
+            <a
+              href="https://www.youtube.com/@Smartgarden-h4f"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-red-400 flex items-center gap-1 transition-colors"
+              title="SmartGarden.gr στο YouTube"
+            >
+              <Youtube className="w-3.5 h-3.5 text-red-500" />
+              <span>YouTube</span>
+            </a>
+
+            <a
+              href="https://www.facebook.com/profile.php?id=1340919395764582"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-blue-400 flex items-center gap-1 transition-colors"
+              title="SmartGarden.gr στο Facebook"
+            >
+              <Facebook className="w-3.5 h-3.5 text-blue-500" />
+              <span>Facebook</span>
+            </a>
+
             <a
               href="/sitemap.xml"
               target="_blank"
