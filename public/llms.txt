@@ -1,0 +1,29 @@
+# SmartGarden.gr
+
+> Ελληνικό ψηφιακό περιοδικό κηπουρικής: επιστημονικοί οδηγοί για μπαλκόνι, γλάστρες, λαχανόκηπο και κήπο, με ζωντανή τηλεμετρία καιρού (εξατμισοδιαπνοή/ET0) και διαδραστικά εργαλεία υπολογισμού.
+
+SmartGarden.gr publishes daily, scientifically-grounded gardening guides for the Greek/Mediterranean climate — botanical names, pH/EC parameters, and season-specific advice, not generic content. Articles cover balcony container gardening, vegetable growing, irrigation/IoT automation, robotic mowers, pest & disease management, and plant propagation. The site also runs live per-city weather telemetry (temperature, humidity, UV index, evapotranspiration) for 15 Greek cities and several free interactive tools (fertilizer/spray dosage calculator, soil volume calculator, AI photo-based plant diagnosis, symptom-based diagnosis wizard, companion-planting matrix). Content is in Greek; article URLs follow `/article/<slug>`.
+
+## Άρθρα ανά κατηγορία
+
+- [Μπαλκόνι & Γλάστρες](https://smartgarden.gr/kategoria/balcony): Καλλιέργεια σε γλάστρα, μπαλκόνι, μικρό χώρο
+- [Φροντίδα Φυτών](https://smartgarden.gr/kategoria/plant_care): Κλάδεμα, λίπανση, φυτοπροστασία, ασθένειες
+- [Λαχανόκηπος σε Γλάστρα](https://smartgarden.gr/kategoria/vegetables): Ντομάτα, πιπεριά και άλλα λαχανικά σε container
+- [Λαχανόκηπος & Raised Beds](https://smartgarden.gr/kategoria/vegetable_garden): Υπερυψωμένα παρτέρια, Hugelkultur
+- [Έξυπνο Πότισμα & IoT](https://smartgarden.gr/kategoria/irrigation_iot): Αυτόματο πότισμα, αισθητήρες εδάφους, τηλεμετρία
+- [Ρομποτικά Χλοοκοπτικά](https://smartgarden.gr/kategoria/robotic_mowers): RTK-GPS, LiDAR, χλοοτάπητας χωρίς καλώδιο
+- [Υδροπονία](https://smartgarden.gr/kategoria/hydroponics): Καλλιέργεια χωρίς χώμα στο σπίτι
+
+## Εργαλεία & Δεδομένα
+
+- [Ημερολόγιο Σποράς](https://smartgarden.gr/imerologio-sporas): Μηνιαίος οδηγός εργασιών κήπου/μπαλκονιού, φιλτραρισμένος ανά μήνα και τύπο εργασίας
+- [Κλίμα Κήπου](https://smartgarden.gr/klima-kipoy): Σύγκριση εξατμισοδιαπνοής/θερμοκρασίας/υγρασίας σε 15 ελληνικές πόλεις με σύσταση ποτίσματος ανά πόλη
+- [RSS Feed](https://smartgarden.gr/rss.xml): Πλήρης ροή όλων των νέων άρθρων
+- [Sitemap](https://smartgarden.gr/sitemap.xml): Πλήρης λίστα όλων των δημοσιευμένων σελίδων
+
+## Σχετικά
+
+- [Ο Συντάκτης](https://smartgarden.gr/syntaktis): Βιογραφικό του αρθρογράφου
+- [Σχετικά με το SmartGarden.gr](https://smartgarden.gr/about.html)
+- [Πολιτική Απορρήτου](https://smartgarden.gr/privacy-policy.html)
+- [Όροι Χρήσης](https://smartgarden.gr/terms-of-service.html)
