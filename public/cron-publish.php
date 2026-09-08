@@ -831,22 +831,68 @@ if (file_exists($latestFile)) {
     }
 }
 
-// Select topic rotating through catalog
-$totalExisting = count($existingArticles);
-$topicIndex = $totalExisting % count($topicPool);
-$cycleNumber = intdiv($totalExisting, count($topicPool));
-$selectedTopic = $topicPool[$topicIndex];
+// Select the LEAST-published topic in the pool, not blind round-robin.
+// The old formula (topicIndex = totalExisting % count($topicPool)) guaranteed every
+// topic got re-published every N articles forever, and once the pool had fully cycled
+// more than 4 times the 4-entry $cycleAngles list itself started repeating too — so the
+// exact same topic + exact same angle suffix got generated twice, producing genuine
+// near-duplicate articles (found and cleaned up 2026-09-08: 22 of 77 articles were
+// near-duplicates of just 9 topics). Counting real existing versions per topic and
+// capping how many times any one topic can be republished fixes this at the root,
+// instead of just deleting the duplicates it produces after the fact.
+$MAX_VERSIONS_PER_TOPIC = 3;
+$cycleAngles = array(
+    array('suffix' => 'Προχωρημένος Οδηγός', 'focus' => 'Δώσε έμφαση σε προχωρημένες τεχνικές, ειδικές περιπτώσεις και αντιμετώπιση σπάνιων προβλημάτων που δεν καλύπτονται σε βασικό οδηγό.'),
+    array('suffix' => 'Συχνά Λάθη & Λύσεις', 'focus' => 'Δώσε έμφαση σε διαγνωστικά συμπτώματα, λάθη αρχαρίων και συγκεκριμένες διορθωτικές ενέργειες βήμα-βήμα.'),
+    array('suffix' => 'Εποχιακός Οδηγός', 'focus' => 'Δώσε έμφαση σε εποχιακές διαφοροποιήσεις της φροντίδας ανά μήνα και προσαρμογές ανάλογα με το ελληνικό κλίμα.'),
+    array('suffix' => 'Ερωτήσεις & Απαντήσεις', 'focus' => 'Δόμησε το άρθρο γύρω από τις πιο συχνές ερωτήσεις αναγνωστών με άμεσες, πρακτικές απαντήσεις.'),
+);
 
-// After the pool has fully cycled once, avoid publishing a literal duplicate title/content —
-// give each repeat cycle a distinct angle so it reads as a genuinely new article, not a clone.
-if ($cycleNumber > 0) {
-    $cycleAngles = array(
-        array('suffix' => 'Προχωρημένος Οδηγός', 'focus' => 'Δώσε έμφαση σε προχωρημένες τεχνικές, ειδικές περιπτώσεις και αντιμετώπιση σπάνιων προβλημάτων που δεν καλύπτονται σε βασικό οδηγό.'),
-        array('suffix' => 'Συχνά Λάθη & Λύσεις', 'focus' => 'Δώσε έμφαση σε διαγνωστικά συμπτώματα, λάθη αρχαρίων και συγκεκριμένες διορθωτικές ενέργειες βήμα-βήμα.'),
-        array('suffix' => 'Εποχιακός Οδηγός', 'focus' => 'Δώσε έμφαση σε εποχιακές διαφοροποιήσεις της φροντίδας ανά μήνα και προσαρμογές ανάλογα με το ελληνικό κλίμα.'),
-        array('suffix' => 'Ερωτήσεις & Απαντήσεις', 'focus' => 'Δόμησε το άρθρο γύρω από τις πιο συχνές ερωτήσεις αναγνωστών με άμεσες, πρακτικές απαντήσεις.'),
-    );
-    $angle = $cycleAngles[($cycleNumber - 1) % count($cycleAngles)];
+$topicVersionCounts = array();
+foreach ($topicPool as $t) {
+    $count = 0;
+    foreach ($existingArticles as $existing) {
+        $existingSlug = isset($existing['slug']) ? $existing['slug'] : '';
+        if ($existingSlug === $t['slug'] || strpos($existingSlug, $t['slug'] . '-') === 0) {
+            $count++;
+        }
+    }
+    $topicVersionCounts[$t['slug']] = $count;
+}
+
+// Pick the topic with the fewest existing versions that's still under the cap
+// (ties broken by original pool order); topics at/over the cap are skipped entirely.
+$selectedTopic = null;
+$selectedVersionCount = null;
+foreach ($topicPool as $t) {
+    $c = $topicVersionCounts[$t['slug']];
+    if ($c >= $MAX_VERSIONS_PER_TOPIC) continue;
+    if ($selectedTopic === null || $c < $selectedVersionCount) {
+        $selectedTopic = $t;
+        $selectedVersionCount = $c;
+    }
+}
+
+if ($selectedTopic === null) {
+    // Every topic in the pool has hit the republish cap — publishing another one would
+    // only recreate the near-duplicate problem this fix exists to prevent. Skip today's
+    // run cleanly rather than force it; the pool needs new topics added, not more
+    // rewrites of the same 9.
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(array(
+        'success' => false,
+        'skipped' => true,
+        'reason' => 'All topics in topicPool have reached MAX_VERSIONS_PER_TOPIC (' . $MAX_VERSIONS_PER_TOPIC . '). Add new topics to topicPool to keep publishing.',
+        'topicVersionCounts' => $topicVersionCounts,
+    ), JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// This topic already has at least one prior version — give this one a distinct angle
+// (based on how many versions THIS topic has, not a global counter) so it reads as a
+// genuinely different article instead of a near-clone.
+if ($selectedVersionCount > 0) {
+    $angle = $cycleAngles[($selectedVersionCount - 1) % count($cycleAngles)];
     $selectedTopic['title'] = $selectedTopic['title'] . ': ' . $angle['suffix'];
     $selectedTopic['prompt_focus'] = $selectedTopic['prompt_focus'] . "\n\nΣΗΜΑΝΤΙΚΟ: " . $angle['focus'] . ' Απόφυγε να επαναλάβεις αυτολεξεί προηγούμενο άρθρο με τον ίδιο βασικό τίτλο — αυτό είναι νέο, διαφορετικό άρθρο με νέα γωνία θέασης.';
 }

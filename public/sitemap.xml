@@ -109,12 +109,6 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://smartgarden.gr/article/viologiki-zizanioktonia-ksydi-corn-gluten-20260902</loc>
-    <lastmod>2026-09-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://smartgarden.gr/article/robotic-mowers-guide-ellada-2026-20260902</loc>
     <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
@@ -145,122 +139,8 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260831</loc>
-    <lastmod>2026-08-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260831</loc>
-    <lastmod>2026-08-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260831</loc>
-    <lastmod>2026-08-31</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/kladema-anazwoogonisi-geraniwn-pelargoniwn-kafsonas-20260830</loc>
-    <lastmod>2026-08-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260830</loc>
-    <lastmod>2026-08-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260830</loc>
-    <lastmod>2026-08-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260829</loc>
-    <lastmod>2026-08-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
     <loc>https://smartgarden.gr/article/viologiki-zizanioktonia-ksydi-corn-gluten-20260829</loc>
     <lastmod>2026-08-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/robotic-mowers-guide-ellada-2026-20260829</loc>
-    <lastmod>2026-08-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/ntomata-se-glastra-ksiri-koryfi-klawdema-20260828</loc>
-    <lastmod>2026-08-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/ardefsi-taratsas-retyre-anemos-stalaktes-pc-20260828</loc>
-    <lastmod>2026-08-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/yperypsomena-parteria-hugelkultur-paragwgi-20260828</loc>
-    <lastmod>2026-08-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/published-1787659939763</loc>
-    <lastmod>2026-08-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/published-1787634040863</loc>
-    <lastmod>2026-08-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/published-1787605240857</loc>
-    <lastmod>2026-08-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/cron-published-1724576400000</loc>
-    <lastmod>2026-08-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/cron-published-1724662800000</loc>
-    <lastmod>2026-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/cron-published-1724749200000</loc>
-    <lastmod>2026-08-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/cron-published-1724835600000</loc>
-    <lastmod>2026-08-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/guide-1-vegetables</loc>
-    <lastmod>2026-08-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -285,18 +165,6 @@
   <url>
     <loc>https://smartgarden.gr/article/guide-5-irrigation_iot</loc>
     <lastmod>2026-08-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/guide-6-plant_care</loc>
-    <lastmod>2026-08-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://smartgarden.gr/article/guide-9-robotic_mowers</loc>
-    <lastmod>2026-08-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
