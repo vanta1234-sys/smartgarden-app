@@ -1190,7 +1190,7 @@ pause
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {articles.map((art) => (
+                {articles.map((art, articleIdx) => (
                   <div
                     key={art.id}
                     className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all flex flex-col justify-between group shadow-lg"
@@ -1207,6 +1207,7 @@ pause
                           summary={art.summary.el}
                           staticImage={art.image}
                           isHovered={hoveredArticleId === art.id}
+                          priority={articleIdx === 0}
                         />
                         <div className="absolute top-3 left-3 flex flex-wrap gap-2 pointer-events-none z-10">
                           <span className="px-2.5 py-1 rounded-md bg-emerald-600/90 text-white font-bold text-[10px] tracking-wider uppercase backdrop-blur shadow">

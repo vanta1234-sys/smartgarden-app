@@ -1,11 +1,99 @@
-=== SMARTGARDEN DEPLOY LOG: 2026-08-21T20:21:51.280Z ===
-[11:21:51 PM] Target Host: smartgarden.gr
-[11:21:51 PM] Target User: smartgarden.gr_8p3lo1vph0t
-[11:21:51 PM] Remote Directory: /httpdocs
-[11:21:51 PM] Connecting to smartgarden.gr...
-[11:22:13 PM] ⚠️ Connection to smartgarden.gr failed:  (control socket)
-[11:22:13 PM] Connecting to ftp.smartgarden.gr...
-[11:22:13 PM] ✅ Successfully connected and authenticated to ftp.smartgarden.gr!
-[11:22:13 PM] Switching to remote directory: /httpdocs
-[11:22:14 PM] 🚀 Uploading contents of C:\Users\me\Desktop\smartgarden.gr_fixed\dist to /httpdocs...
-[11:22:16 PM] ✅ All files uploaded successfully to smartgarden.gr!
+﻿====================================================
+[LOG] SMARTGARDEN DEPLOYMENT STARTED AT: 2026-09-09 01:38:43
+====================================================
+[LOG] Running npm run build...
+
+> react-example@0.0.0 build
+> vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs
+
+vite v6.4.3 building for production...
+transforming...
+✓ 1961 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                 4.02 kB │ gzip:   1.63 kB
+dist/assets/index-DrP9QXPD.css                146.24 kB │ gzip:  18.16 kB
+dist/assets/smartphone-BXLsAm65.js              0.37 kB │ gzip:   0.29 kB
+dist/assets/SeoMetadataAuditor-FS4VFZJt.js     35.50 kB │ gzip:   9.54 kB
+dist/assets/TikTokStudio-BRfwmrTY.js          360.85 kB │ gzip: 108.88 kB
+dist/assets/index-C2W3D0Qt.js               1,365.70 kB │ gzip: 259.21 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.72s
+▲ [WARNING] "import.meta" is not available with the "cjs" output format and will be empty [empty-import-meta]
+
+    server.ts:9:33:
+      9 │ const __filename = fileURLToPath(import.meta.url);
+        ╵                                  ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+1 warning
+
+  dist\server.cjs      1.8mb
+  dist\server.cjs.map  1.9mb
+
+Done in 60ms
+[LOG] Build succeeded.
+[LOG] OK: /.htaccess
+[LOG] OK: /about.html
+[LOG] OK: /ads.txt
+[LOG] OK: /apple-touch-icon.png
+[LOG] OK: /article.php
+[LOG] OK: /cron-publish.php
+[LOG] OK: /cron-publish.php.bak
+[LOG] OK: /cron.php
+[LOG] OK: /facebook-auth-callback.php
+[LOG] OK: /facebook-auth-login.php
+[LOG] OK: /facebook-publish.php
+[LOG] OK: /favicon-32.png
+[LOG] OK: /google-service-account.json
+[LOG] OK: /google2cdfa49dadae03df.html
+[LOG] OK: /icon-192.png
+[LOG] OK: /index.html
+[LOG] OK: /latest_articles.json
+[LOG] OK: /logo-schema.png
+[LOG] OK: /manifest.webmanifest
+[LOG] OK: /newsletter-subscribe.php
+[LOG] OK: /pinterest-auth-callback.php
+[LOG] OK: /pinterest-auth-login.php
+[LOG] OK: /pinterest-boards.php
+[LOG] OK: /pinterest-publish.php
+[LOG] OK: /plant-diagnosis.php
+[LOG] OK: /privacy-policy.html
+[LOG] OK: /robots.txt
+[LOG] OK: /rss.xml
+[LOG] OK: /server.cjs
+[LOG] OK: /server.cjs.map
+[LOG] OK: /sitemap.xml
+[LOG] OK: /static-meta.php
+[LOG] OK: /terms-of-service.html
+[LOG] OK: /tiktok-auth-callback.php
+[LOG] OK: /tiktok-auth-login.php
+[LOG] OK: /tiktok-auth-status.php
+[LOG] OK: /tiktok-check-status.php
+[LOG] OK: /tiktok-publish-photo.php
+[LOG] OK: /tiktok-publish.php
+[LOG] OK: /tiktok4kzlIitf2UeCVpeXTMR77uN1hHd5zdhJ.txt
+[LOG] OK: /tiktokKwGubbDBzyRILoAZuuwlxT6ltqdCHASb.txt
+[LOG] OK: /tiktokpSGSVy0Ci6fbrgZcAbRfkCkVde96z5r6.txt
+[LOG] OK: /tiktok_posts.json
+[LOG] OK: /tts-edge.php
+[LOG] OK: /tts-greek.php
+[LOG] OK: /youtube-auth-callback.php
+[LOG] OK: /youtube-auth-login.php
+[LOG] OK: /youtube-publish.php
+[LOG] OK: /assets/index-C2W3D0Qt.js
+[LOG] OK: /assets/index-DrP9QXPD.css
+[LOG] OK: /assets/SeoMetadataAuditor-FS4VFZJt.js
+[LOG] OK: /assets/smartphone-BXLsAm65.js
+[LOG] OK: /assets/TikTokStudio-BRfwmrTY.js
+[LOG] OK: /social-images/elia-se-glastra-bonsai-kladema-lipansi-20260904.jpg
+[LOG] OK: /videos/demo-video.mp4
+
+====================================================
+[LOG] UPLOAD SUMMARY: 55 / 55 files uploaded at 2026-09-09 01:39:12
+====================================================

@@ -7,6 +7,10 @@ interface AnimatedShortVideoProps {
   summary?: string;
   staticImage: string;
   isHovered: boolean;
+  /** True only for the handful of cards visible above the fold on load — these get
+   * eager+high-priority loading so the browser prioritizes the real LCP candidate
+   * instead of racing it against dozens of below-the-fold card images. */
+  priority?: boolean;
 }
 
 export const AnimatedShortVideo: React.FC<AnimatedShortVideoProps> = ({
@@ -15,6 +19,7 @@ export const AnimatedShortVideo: React.FC<AnimatedShortVideoProps> = ({
   summary,
   staticImage,
   isHovered,
+  priority = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [secondsLeft, setSecondsLeft] = useState<number>(15);
@@ -879,12 +884,38 @@ export const AnimatedShortVideo: React.FC<AnimatedShortVideoProps> = ({
     };
   }, [isHovered, title, category, summary, soundEnabled]);
 
+  // The grid card renders this image at ~350px CSS width, but every staticImage URL
+  // requests Unsplash's full w=1200 render — 3-4x more bytes than the card ever
+  // displays, across up to dozens of cards on the homepage. Downscale the request to
+  // a size that's still sharp on a 2x/retina card without paying for pixels no one
+  // sees (found via a real PageSpeed Insights run: 2026-09-09, LCP was 9-16s).
+  // Card is a fixed h-52 (208px) box at a ~1.95:1 width:height ratio on mobile, but
+  // Unsplash's fit=crop only actually crops when both w and h are given — without h
+  // it just proportionally resizes the source, so the delivered image keeps whatever
+  // portrait/landscape ratio the original photo had. That mismatch between the
+  // image's natural size and its displayed CSS box is what Lighthouse's "Displays
+  // images with correct aspect ratio" Best Practices audit flags (only visible once
+  // the LCP candidate is eager-loaded and actually finishes before the trace ends).
+  // Requesting a matching h here crops server-side to the real display ratio, fixing
+  // the audit and shaving a few more bytes; object-cover still handles any further
+  // fit on wider desktop grid columns exactly as it does today.
+  const cardImageWidth = 700;
+  const cardImageHeight = Math.round(cardImageWidth / 1.95);
+  let cardImageSrc = (staticImage || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80")
+    .replace(/([?&])w=\d+/, `$1w=${cardImageWidth}`);
+  cardImageSrc = /[?&]h=\d+/.test(cardImageSrc)
+    ? cardImageSrc.replace(/([?&])h=\d+/, `$1h=${cardImageHeight}`)
+    : cardImageSrc.replace(/([?&])w=\d+/, `$1w=${cardImageWidth}&h=${cardImageHeight}`);
+
   return (
     <div className="w-full h-full relative overflow-hidden bg-slate-950 flex items-center justify-center">
       {/* Static Image when not hovered */}
       <img
-        src={staticImage || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80"}
+        src={cardImageSrc}
         alt={title}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : 'auto'}
+        decoding="async"
         referrerPolicy="no-referrer"
         onError={(e) => {
           (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80";
