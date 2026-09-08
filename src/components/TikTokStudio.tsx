@@ -190,20 +190,61 @@ export const TikTokStudio: React.FC<TikTokStudioProps> = ({
     const stepFallbacks = ['Σωστή αποστράγγιση', 'Πότισμα μόνο όταν στεγνώσει το χώμα', 'Οργανικό λίπασμα'];
     const stepOrdinals = ['Πρώτον', 'Δεύτερον', 'Τρίτον'];
 
+    // Rotate the opening hook/problem framing across a few storytelling angles that
+    // research shows outperform a single repeated format on Shorts/TikTok ("plant
+    // autopsy", "soil detective", "myth court") — deterministic per-article (id hash)
+    // so the same article always renders the same way, but different articles vary.
+    // Deliberately only touches the HOOK/PROBLEM scenes' tag/voiceover/onScreenText —
+    // scene count, timing, and the per-step/caption sync logic below are untouched.
+    const hookAngles = [
+      {
+        hookTag: '🪝 THE HOOK',
+        hookVoiceover: 'Μην κάνεις ποτέ αυτό το λάθος με τα φυτά σου στο μπαλκόνι',
+        hookText: 'Το λάθος που κάνουν όλοι',
+        problemTag: 'ΤΟ ΠΡΟΒΛΗΜΑ',
+        problemText: 'Αν το αγνοήσεις, οι ρίζες ασφυκτιούν',
+      },
+      {
+        hookTag: '🔬 PLANT AUTOPSY',
+        hookVoiceover: 'Ας κάνουμε αυτοψία σε αυτό το άρρωστο φυτό',
+        hookText: 'Αυτοψία Φυτού 🔬',
+        problemTag: 'Η ΔΙΑΓΝΩΣΗ',
+        problemText: 'Να τι πραγματικά συμβαίνει από μέσα',
+      },
+      {
+        hookTag: '🕵️ SOIL DETECTIVE',
+        hookVoiceover: 'Ντετέκτιβ χώματος εδώ, ας λύσουμε αυτό το μυστήριο',
+        hookText: 'Το Μυστήριο του Χώματος 🕵️',
+        problemTag: 'ΤΑ ΣΤΟΙΧΕΙΑ',
+        problemText: 'Τα στοιχεία δείχνουν προς ένα σαφές πρόβλημα',
+      },
+      {
+        hookTag: '⚖️ MYTH COURT',
+        hookVoiceover: 'Στο δικαστήριο μύθων κηπουρικής σήμερα εξετάζουμε αυτό',
+        hookText: 'Μύθος ή Αλήθεια; ⚖️',
+        problemTag: 'Η ΕΝΟΧΗ ΑΠΟΔΕΙΞΗ',
+        problemText: 'Η επιστήμη λέει κάτι διαφορετικό',
+      },
+    ];
+    const angleIndex = currentArticle.id
+      ? Array.from(currentArticle.id).reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % hookAngles.length
+      : 0;
+    const angle = hookAngles[angleIndex];
+
     const scenes = [
       {
         time: '0:00 - 0:03',
-        tag: '🪝 THE HOOK',
+        tag: angle.hookTag,
         visual: 'Δραματικό zoom-in στο φυτό',
-        voiceover: `«Μην κάνεις ποτέ αυτό το λάθος με τα φυτά σου στο μπαλκόνι»`,
-        onScreenText: `Το λάθος που κάνουν όλοι`
+        voiceover: `«${angle.hookVoiceover}»`,
+        onScreenText: angle.hookText
       },
       {
         time: '0:03 - 0:12',
-        tag: 'ΤΟ ΠΡΟΒΛΗΜΑ',
+        tag: angle.problemTag,
         visual: 'Πλάνο με κίτρινα φύλλα ή υπερβολικό πότισμα',
         voiceover: `«${summary.slice(0, 130)}»`,
-        onScreenText: `Αν το αγνοήσεις, οι ρίζες ασφυκτιούν`
+        onScreenText: angle.problemText
       },
       // One scene PER step (not one scene narrating all 3 at once) so the on-screen
       // text always matches whichever step is actually being spoken at that moment
