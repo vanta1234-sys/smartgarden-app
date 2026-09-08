@@ -2755,7 +2755,7 @@ pause
             <span>© 2026 Επιστημονική Γεωπονία, Αστική Κηπουρική & Τηλεμετρία</span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px]">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px]">
             <a
               href="https://www.youtube.com/@Smartgarden-h4f"
               target="_blank"
