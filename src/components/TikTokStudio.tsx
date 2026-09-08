@@ -277,6 +277,24 @@ export const TikTokStudio: React.FC<TikTokStudioProps> = ({
 
 #smartgarden #plants #gardening #gardentips #balconygarden #fyp #foryou #foryoupage #viralgreece #fygr #φυτα #μπαλκονι #κηπουρικη #λουλουδια #αθηνα`;
 
+    // Separate from tiktokCaption on purpose: TikTok's #fyp/#foryoupage/#viralgreece
+    // hashtags mean nothing to YouTube's search/discovery and just look like spam there.
+    // YouTube instead rewards a keyword-rich opening line (shown in search results before
+    // the "...more" cutoff) and its own hashtag set. #Shorts is listed FIRST (not just
+    // present) because YouTube shows only the first 3 hashtags above the title as clickable
+    // links, and #Shorts in that leading slot is what most reliably routes the upload into
+    // the Shorts shelf — capped at 4 total hashtags per the 2026 "3-5 max, more reads as
+    // spam" guidance. youtube-publish.php only appends its own #Shorts as a fallback when
+    // none is present at all, so this takes priority.
+    const youtubeDescription = `${cleanTitle} — Πλήρης οδηγός βήμα-βήμα από το SmartGarden.gr 🌿
+
+${summary.slice(0, 200)}
+
+📖 Διαβάστε ολόκληρο τον επιστημονικό οδηγό: https://smartgarden.gr/article/${currentArticle.slug}
+🌱 Περισσότεροι οδηγοί κηπουρικής & μπαλκονιού: https://smartgarden.gr
+
+#Shorts #κηπουρικη #μπαλκονι #gardening`;
+
     const fullScriptText = `🎬 TIKTOK SCRIPT: ${title}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⏱️ Διάρκεια: 30 δευτερόλεπτα (Viral Retention Rate)
@@ -345,6 +363,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
       scenes,
       remotionScriptData,
       tiktokCaption,
+      youtubeDescription,
       fullScriptText
     };
   }, [currentArticle]);
@@ -498,7 +517,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
           body: JSON.stringify({
             videoBase64,
             title: (currentArticle.title?.el || currentArticle.title || 'SmartGarden.gr Οδηγός').toString().slice(0, 90),
-            description: tikTokScript.tiktokCaption || '',
+            description: tikTokScript.youtubeDescription || '',
           }),
         })
           .then((r) => r.json())
