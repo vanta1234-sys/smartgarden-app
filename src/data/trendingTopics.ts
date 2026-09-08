@@ -81,7 +81,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #3",
     searchIntent: "Κίτρινα στίγματα στα φύλλα και ιστοί αράχνης - πώς να τα διώξω χωρίς χημικά",
     readTime: "9 min",
-    suggestedImage: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80",
     summary: "Πώς να εξολοθρεύσετε τετράνυχο, μελίγκρα και αλευρώδη με σαπούνι καλίου, έλαιο Neem, βάκιλο Θουριγγίας και ωφέλιμα έντομα (πασχαλίτσες).",
     keyPoints: [
       "Ψεκασμός με σαπούνι καλίου (15-20ml/L) τις απογευματινές ώρες",
@@ -105,7 +105,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #4",
     searchIntent: "Ποιος είναι ο καλύτερος αισθητήρας χώματος για Home Assistant & Tuya",
     readTime: "13 min",
-    suggestedImage: "https://images.unsplash.com/photo-1589923188900-85dae523342b?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=1200&auto=format&fit=crop&q=80",
     summary: "Συγκριτικός τεχνικός οδηγός για αισθητήρες εδάφους 4-in-1 και 7-in-1. Σύνδεση με αυτοματισμούς ποτίσματος και Home Assistant.",
     keyPoints: [
       "Αισθητήρες χωρητικού τύπου (Capacitive) για αποφυγή διάβρωσης",
@@ -124,7 +124,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #5",
     searchIntent: "Κομπόστ στο διαμέρισμα χωρίς μυρωδιές και μυγάκια",
     readTime: "10 min",
-    suggestedImage: "https://images.unsplash.com/photo-1598880940371-c756e015fea1?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=1200&auto=format&fit=crop&q=80",
     summary: "Πώς να μετατρέψετε τα οργανικά υπολείμματα της κουζίνας σε μαύρο χρυσό. Σύστημα Bokashi με αναερόβια ζύμωση και vermicomposting.",
     keyPoints: [
       "Αναερόβια ζύμωση Bokashi με ενεργούς μικροοργανισμούς (EM bran)",
@@ -162,7 +162,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #7",
     searchIntent: "Καλύτερο ρομπότ γκαζόν χωρίς περιμετρικό σύρμα για Ελλάδα",
     readTime: "13 min",
-    suggestedImage: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
     summary: "Ο απόλυτος τεχνικός οδηγός 2026 για ρομποτικά mowers χωρίς περιμετρικό καλώδιο με δορυφορικό εντοπισμό εκατοστού και AI αποφυγή εμποδίων.",
     keyPoints: [
       "Πλήρης κατάργηση καλωδίου με τεχνολογία RTK-GNSS & 3D LiDAR",
@@ -200,7 +200,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #9",
     searchIntent: "Φροντίδα ελιάς σε γλάστρα στο μπαλκόνι - πώς κλαδεύεται και τι λίπασμα θέλει",
     readTime: "12 min",
-    suggestedImage: "https://images.unsplash.com/photo-1546548970-71785318a17b?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
     summary: "Πώς να διατηρήσετε μια αιωνόβια ή διακοσμητική ελιά σε γλάστρα. Υπόστρωμα με άριστη αποστράγγιση, κλάδεμα κυπέλλου και λίπανση με βόριο και άζωτο.",
     keyPoints: [
       "Αμμώδες, πετρώδες χώμα με 30% ελαφρόπετρα για μηδενική στασιμότητα νερού",
@@ -238,7 +238,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #11",
     searchIntent: "Πότισμα χωρίς βρύση και ρεύμα με ηλιακό πάνελ και αντλία 12V",
     readTime: "13 min",
-    suggestedImage: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
     summary: "Πλήρης οδηγός κατασκευής αυτόνομου συστήματος άρδευσης με φωτοβολταϊκό πάνελ, μπαταρία λιθίου, αντλία 12V και δεξαμενή νερού για απομακρυσμένα μπαλκόνια και κτήματα.",
     keyPoints: [
       "Ηλιακό πάνελ 20W με ρυθμιστή φόρτισης MPPT και μπαταρία LiFePO4",
@@ -257,7 +257,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #12",
     searchIntent: "Ποια αρωματικά φυτά μπαίνουν στην ίδια ζαρντινιέρα και πώς φροντίζονται",
     readTime: "10 min",
-    suggestedImage: "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=1200&auto=format&fit=crop&q=80",
     summary: "Συγκαλλιέργεια μεσογειακών βοτάνων. Ποια είδη αγαπούν τον ήλιο και την ξηρασία και ποια θέλουν περισσότερο νερό και σκιά (Μέντα, Δυόσμος).",
     keyPoints: [
       "Ομαδοποίηση ξηροθερμικών: Δεντρολίβανο, Θυμάρι, Ρίγανη, Φασκόμηλο",
@@ -295,7 +295,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #14",
     searchIntent: "Υδροπονία στο σπίτι εξοπλισμός τιμές και θρεπτικά διαλύματα",
     readTime: "14 min",
-    suggestedImage: "https://images.unsplash.com/photo-1584473457406-6240486418e9?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80",
     summary: "Πώς να στήσετε έναν κατακόρυφο πύργο υδροπονίας (Tower Garden) ή σύστημα NFT στο μπαλκόνι. Διαχείριση pH, EC, φωτισμού LED και θρεπτικών αλάτων.",
     keyPoints: [
       "Εξοικονόμηση νερού κατά 90% σε σύγκριση με το παραδοσιακό χώμα",
@@ -314,7 +314,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #15",
     searchIntent: "Κίτρινο ξερό γκαζόν μετά το καλοκαίρι - πώς φτιάχνει με επανασπορά",
     readTime: "12 min",
-    suggestedImage: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
     summary: "Οδηγός φθινοπωρινής αποκατάστασης χλοοτάπητα. Εξαέρωση (aeration), απομάκρυνση νεκρού γρασιδιού (verticutting), σπορά με θερμόφιλες/ψυχρόφιλες ποικιλίες και φωσφορούχα λίπανση.",
     keyPoints: [
       "Εξαέρωση και κάθετη κοπή για διάνοιξη του εδάφους",
@@ -409,7 +409,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #20",
     searchIntent: "Έξυπνος φωτισμός κήπου led solar αυτοματισμοί νύχτας",
     readTime: "11 min",
-    suggestedImage: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80",
     summary: "Πώς να αναβαθμίσετε αισθητικά και λειτουργικά τον κήπο σας. Επιλογή θερμών LED 2700K, φωτοβολταϊκών προβολέων με μπαταρία LiFePO4 και σενάρια φωτισμού μέσω smartphone.",
     keyPoints: [
       "Θερμό φως 2700K - 3000K που δεν ελκύει έντομα και αναδεικνύει τα φυλλώματα",
