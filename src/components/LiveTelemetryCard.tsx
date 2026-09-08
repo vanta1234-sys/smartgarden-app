@@ -178,7 +178,7 @@ export const LiveTelemetryCard: React.FC<LiveTelemetryCardProps> = ({
               value={customCity ? 'custom' : selectedCityId}
               onChange={(e) => handleCityChange(e.target.value)}
               aria-label="Επιλογή πόλης για τηλεμετρία καιρού"
-              className="bg-slate-900 text-white font-bold text-sm sm:text-base rounded-lg px-2.5 py-1 border border-slate-700 hover:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+              className="bg-slate-900 text-white font-bold text-sm sm:text-base rounded-lg px-2.5 py-1 border border-slate-700 hover:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer max-w-full min-w-0"
             >
               {customCity && (
                 <option value="custom">📍 {customCity.name}</option>
