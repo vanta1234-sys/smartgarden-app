@@ -532,7 +532,13 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
 
         // Same best-effort treatment for Facebook — uploads to the Page's Videos
         // tab (not the feed) via facebook-publish.php's "video" type.
-        fetch('/facebook-publish.php', {
+        //
+        // TEMPORARILY DISABLED (2026-09-09): Meta blocked the whole Facebook app's
+        // API access (confirmed via debug_token with an app-level token — not a
+        // per-page token problem). Re-enable (delete the early-return below) once
+        // the user has resolved this via developers.facebook.com.
+        const FB_VIDEO_AUTO_PUBLISH_ENABLED = false;
+        (FB_VIDEO_AUTO_PUBLISH_ENABLED ? fetch('/facebook-publish.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -540,9 +546,10 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
             videoBase64,
             description: tikTokScript.tiktokCaption || '',
           }),
-        })
-          .then((r) => r.json())
+        }) : Promise.resolve(null))
+          .then((r) => r ? r.json() : null)
           .then((fbData) => {
+            if (!fbData) return;
             if (fbData.success) {
               setPublishSuccessMessage((prev) => (prev || '') + `\n✅ Ανέβηκε και στο Facebook (Βίντεο).`);
             } else {

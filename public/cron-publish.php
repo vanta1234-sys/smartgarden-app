@@ -1681,9 +1681,18 @@ if (count($existingArticles) > 100) {
 // Facebook renders its own preview card from the article's OG title/description/
 // image (via article.php), so this is deliberately just a link + short caption,
 // not a duplicate of the article body.
+//
+// TEMPORARILY DISABLED (2026-09-09): Meta blocked the entire Facebook app's API
+// access ("API access blocked" from debug_token, confirmed with an app-level
+// token — not a per-user/per-page token issue). Likely trigger: a brand-new
+// 0-follower Page receiving a burst of video uploads plus 10 auto-posts within
+// ~15 minutes on the same day. Flip FB_AUTO_POST_ENABLED back to true once the
+// user has resolved this via developers.facebook.com (App Review / Alerts) —
+// do not just silently leave it off.
+define('FB_AUTO_POST_ENABLED', false);
 $fbPageId = getenv('FACEBOOK_PAGE_ID');
 $fbPageToken = getenv('FACEBOOK_PAGE_ACCESS_TOKEN');
-if ($fbPageId && $fbPageToken) {
+if (FB_AUTO_POST_ENABLED && $fbPageId && $fbPageToken) {
     $articleUrl = 'https://smartgarden.gr/article/' . rawurlencode($newArticleObj['slug']);
     $fbCh = curl_init("https://graph.facebook.com/v26.0/{$fbPageId}/feed");
     curl_setopt_array($fbCh, array(
