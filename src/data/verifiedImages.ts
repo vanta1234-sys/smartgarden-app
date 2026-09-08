@@ -2,9 +2,9 @@ export const VERIFIED_50_GARDEN_IMAGES: string[] = [
   "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80", // 1. Ripe Tomatoes on vine
   "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=1200&auto=format&fit=crop&q=80", // 2. Ladybug biological pest control
   "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", // 3. Vertical garden green wall
-  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // 4. Mediterranean Bougainvillea & flowers
+  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // 4. Tomato greenhouse interior
   "https://images.unsplash.com/photo-1589923188900-85dae523342b?w=1200&auto=format&fit=crop&q=80", // 5. Smart soil moisture probe
-  "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=1200&auto=format&fit=crop&q=80", // 6. Lemon tree citrus branch
+  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // 6. Tomato greenhouse interior
   "https://images.unsplash.com/photo-1546548970-71785318a17b?w=1200&auto=format&fit=crop&q=80", // 7. Potted Olive tree
   "https://images.unsplash.com/photo-1598880940371-c756e015fea1?w=1200&auto=format&fit=crop&q=80", // 8. Dark organic compost soil
   "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80", // 9. Robotic Lawn Mower on green grass
@@ -17,7 +17,7 @@ export const VERIFIED_50_GARDEN_IMAGES: string[] = [
   "https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?w=1200&auto=format&fit=crop&q=80", // 16. Pruning shears orchard
   "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&auto=format&fit=crop&q=80", // 17. Soil earth & seedling
   "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=1200&auto=format&fit=crop&q=80", // 18. Cucumbers on trellis
-  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // 19. Green grass lawn
+  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // 19. Tomato greenhouse interior
   "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=1200&auto=format&fit=crop&q=80", // 20. Drip irrigation tubing
   "https://images.unsplash.com/photo-1526346698789-22fd84314424?w=1200&auto=format&fit=crop&q=80", // 21. Eggplants in garden
   "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80", // 22. Succulents in pots
@@ -34,7 +34,7 @@ export const VERIFIED_50_GARDEN_IMAGES: string[] = [
   "https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=1200&auto=format&fit=crop&q=80", // 33. Clean greenhouse water pipes
   "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=1200&auto=format&fit=crop&q=80", // 34. Watermelon patch
   "https://images.unsplash.com/photo-1528183429752-a97d0bf99b5a?w=1200&auto=format&fit=crop&q=80", // 35. Lavender & herbs
-  "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=1200&auto=format&fit=crop&q=80", // 36. Pomegranate tree
+  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // 36. Tomato greenhouse interior
   "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=1200&auto=format&fit=crop&q=80", // 37. Water pond lilies
   "https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=1200&auto=format&fit=crop&q=80", // 38. Garlic & onion plants
   "https://images.unsplash.com/photo-1483921020237-2ff51e8e4b22?w=1200&auto=format&fit=crop&q=80", // 39. Winter plant frost fleece

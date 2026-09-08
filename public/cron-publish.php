@@ -497,7 +497,7 @@ $topicPool = array(
         "readTime" => "14 min",
         "difficulty" => "Προχωρημένο",
         "difficultyLabel" => "Προχωρημένο",
-        "image" => "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=1200&auto=format&fit=crop&q=80",
+        "image" => "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
         "summary" => "Πώς να κατασκευάσετε παρτέρια Hugelkultur που μιμούνται το φυσικό δάσος. Στρωμάτωση κορμών, κλαδιών και κομπόστ, εξοικονόμηση 70% νερού άρδευσης και μέθοδος No-Dig.",
         "botanical" => "Quercus, Populus, Mycorrhizal Inoculants, Humus Compositum",
         "ph" => "6.2 - 6.8",

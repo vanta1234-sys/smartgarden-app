@@ -105,7 +105,7 @@ export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
   // 🍋 TREES, FRUITS & CITRUS (ΕΣΠΕΡΙΔΟΕΙΔΗ & ΔΕΝΤΡΑ)
   // ──────────────────────────────────────────
   {
-    url: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=1200&auto=format&fit=crop&q=80",
+    url: "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
     keywords: ["λεμονια", "λεμονι", "λεμονιας", "εσπεριδοειδη", "lemon", "citrus", "κουμκουατ", "μανταρινια", "χλωρωση", "σιδηρος"],
     category: "plant_care",
     alt: "Bright fresh lemons growing on a green lemon tree branch"
@@ -209,13 +209,13 @@ export const FALLBACK_BOTANICAL_PHOTOS = [
   "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", // Vertical Garden
   "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80", // Tomato Greenhouse
   "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=1200&auto=format&fit=crop&q=80", // Smart Drip Irrigation
-  "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=1200&auto=format&fit=crop&q=80", // Lemon Citrus Tree
+  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // Tomato Greenhouse Interior
   "https://images.unsplash.com/photo-1546548970-71785318a17b?w=1200&auto=format&fit=crop&q=80", // Potted Olive Tree
   "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=1200&auto=format&fit=crop&q=80", // Potted Herbs
   "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=1200&auto=format&fit=crop&q=80", // Vibrant Chili Peppers
   "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=1200&auto=format&fit=crop&q=80", // Strawberries
   "https://images.unsplash.com/photo-1589923188900-85dae523342b?w=1200&auto=format&fit=crop&q=80", // Smart IoT Sensor
-  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // Bougainvillea Garden
+  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // Tomato Greenhouse Interior
   "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80", // Succulents
   "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=1200&auto=format&fit=crop&q=80", // Orchids
   "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=1200&auto=format&fit=crop&q=80", // Robotic Lawn Mower

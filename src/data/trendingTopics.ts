@@ -219,7 +219,7 @@ export const WEEKLY_TRENDING_TOPICS: TrendingTopic[] = [
     growth: "🔥 Top Trend #10",
     searchIntent: "Κίτρινα φύλλα σε λεμονιά σε γλάστρα και πτώση μικρών λεμονιών",
     readTime: "11 min",
-    suggestedImage: "https://images.unsplash.com/photo-1534766555764-ce878a5e3a2b?w=1200&auto=format&fit=crop&q=80",
+    suggestedImage: "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80",
     summary: "Γιατί κιτρινίζουν τα φύλλα και πέφτουν τα μικρά λεμονάκια. Η σημασία του χηλικού σιδήρου EDDHA, η λίπανση με μαγνήσιο και η προστασία από φυλλοκνίστη.",
     keyPoints: [
       "Εφαρμογή χηλικού σιδήρου EDDHA κάθε 20 ημέρες την άνοιξη και το καλοκαίρι",
