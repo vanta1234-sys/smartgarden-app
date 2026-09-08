@@ -4,11 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6346961910073260" crossorigin="anonymous"></script>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CJEVW0930F"></script>
+    <!-- Google AdSense + gtag.js: the actual script downloads are deferred until
+         after window.load (see bottom of this block) instead of loading async in
+         <head>. A local Lighthouse trace (2026-09-09) showed the homepage's LCP
+         element is the H1 hero heading, not an image, delayed ~2.6s by main-thread
+         contention — adsbygoogle.js (which injects the real Funding Choices CMP
+         consent banner at runtime) and gtag.js together cost ~800ms of scripting
+         time landing right in that critical rendering window. The inline
+         dataLayer/gtag('consent','default',...) call below still runs immediately,
+         synchronously, so the GDPR-safe deny-by-default consent state is set before
+         either library loads — gtag's dataLayer queue processes it once gtag.js
+         actually arrives, so default-consent timing/compliance is unaffected by the
+         later script load. The consent banner itself just renders a couple seconds
+         later post-load instead of contending with first paint. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -22,6 +30,24 @@
         'ad_personalization': 'denied'
       });
       gtag('config', 'G-CJEVW0930F');
+
+      function __loadDeferredAdAndAnalyticsScripts() {
+        var ads = document.createElement('script');
+        ads.async = true;
+        ads.crossOrigin = 'anonymous';
+        ads.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6346961910073260';
+        document.head.appendChild(ads);
+
+        var gtagLib = document.createElement('script');
+        gtagLib.async = true;
+        gtagLib.src = 'https://www.googletagmanager.com/gtag/js?id=G-CJEVW0930F';
+        document.head.appendChild(gtagLib);
+      }
+      if (document.readyState === 'complete') {
+        __loadDeferredAdAndAnalyticsScripts();
+      } else {
+        window.addEventListener('load', __loadDeferredAdAndAnalyticsScripts);
+      }
     </script>
     <title>SmartGarden.gr | Επιστημονική Γεωπονία, Αστική Κηπουρική & Τηλεμετρία</title>
     <meta name="description" content="Ολοκληρωμένοι επιστημονικοί οδηγοί κηπουρικής, βιολογική φυτοπροστασία, υπολογιστές άρδευσης & λιπασμάτων και ζωντανή τηλεμετρία εξάτμισης για την Ελλάδα." />
