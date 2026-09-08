@@ -120,6 +120,13 @@ export default function App() {
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [articleToDelete, setArticleToDelete] = useState<ArticleItem | null>(null);
   const [hoveredArticleId, setHoveredArticleId] = useState<string | null>(null);
+  // Homepage article grid renders this many cards initially (each card ships a
+  // hidden <canvas> + real DOM/CSS weight); "Load More" reveals the rest instead of
+  // mounting all of them on first paint — found via a local Lighthouse trace
+  // (2026-09-09) that flagged "Style & Layout" as the single biggest main-thread
+  // cost bucket delaying the homepage's real LCP element (the hero H1 text).
+  const ARTICLES_PAGE_SIZE = 12;
+  const [visibleArticleCount, setVisibleArticleCount] = useState<number>(ARTICLES_PAGE_SIZE);
   const [isModalImageHovered, setIsModalImageHovered] = useState<boolean>(false);
   const [isArticleReadingAudioActive, setIsArticleReadingAudioActive] = useState<boolean>(false);
   const [readingVoiceProfile, setReadingVoiceProfile] = useState<VoiceProfile>('deep_male');
@@ -1190,7 +1197,7 @@ pause
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {articles.map((art, articleIdx) => (
+                {articles.slice(0, visibleArticleCount).map((art, articleIdx) => (
                   <div
                     key={art.id}
                     className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all flex flex-col justify-between group shadow-lg"
@@ -1263,6 +1270,18 @@ pause
                   </div>
                 ))}
               </div>
+
+              {visibleArticleCount < articles.length && (
+                <div className="flex justify-center pt-2">
+                  <button
+                    onClick={() => setVisibleArticleCount((c) => c + ARTICLES_PAGE_SIZE)}
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-6 py-3 rounded-xl border border-slate-700 flex items-center gap-2 text-sm transition-all cursor-pointer"
+                  >
+                    <BookOpen className="w-4 h-4 text-emerald-400" />
+                    Φόρτωση Περισσότερων ({articles.length - visibleArticleCount} ακόμα)
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
