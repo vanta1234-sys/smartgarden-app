@@ -62,6 +62,8 @@ export function injectGlobalSiteSchema() {
           // vanity username, so that placeholder URL didn't point at the real Page.
           'https://www.facebook.com/profile.php?id=1340919395764582',
           'https://tiktok.com/@smartgarden.gr',
+          // Real, publicly live channel with real uploaded content (2026-09-08).
+          'https://www.youtube.com/@Smartgarden-h4f',
         ],
       },
       {
