@@ -1,5 +1,5 @@
 ﻿====================================================
-[LOG] SMARTGARDEN DEPLOYMENT STARTED AT: 2026-09-09 01:38:43
+[LOG] SMARTGARDEN DEPLOYMENT STARTED AT: 2026-09-09 02:00:15
 ====================================================
 [LOG] Running npm run build...
 
@@ -11,18 +11,18 @@ transforming...
 ✓ 1961 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                                 4.02 kB │ gzip:   1.63 kB
-dist/assets/index-DrP9QXPD.css                146.24 kB │ gzip:  18.16 kB
-dist/assets/smartphone-BXLsAm65.js              0.37 kB │ gzip:   0.29 kB
-dist/assets/SeoMetadataAuditor-FS4VFZJt.js     35.50 kB │ gzip:   9.54 kB
-dist/assets/TikTokStudio-BRfwmrTY.js          360.85 kB │ gzip: 108.88 kB
-dist/assets/index-C2W3D0Qt.js               1,365.70 kB │ gzip: 259.21 kB
+dist/index.html                                 5.52 kB │ gzip:   2.28 kB
+dist/assets/index-R3zpJPuO.css                146.27 kB │ gzip:  18.16 kB
+dist/assets/smartphone-DHDbhD_N.js              0.37 kB │ gzip:   0.29 kB
+dist/assets/SeoMetadataAuditor-DdqnJDuM.js     35.50 kB │ gzip:   9.54 kB
+dist/assets/TikTokStudio-kRHWn5I9.js          360.85 kB │ gzip: 108.88 kB
+dist/assets/index-ENRLFVjq.js               1,366.57 kB │ gzip: 259.39 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 7.72s
+✓ built in 8.80s
 ▲ [WARNING] "import.meta" is not available with the "cjs" output format and will be empty [empty-import-meta]
 
     server.ts:9:33:
@@ -36,7 +36,7 @@ dist/assets/index-C2W3D0Qt.js               1,365.70 kB │ gzip: 259.21 kB
   dist\server.cjs      1.8mb
   dist\server.cjs.map  1.9mb
 
-Done in 60ms
+Done in 66ms
 [LOG] Build succeeded.
 [LOG] OK: /.htaccess
 [LOG] OK: /about.html
@@ -86,14 +86,14 @@ Done in 60ms
 [LOG] OK: /youtube-auth-callback.php
 [LOG] OK: /youtube-auth-login.php
 [LOG] OK: /youtube-publish.php
-[LOG] OK: /assets/index-C2W3D0Qt.js
-[LOG] OK: /assets/index-DrP9QXPD.css
-[LOG] OK: /assets/SeoMetadataAuditor-FS4VFZJt.js
-[LOG] OK: /assets/smartphone-BXLsAm65.js
-[LOG] OK: /assets/TikTokStudio-BRfwmrTY.js
+[LOG] OK: /assets/index-ENRLFVjq.js
+[LOG] OK: /assets/index-R3zpJPuO.css
+[LOG] OK: /assets/SeoMetadataAuditor-DdqnJDuM.js
+[LOG] OK: /assets/smartphone-DHDbhD_N.js
+[LOG] OK: /assets/TikTokStudio-kRHWn5I9.js
 [LOG] OK: /social-images/elia-se-glastra-bonsai-kladema-lipansi-20260904.jpg
 [LOG] OK: /videos/demo-video.mp4
 
 ====================================================
-[LOG] UPLOAD SUMMARY: 55 / 55 files uploaded at 2026-09-09 01:39:12
+[LOG] UPLOAD SUMMARY: 55 / 55 files uploaded at 2026-09-09 02:00:42
 ====================================================

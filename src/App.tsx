@@ -1035,7 +1035,7 @@ pause
 
       {/* VIEW 1: LIVE SITE PREVIEW WITH INTERACTIVE MODAL */}
       {viewMode === 'live_preview' && (
-        <div id="live-site-view" className="flex-1 bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+        <div id="live-site-view" role="main" className="flex-1 bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto space-y-8">
             {/* Header Hero Simulation */}
             <div className="bg-gradient-to-r from-emerald-950/60 via-slate-900 to-teal-950/60 border border-emerald-500/20 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
@@ -1058,7 +1058,7 @@ pause
                     <button
                       id="btn-read-today"
                       onClick={() => setIsReadingModalOpen(true)}
-                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-emerald-900/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer"
+                      className="bg-emerald-700 hover:bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-emerald-900/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer"
                     >
                       <BookOpen className="w-4 h-4" />
                       Διαβάστε τα Σημερινά Άρθρα ({articles.length})
@@ -2767,7 +2767,7 @@ pause
       )}
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 bg-slate-950 py-6 px-4 text-xs text-slate-500 max-w-6xl mx-auto w-full space-y-3">
+      <footer className="border-t border-slate-800/80 bg-slate-950 py-6 px-4 text-xs text-slate-400 max-w-6xl mx-auto w-full space-y-3">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-400">SmartGarden.gr</span>

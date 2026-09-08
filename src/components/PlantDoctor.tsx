@@ -142,7 +142,7 @@ export const PlantDoctor: React.FC = () => {
             <Upload className="w-8 h-8" />
           </div>
           <p className="text-sm text-slate-300 font-medium">Πατήστε για να ανεβάσετε φωτογραφία</p>
-          <p className="text-[11px] text-slate-500">JPG ή PNG, έως ~10MB (θα σμικρυνθεί αυτόματα)</p>
+          <p className="text-[11px] text-slate-400">JPG ή PNG, έως ~10MB (θα σμικρυνθεί αυτόματα)</p>
           <input
             ref={fileInputRef}
             type="file"

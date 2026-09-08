@@ -134,7 +134,7 @@ export const MyBalcony: React.FC<MyBalconyProps> = ({ currentWeather }) => {
         </div>
         <button
           onClick={() => setShowPicker((s) => !s)}
-          className="flex items-center gap-1.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 bg-teal-700 hover:bg-teal-600 text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors cursor-pointer shrink-0"
         >
           <Plus className="w-3.5 h-3.5" />
           Προσθήκη

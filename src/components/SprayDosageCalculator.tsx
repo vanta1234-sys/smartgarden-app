@@ -244,6 +244,7 @@ export const SprayDosageCalculator: React.FC<SprayDosageCalculatorProps> = ({ on
           <select
             value={selectedRecipeId}
             onChange={(e) => setSelectedRecipeId(e.target.value)}
+            aria-label="Επιλέξτε Σκεύασμα & Πρόβλημα Φυτού"
             className="w-full bg-slate-900 text-white text-sm font-semibold rounded-xl p-3 border border-slate-700 hover:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
           >
             {RECIPES.map((r) => (
@@ -271,7 +272,7 @@ export const SprayDosageCalculator: React.FC<SprayDosageCalculatorProps> = ({ on
                 onClick={() => setTankSize(t.size)}
                 className={`p-2.5 rounded-xl text-center text-xs font-bold border transition-all cursor-pointer ${
                   tankSize === t.size
-                    ? 'bg-emerald-600 text-white border-emerald-400 shadow-lg shadow-emerald-950 scale-105'
+                    ? 'bg-emerald-700 text-white border-emerald-400 shadow-lg shadow-emerald-950 scale-105'
                     : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-600 hover:bg-slate-850'
                 }`}
               >

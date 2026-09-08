@@ -151,7 +151,7 @@ export const SoilCalculator: React.FC = () => {
         </div>
       </div>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed">
+      <p className="text-[11px] text-slate-400 leading-relaxed">
         <span className="font-bold text-slate-400">Σύνολο υποστρώματος: {volumeLiters.toFixed(1)}L. </span>
         {profile.note}
       </p>

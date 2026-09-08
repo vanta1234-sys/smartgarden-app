@@ -267,6 +267,7 @@ export const SmartBalconyCalculator: React.FC = () => {
               <select
                 value={selectedPotSize}
                 onChange={(e) => setSelectedPotSize(e.target.value)}
+                aria-label="Χωρητικότητα Γλάστρας"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-medium focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
                 {POT_SIZES.map((s) => (
@@ -286,6 +287,7 @@ export const SmartBalconyCalculator: React.FC = () => {
               <select
                 value={selectedMaterial}
                 onChange={(e) => setSelectedMaterial(e.target.value)}
+                aria-label="Υλικό Γλάστρας"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-medium focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
                 {POT_MATERIALS.map((m) => (
@@ -308,6 +310,7 @@ export const SmartBalconyCalculator: React.FC = () => {
               <select
                 value={selectedExposure}
                 onChange={(e) => setSelectedExposure(e.target.value)}
+                aria-label="Προσανατολισμός Μπαλκονιού"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-medium focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
                 {EXPOSURES.map((e) => (
@@ -327,6 +330,7 @@ export const SmartBalconyCalculator: React.FC = () => {
               <select
                 value={selectedSeason}
                 onChange={(e) => setSelectedSeason(e.target.value)}
+                aria-label="Εποχή / Θερμοκρασία"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-medium focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
                 {SEASONS.map((s) => (
