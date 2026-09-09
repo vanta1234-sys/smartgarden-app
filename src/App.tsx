@@ -17,6 +17,7 @@ import { FrostDatesPage } from './components/FrostDatesPage';
 import { PlantDatabasePage } from './components/PlantDatabasePage';
 import { AskAgronomistPage } from './components/AskAgronomistPage';
 import { InstagramStudio } from './components/InstagramStudio';
+import { ArticleToolLinks } from './components/ArticleToolLinks';
 import { SoilCalculator } from './components/SoilCalculator';
 import { SymptomWizard } from './components/SymptomWizard';
 import { CompanionMatrix } from './components/CompanionMatrix';
@@ -2235,6 +2236,8 @@ pause
                 image={selectedArticle.image}
                 url={typeof window !== 'undefined' ? `${window.location.origin}/article/${selectedArticle.slug}` : `https://smartgarden.gr/article/${selectedArticle.slug}`}
               />
+
+              <ArticleToolLinks title={selectedArticle.title.el} summary={selectedArticle.summary.el} />
 
               <FaqAccordion faqs={getFaqsForArticle(selectedArticle)} />
 
