@@ -1248,7 +1248,15 @@ pause
                 {articles.slice(0, visibleArticleCount).map((art, articleIdx) => (
                   <div
                     key={art.id}
-                    className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all flex flex-col justify-between group shadow-lg"
+                    onClick={() => {
+                      setSelectedArticle(art);
+                      setIsReadingModalOpen(true);
+                    }}
+                    // Pointer-only affordance on purpose: the "Ανάγνωση" button below stays
+                    // the real focusable control, so keyboard and screen-reader users get one
+                    // clear target instead of a duplicate tab stop, and there is no
+                    // interactive element nested inside another one.
+                    className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden hover:border-emerald-500/50 hover:-translate-y-0.5 transition-all flex flex-col justify-between group shadow-lg cursor-pointer"
                   >
                     <div>
                       <div
@@ -2825,12 +2833,12 @@ pause
             <span>© 2026 Επιστημονική Γεωπονία, Αστική Κηπουρική & Τηλεμετρία</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px]">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px]">
             <a
               href="https://www.youtube.com/@Smartgarden-h4f"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 hover:text-red-400 flex items-center gap-1 transition-colors"
+              className="text-slate-400 hover:text-red-400 flex items-center gap-1 transition-colors py-1.5"
               title="SmartGarden.gr στο YouTube"
             >
               <Youtube className="w-3.5 h-3.5 text-red-500" />
@@ -2841,7 +2849,7 @@ pause
               href="https://www.facebook.com/people/SmartGardengr/61594241310349/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 hover:text-blue-400 flex items-center gap-1 transition-colors"
+              className="text-slate-400 hover:text-blue-400 flex items-center gap-1 transition-colors py-1.5"
               title="SmartGarden.gr στο Facebook"
             >
               <Facebook className="w-3.5 h-3.5 text-blue-500" />
@@ -2852,7 +2860,7 @@ pause
               href="https://www.instagram.com/smartgarden.gr/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 hover:text-pink-400 flex items-center gap-1 transition-colors"
+              className="text-slate-400 hover:text-pink-400 flex items-center gap-1 transition-colors py-1.5"
               title="SmartGarden.gr στο Instagram"
             >
               <Instagram className="w-3.5 h-3.5 text-pink-500" />
@@ -2884,7 +2892,7 @@ pause
             <a
               href="/imerologio-sporas"
               onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/imerologio-sporas'); window.location.reload(); }}
-              className="text-slate-400 hover:text-emerald-400 transition-colors"
+              className="text-slate-400 hover:text-emerald-400 transition-colors py-1.5"
             >
               Ημερολόγιο Σποράς
             </a>
@@ -2892,7 +2900,7 @@ pause
             <a
               href="/syntaktis"
               onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/syntaktis'); window.location.reload(); }}
-              className="text-slate-400 hover:text-emerald-400 transition-colors"
+              className="text-slate-400 hover:text-emerald-400 transition-colors py-1.5"
             >
               Ο Συντάκτης
             </a>
@@ -2900,7 +2908,7 @@ pause
             <a
               href="/klima-kipoy"
               onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/klima-kipoy'); window.location.reload(); }}
-              className="text-slate-400 hover:text-emerald-400 transition-colors"
+              className="text-slate-400 hover:text-emerald-400 transition-colors py-1.5"
             >
               Κλίμα &amp; ET₀ Πόλεων
             </a>
@@ -2908,7 +2916,7 @@ pause
             <a
               href="/pagetos"
               onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/pagetos'); window.location.reload(); }}
-              className="text-slate-400 hover:text-emerald-400 transition-colors"
+              className="text-slate-400 hover:text-emerald-400 transition-colors py-1.5"
             >
               Ημερομηνίες Παγετού
             </a>
@@ -2916,7 +2924,7 @@ pause
             <a
               href="/fyta"
               onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/fyta'); window.location.reload(); }}
-              className="text-slate-400 hover:text-emerald-400 transition-colors"
+              className="text-slate-400 hover:text-emerald-400 transition-colors py-1.5"
             >
               Βάση Φυτών
             </a>
@@ -2924,26 +2932,26 @@ pause
             <a
               href="/rotiste"
               onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/rotiste'); window.location.reload(); }}
-              className="text-slate-400 hover:text-emerald-400 transition-colors"
+              className="text-slate-400 hover:text-emerald-400 transition-colors py-1.5"
             >
               Ρωτήστε τον Γεωπόνο
             </a>
 
-            <a href="/about.html" className="text-slate-400 hover:text-emerald-400 transition-colors">
+            <a href="/about.html" className="text-slate-400 hover:text-emerald-400 transition-colors py-1.5">
               Σχετικά & Επικοινωνία
             </a>
 
-            <a href="/privacy-policy.html" className="text-slate-400 hover:text-emerald-400 transition-colors">
+            <a href="/privacy-policy.html" className="text-slate-400 hover:text-emerald-400 transition-colors py-1.5">
               Πολιτική Απορρήτου
             </a>
 
-            <a href="/terms-of-service.html" className="text-slate-400 hover:text-emerald-400 transition-colors">
+            <a href="/terms-of-service.html" className="text-slate-400 hover:text-emerald-400 transition-colors py-1.5">
               Όροι Χρήσης
             </a>
 
             <button
               onClick={() => setIsAdmin(!isAdmin)}
-              className="text-slate-400 hover:text-emerald-300 transition-colors cursor-pointer border-l border-slate-800 pl-3"
+              className="text-slate-400 hover:text-emerald-300 transition-colors cursor-pointer border-l border-slate-800 pl-3 py-1.5"
               title="Εναλλαγή προβολής διαχειριστή / επισκέπτη"
             >
               {isAdmin ? '🔒 Λειτουργία Επισκέπτη' : '⚙️ Visual Studio Admin'}
