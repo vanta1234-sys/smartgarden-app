@@ -79,7 +79,10 @@ import {
   Snowflake,
   Leaf,
   MessageCircleQuestion,
-  Instagram
+  Instagram,
+  CalendarDays,
+  Camera,
+  FlaskConical
 } from 'lucide-react';
 import { ArticleItem } from './types';
 import { WEEKLY_TRENDING_TOPICS, TrendingTopic } from './data/trendingTopics';
@@ -1078,80 +1081,49 @@ pause
                     Ψηφιακό περιοδικό για το ελληνικό μπαλκόνι, τις γλάστρες, τον λαχανόκηπο και τον κήπο. Καθημερινή ανάλυση καιρού, reviews κορυφαίου εξοπλισμού και έτοιμο περιεχόμενο.
                   </p>
 
-                  <div className="flex flex-wrap gap-3 pt-2">
+                  <div className="space-y-3 pt-2">
+                    {/* Reading the articles is the primary action; the seven tools below
+                        are peers of each other, not of it. Giving them equal-sized tiles
+                        and the CTA its own full-width row makes that hierarchy visible —
+                        previously all eight competed as differently-sized pills that wrapped
+                        into ragged rows. */}
                     <button
                       id="btn-read-today"
                       onClick={() => setIsReadingModalOpen(true)}
-                      className="bg-emerald-700 hover:bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-emerald-900/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer"
+                      className="w-full bg-emerald-700 hover:bg-emerald-600 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer"
                     >
                       <BookOpen className="w-4 h-4" />
                       Διαβάστε τα Σημερινά Άρθρα ({articles.length})
                     </button>
-                    <button
-                      id="btn-jump-calculator"
-                      onClick={() => {
-                        const el = document.getElementById('smart-balcony-calculator-section');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="bg-gradient-to-r from-emerald-900/60 to-teal-900/60 hover:from-emerald-800/80 hover:to-teal-800/80 text-emerald-300 font-bold px-5 py-3 rounded-xl border border-emerald-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
-                    >
-                      <Sparkles className="w-4 h-4 text-emerald-400" />
-                      Υπολογιστής Ποτίσματος & Γλάστρας
-                    </button>
-                    <button
-                      id="btn-jump-spray-calc"
-                      onClick={() => {
-                        const el = document.getElementById('spray-dosage-calculator');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="bg-gradient-to-r from-cyan-950/80 to-blue-950/80 hover:from-cyan-900 hover:to-blue-900 text-cyan-300 font-bold px-5 py-3 rounded-xl border border-cyan-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
-                    >
-                      <Droplets className="w-4 h-4 text-cyan-400" />
-                      Υπολογιστής Δοσολογιών Ψεκαστήρα
-                    </button>
-                    <button
-                      id="btn-jump-plant-doctor"
-                      onClick={() => {
-                        const el = document.getElementById('plant-doctor');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="bg-gradient-to-r from-rose-950/80 to-amber-950/80 hover:from-rose-900 hover:to-amber-900 text-amber-300 font-bold px-5 py-3 rounded-xl border border-amber-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
-                    >
-                      <Sparkles className="w-4 h-4 text-amber-400" />
-                      AI Διάγνωση Φυτού από Φωτογραφία
-                    </button>
-                    <button
-                      id="btn-jump-calendar"
-                      onClick={() => { window.location.href = '/imerologio-sporas'; }}
-                      className="bg-gradient-to-r from-lime-950/80 to-emerald-950/80 hover:from-lime-900 hover:to-emerald-900 text-lime-300 font-bold px-5 py-3 rounded-xl border border-lime-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
-                    >
-                      <Sparkles className="w-4 h-4 text-lime-400" />
-                      Ημερολόγιο Σποράς &amp; Εργασιών
-                    </button>
-                    <button
-                      id="btn-jump-frost"
-                      onClick={() => { window.location.href = '/pagetos'; }}
-                      className="bg-gradient-to-r from-sky-950/80 to-indigo-950/80 hover:from-sky-900 hover:to-indigo-900 text-sky-300 font-bold px-5 py-3 rounded-xl border border-sky-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
-                    >
-                      <Snowflake className="w-4 h-4 text-sky-400" />
-                      Ημερομηνίες Παγετού ανά Περιοχή
-                    </button>
-                    <button
-                      id="btn-jump-plants"
-                      onClick={() => { window.location.href = '/fyta'; }}
-                      className="bg-gradient-to-r from-green-950/80 to-lime-950/80 hover:from-green-900 hover:to-lime-900 text-green-300 font-bold px-5 py-3 rounded-xl border border-green-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
-                    >
-                      <Leaf className="w-4 h-4 text-green-400" />
-                      Βάση Δεδομένων Φυτών
-                    </button>
-                    <button
-                      id="btn-jump-qa"
-                      onClick={() => { window.location.href = '/rotiste'; }}
-                      className="bg-gradient-to-r from-amber-950/80 to-orange-950/80 hover:from-amber-900 hover:to-orange-900 text-amber-300 font-bold px-5 py-3 rounded-xl border border-amber-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
-                    >
-                      <MessageCircleQuestion className="w-4 h-4 text-amber-400" />
-                      Ρωτήστε τον Γεωπόνο
-                    </button>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {[
+                        { id: 'btn-jump-calculator', label: 'Πότισμα & Γλάστρα', Icon: Droplets, tone: 'text-emerald-400 hover:border-emerald-500/50', scrollTo: 'smart-balcony-calculator-section' },
+                        { id: 'btn-jump-spray-calc', label: 'Δοσολογίες Ψεκαστήρα', Icon: FlaskConical, tone: 'text-cyan-400 hover:border-cyan-500/50', scrollTo: 'spray-dosage-calculator' },
+                        { id: 'btn-jump-plant-doctor', label: 'AI Διάγνωση Φυτού', Icon: Camera, tone: 'text-amber-400 hover:border-amber-500/50', scrollTo: 'plant-doctor' },
+                        { id: 'btn-jump-calendar', label: 'Ημερολόγιο Σποράς', Icon: CalendarDays, tone: 'text-lime-400 hover:border-lime-500/50', href: '/imerologio-sporas' },
+                        { id: 'btn-jump-frost', label: 'Ημερομηνίες Παγετού', Icon: Snowflake, tone: 'text-sky-400 hover:border-sky-500/50', href: '/pagetos' },
+                        { id: 'btn-jump-plants', label: 'Βάση Δεδομένων Φυτών', Icon: Leaf, tone: 'text-green-400 hover:border-green-500/50', href: '/fyta' },
+                        { id: 'btn-jump-qa', label: 'Ρωτήστε τον Γεωπόνο', Icon: MessageCircleQuestion, tone: 'text-orange-400 hover:border-orange-500/50', href: '/rotiste' },
+                      ].map(({ id, label, Icon, tone, scrollTo, href }) => (
+                        <button
+                          key={id}
+                          id={id}
+                          onClick={() => {
+                            if (href) { window.location.href = href; return; }
+                            const el = document.getElementById(scrollTo!);
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className={`bg-slate-950/70 border border-slate-800 rounded-xl px-3 py-4 flex flex-col items-center justify-start gap-2 text-center transition-all transform hover:-translate-y-0.5 hover:bg-slate-950 cursor-pointer ${tone.split(' ').slice(1).join(' ')}`}
+                        >
+                          <Icon className={`w-5 h-5 shrink-0 ${tone.split(' ')[0]}`} />
+                          <span className="text-[11px] font-semibold text-slate-200 leading-tight">{label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3 pt-1">
                     {isAdmin && (
                       <button
                         onClick={() => setViewMode('article_editor')}
