@@ -1,1 +1,134 @@
 @import "tailwindcss";
+
+/*
+  Light "Mediterranean" theme, 2026-09-10.
+
+  The site was built dark: slate-950/900 surfaces, near-white text, emerald accents.
+  Every competitor checked (mistikakipou.gr, Epic Gardening, BBC Gardeners' World,
+  The Spruce) is light — and for this audience that is the right call, not just
+  convention: gardeners read on phones outdoors in Greek sun, where dark themes wash
+  out, and the articles run 2.000+ words, which is more tiring light-on-dark.
+
+  Rather than rewrite colour classes across 40 files, the slate scale is INVERTED in
+  place — slate-950 (was the darkest page background) now emits the lightest cream,
+  slate-100 (was near-white text) now emits the darkest green. Every existing
+  `bg-slate-950` / `text-slate-300` keeps working and lands on the right side of the
+  new palette. The names now read backwards, which is the deliberate trade: one
+  reversible file instead of thousands of hand edits.
+
+  Palette: cream #FBF6EC, deep green #14301C, mid green #2E6B3A, terracotta #C4622D
+  (the colour of a Greek clay pot, and the second accent the all-emerald original
+  never had).
+*/
+@theme {
+  /* Surfaces — lightest at the 950 end, because that is what the markup asks for. */
+  --color-slate-950: #FBF6EC;
+  --color-slate-900: #FFFFFF;
+  --color-slate-850: #F7F1E4;
+  --color-slate-800: #F1E7D6;
+  --color-slate-750: #EADFCB;
+  --color-slate-700: #E0D3BB;
+  --color-slate-600: #C9B99E;
+
+  /* Text — darkest at the low end. */
+  /* Hint text. The first pass put this at #7A8A7C, which measured 3.44:1 on cream and
+     failed on every page that uses small print — table headers, card captions, form
+     hints. One stop darker clears 4.5:1 everywhere. */
+  --color-slate-500: #5F6E60;
+  --color-slate-400: #5C6B5E;
+  --color-slate-300: #3A4A3D;
+  --color-slate-200: #24352A;
+  --color-slate-100: #14301C;
+  --color-slate-50:  #0D1F12;
+
+  /* Greens. The high stops are used as bright accent text on what used to be a dark
+     background, so they have to be dark enough to read on cream instead. */
+  --color-emerald-300: #2E6B3A;
+  --color-emerald-400: #2E6B3A;
+  --color-emerald-500: #2E6B3A;
+  --color-emerald-600: #2A6335;
+  --color-emerald-700: #245830;
+  --color-emerald-800: #1B4425;
+  --color-emerald-900: #EDF3EC;
+  --color-emerald-950: #F2F7F1;
+
+  /* Teal shares duty with emerald across the UI; keep the two families consistent. */
+  --color-teal-300: #3A7D6E;
+  --color-teal-400: #2E6B5E;
+  --color-teal-500: #2E6B5E;
+  --color-teal-600: #2A6355;
+  --color-teal-700: #245848;
+  --color-teal-900: #ECF4F1;
+  --color-teal-950: #F1F7F5;
+
+  /* Terracotta, mapped over the orange ramp so `bg-orange-600` and friends pick it up. */
+  --color-orange-300: #D98A5A;
+  --color-orange-400: #C4622D;
+  --color-orange-500: #C4622D;
+  --color-orange-600: #B25726;
+  --color-orange-700: #9C4B20;
+  --color-orange-900: #FBEDE3;
+  --color-orange-950: #FDF4EC;
+
+  /* Accent text. The 200-400 stops were bright colours chosen to glow on a dark panel;
+     on cream they measured 1.3-2.8:1. Darkened to roughly 4.5:1 against the new ground
+     while keeping each family recognisable. */
+  --color-sky-200: #1E6E8C;
+  --color-sky-300: #1B6480;
+  --color-sky-400: #175A74;
+  --color-rose-200: #A63A4A;
+  --color-rose-300: #9A3140;
+  --color-rose-400: #8E2B39;
+  --color-amber-200: #8A5A0B;
+  --color-amber-300: #7C4F08;
+  --color-amber-400: #6E4607;
+  --color-purple-200: #6B4A9E;
+  --color-purple-300: #5E3F8C;
+  --color-purple-400: #53367B;
+  --color-lime-200: #55801A;
+  --color-lime-300: #4B7215;
+  --color-lime-400: #426411;
+  --color-cyan-200: #13707F;
+  --color-cyan-300: #106370;
+  --color-cyan-400: #0E5763;
+  --color-pink-200: #A6386A;
+  --color-pink-300: #94305E;
+  --color-pink-400: #832952;
+  --color-blue-200: #1D5FA8;
+  --color-blue-300: #1A5595;
+  --color-blue-400: #174A83;
+  --color-indigo-200: #4149A8;
+  --color-indigo-300: #3A4195;
+  --color-indigo-400: #333983;
+  --color-green-200: #2E6B3A;
+  --color-green-300: #2A6335;
+  --color-green-400: #265A30;
+  --color-red-200: #A3312F;
+  --color-red-300: #922B29;
+  --color-red-400: #812624;
+  --color-violet-200: #5E3F8C;
+  --color-violet-300: #53367B;
+  --color-violet-400: #482E6B;
+  --color-orange-200: #A24E22;
+
+  /* Remaining accent families retinted for a light ground: the 900/950 stops were
+     dark tinted panels and now need to be pale washes instead. */
+  --color-amber-900: #FBF0DC;
+  --color-amber-950: #FDF7EC;
+  --color-sky-900: #E8F1F7;
+  --color-sky-950: #F0F6FA;
+  --color-rose-900: #FBE9E9;
+  --color-rose-950: #FDF2F2;
+  --color-lime-900: #F0F5E4;
+  --color-lime-950: #F6F9EF;
+  --color-cyan-900: #E7F2F4;
+  --color-cyan-950: #F0F7F8;
+  --color-indigo-900: #EDEFF8;
+  --color-indigo-950: #F4F5FB;
+  --color-green-900: #EDF3EC;
+  --color-green-950: #F2F7F1;
+  --color-blue-900: #E9EFF8;
+  --color-blue-950: #F2F6FB;
+  --color-purple-900: #F1ECF8;
+  --color-purple-950: #F7F4FB;
+}

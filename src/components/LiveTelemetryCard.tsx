@@ -178,7 +178,7 @@ export const LiveTelemetryCard: React.FC<LiveTelemetryCardProps> = ({
               value={customCity ? 'custom' : selectedCityId}
               onChange={(e) => handleCityChange(e.target.value)}
               aria-label="Επιλογή πόλης για τηλεμετρία καιρού"
-              className="bg-slate-900 text-white font-bold text-sm sm:text-base rounded-lg px-2.5 py-1 border border-slate-700 hover:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer max-w-full min-w-0"
+              className="bg-slate-900 text-slate-100 font-bold text-sm sm:text-base rounded-lg px-2.5 py-1 border border-slate-700 hover:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 cursor-pointer max-w-full min-w-0"
             >
               {customCity && (
                 <option value="custom">📍 {customCity.name}</option>
@@ -219,7 +219,7 @@ export const LiveTelemetryCard: React.FC<LiveTelemetryCardProps> = ({
             <Droplets className="w-3 h-3 text-cyan-400" />
             <span>Υγρασία</span>
           </div>
-          <div className="font-extrabold text-white text-sm">
+          <div className="font-extrabold text-slate-100 text-sm">
             {weatherData?.humidity}%
           </div>
           <div className="text-[9px] text-slate-500 mt-0.5">

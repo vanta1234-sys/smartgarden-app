@@ -22,7 +22,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ articles, categorySl
   }, [label, matches.length]);
 
   return (
-    <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div role="main" className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-6">
         <button
           onClick={onBack}
@@ -37,7 +37,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ articles, categorySl
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{label}</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">{label}</h1>
             <p className="text-sm text-slate-400">{matches.length} άρθρα &amp; οδηγοί</p>
           </div>
         </div>
@@ -58,7 +58,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ articles, categorySl
                 />
               </div>
               <div className="p-4 space-y-2">
-                <h2 className="text-sm font-bold text-white leading-snug line-clamp-2">{article.title.el}</h2>
+                <h2 className="text-sm font-bold text-slate-100 leading-snug line-clamp-2">{article.title.el}</h2>
                 <p className="text-xs text-slate-400 line-clamp-2">{article.summary.el}</p>
                 <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
                   <Clock className="w-3 h-3" />

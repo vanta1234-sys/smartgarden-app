@@ -50,7 +50,7 @@ export const SoilCalculator: React.FC = () => {
           <Layers className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-white tracking-tight">Υπολογιστής Χώματος &amp; Γλάστρας</h3>
+          <h3 className="text-lg font-bold text-slate-100 tracking-tight">Υπολογιστής Χώματος &amp; Γλάστρας</h3>
           <p className="text-xs text-slate-400">Πόσα λίτρα χώμα, περλίτη &amp; κομπόστ χρειάζεστε</p>
         </div>
       </div>
@@ -59,7 +59,7 @@ export const SoilCalculator: React.FC = () => {
         <button
           onClick={() => setShape('round')}
           className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold border cursor-pointer transition-colors ${
-            shape === 'round' ? 'bg-amber-500 text-slate-950 border-amber-500' : 'bg-slate-900 text-slate-300 border-slate-800'
+            shape === 'round' ? 'bg-amber-500 text-slate-100 border-amber-500' : 'bg-slate-900 text-slate-300 border-slate-800'
           }`}
         >
           <Circle className="w-3.5 h-3.5" />
@@ -68,7 +68,7 @@ export const SoilCalculator: React.FC = () => {
         <button
           onClick={() => setShape('rectangular')}
           className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold border cursor-pointer transition-colors ${
-            shape === 'rectangular' ? 'bg-amber-500 text-slate-950 border-amber-500' : 'bg-slate-900 text-slate-300 border-slate-800'
+            shape === 'rectangular' ? 'bg-amber-500 text-slate-100 border-amber-500' : 'bg-slate-900 text-slate-300 border-slate-800'
           }`}
         >
           <RectangleHorizontal className="w-3.5 h-3.5" />
@@ -84,7 +84,7 @@ export const SoilCalculator: React.FC = () => {
               type="number"
               value={diameter}
               onChange={(e) => setDiameter(Number(e.target.value))}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100"
             />
           </label>
         ) : (
@@ -95,7 +95,7 @@ export const SoilCalculator: React.FC = () => {
                 type="number"
                 value={length}
                 onChange={(e) => setLength(Number(e.target.value))}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100"
               />
             </label>
             <label className="text-xs text-slate-400 space-y-1">
@@ -104,7 +104,7 @@ export const SoilCalculator: React.FC = () => {
                 type="number"
                 value={width}
                 onChange={(e) => setWidth(Number(e.target.value))}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100"
               />
             </label>
           </>
@@ -115,7 +115,7 @@ export const SoilCalculator: React.FC = () => {
             type="number"
             value={height}
             onChange={(e) => setHeight(Number(e.target.value))}
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white"
+            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100"
           />
         </label>
       </div>
@@ -125,7 +125,7 @@ export const SoilCalculator: React.FC = () => {
         <select
           value={plantType}
           onChange={(e) => setPlantType(e.target.value as PlantType)}
-          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white cursor-pointer"
+          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 cursor-pointer"
         >
           {Object.entries(PLANT_PROFILES).map(([key, p]) => (
             <option key={key} value={key}>{p.label}</option>

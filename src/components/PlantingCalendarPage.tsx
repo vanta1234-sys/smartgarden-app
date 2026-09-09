@@ -30,7 +30,7 @@ export const PlantingCalendarPage: React.FC<PlantingCalendarPageProps> = ({ onBa
   );
 
   return (
-    <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div role="main" className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
         <button
           onClick={onBack}
@@ -45,7 +45,7 @@ export const PlantingCalendarPage: React.FC<PlantingCalendarPageProps> = ({ onBa
             <Calendar className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Ημερολόγιο Σποράς &amp; Εργασιών Κήπου</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">Ημερολόγιο Σποράς &amp; Εργασιών Κήπου</h1>
             <p className="text-sm text-slate-400">Τι κάνουμε κάθε μήνα στο ελληνικό μπαλκόνι &amp; κήπο</p>
           </div>
         </div>
@@ -58,7 +58,7 @@ export const PlantingCalendarPage: React.FC<PlantingCalendarPageProps> = ({ onBa
               onClick={() => setActiveMonth(idx)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
                 activeMonth === idx
-                  ? 'bg-amber-500 text-slate-950 border-amber-500'
+                  ? 'bg-amber-500 text-slate-100 border-amber-500'
                   : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-amber-500/40'
               }`}
             >
@@ -103,7 +103,7 @@ export const PlantingCalendarPage: React.FC<PlantingCalendarPageProps> = ({ onBa
                   {task.badge}
                 </span>
               </div>
-              <h4 className="text-sm font-bold text-white leading-snug mb-1.5">{task.title}</h4>
+              <h4 className="text-sm font-bold text-slate-100 leading-snug mb-1.5">{task.title}</h4>
               <p className="text-xs text-slate-400 leading-relaxed">{task.desc}</p>
             </div>
           ))}

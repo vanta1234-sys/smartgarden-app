@@ -24,7 +24,7 @@ export const AuthorBioPage: React.FC<AuthorBioPageProps> = ({ articles, onOpenAr
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div role="main" className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <button
           onClick={onBack}
@@ -36,11 +36,11 @@ export const AuthorBioPage: React.FC<AuthorBioPageProps> = ({ articles, onOpenAr
 
         <div className="bg-slate-950/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-black text-2xl shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-100 font-black text-2xl shrink-0">
               {AUTHOR_NAME.split(' ').map((w) => w[0]).join('')}
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-white tracking-tight">{AUTHOR_NAME}</h1>
+              <h1 className="text-2xl font-extrabold text-slate-100 tracking-tight">{AUTHOR_NAME}</h1>
               <p className="text-emerald-400 font-semibold text-sm">{AUTHOR_ROLE}</p>
             </div>
           </div>
@@ -64,7 +64,7 @@ export const AuthorBioPage: React.FC<AuthorBioPageProps> = ({ articles, onOpenAr
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-white">Άρθρα του {AUTHOR_NAME.split(' ')[0]}</h2>
+          <h2 className="text-lg font-bold text-slate-100">Άρθρα του {AUTHOR_NAME.split(' ')[0]}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {byAuthor.slice(0, 20).map((article) => (
               <button
@@ -81,7 +81,7 @@ export const AuthorBioPage: React.FC<AuthorBioPageProps> = ({ articles, onOpenAr
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="text-sm font-bold text-white leading-snug line-clamp-2">{article.title.el}</h3>
+                  <h3 className="text-sm font-bold text-slate-100 leading-snug line-clamp-2">{article.title.el}</h3>
                 </div>
               </button>
             ))}

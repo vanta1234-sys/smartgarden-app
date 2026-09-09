@@ -76,7 +76,7 @@ export const IoTTelemetryHub: React.FC<IoTTelemetryHubProps> = ({ lang }) => {
             <span>{lang === 'el' ? 'Smart Garden Microclimate Engine' : 'Smart Garden Microclimate Engine'}</span>
           </div>
 
-          <h2 id="telemetry-title" className="text-3xl sm:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+          <h2 id="telemetry-title" className="text-3xl sm:text-4xl font-extrabold text-neutral-900 dark:text-slate-100 tracking-tight">
             {lang === 'el' ? 'Live Τηλεμετρία & Υπολογιστής Άρδευσης' : 'Live Telemetry & Smart Irrigation Hub'}
           </h2>
 
@@ -111,13 +111,13 @@ export const IoTTelemetryHub: React.FC<IoTTelemetryHubProps> = ({ lang }) => {
           <div className="lg:col-span-6 bg-neutral-50 dark:bg-neutral-850 border border-neutral-200 dark:border-neutral-750 rounded-3xl p-6 sm:p-8 shadow-sm">
             <div className="flex items-center justify-between pb-4 border-b border-neutral-200 dark:border-neutral-700 mb-6">
               <div>
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-slate-100">
                   {city.name[lang]}
                 </h3>
                 <p className="text-xs text-neutral-500">{city.region[lang]}</p>
               </div>
               <div className="text-right">
-                <span className="text-2xl font-extrabold text-neutral-900 dark:text-white">
+                <span className="text-2xl font-extrabold text-neutral-900 dark:text-slate-100">
                   {city.temp}°C
                 </span>
                 <p className="text-xs text-amber-600 font-semibold">{city.condition[lang]}</p>
@@ -206,7 +206,7 @@ export const IoTTelemetryHub: React.FC<IoTTelemetryHubProps> = ({ lang }) => {
                 <Calculator className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+                <h3 className="text-base font-bold text-neutral-900 dark:text-slate-100">
                   {lang === 'el' ? 'Έξυπνος Υπολογιστής Ποτίσματος Γλάστρας' : 'Smart Pot Irrigation Calculator'}
                 </h3>
                 <p className="text-xs text-neutral-500">
@@ -270,7 +270,7 @@ export const IoTTelemetryHub: React.FC<IoTTelemetryHubProps> = ({ lang }) => {
                     id="calc-select-plant"
                     value={plantType}
                     onChange={(e) => setPlantType(e.target.value as any)}
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-slate-100 font-medium"
                   >
                     <option value="vegetables">{lang === 'el' ? 'Λαχανικά / Ντομάτες' : 'Vegetables / Tomatoes'}</option>
                     <option value="citrus">{lang === 'el' ? 'Εσπεριδοειδή / Ελιά' : 'Citrus / Olive Tree'}</option>
@@ -287,7 +287,7 @@ export const IoTTelemetryHub: React.FC<IoTTelemetryHubProps> = ({ lang }) => {
                     id="calc-select-dripper"
                     value={dripperFlowLPH}
                     onChange={(e) => setDripperFlowLPH(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
+                    className="w-full px-3 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-slate-100 font-medium"
                   >
                     <option value={2}>2 Liters / ώρα (L/h)</option>
                     <option value={4}>4 Liters / ώρα (L/h)</option>
@@ -305,14 +305,14 @@ export const IoTTelemetryHub: React.FC<IoTTelemetryHubProps> = ({ lang }) => {
                 <div className="grid grid-cols-2 gap-4 text-xs">
                   <div>
                     <span className="text-neutral-500">{lang === 'el' ? 'Απαιτούμενο Νερό:' : 'Required Volume:'}</span>
-                    <p className="text-xl font-extrabold text-neutral-900 dark:text-white mt-0.5">
+                    <p className="text-xl font-extrabold text-neutral-900 dark:text-slate-100 mt-0.5">
                       {results.liters} <span className="text-xs font-semibold text-emerald-600">Liters / μέρα</span>
                     </p>
                   </div>
 
                   <div>
                     <span className="text-neutral-500">{lang === 'el' ? 'Διάρκεια Προγραμματιστή:' : 'Timer Runtime:'}</span>
-                    <p className="text-xl font-extrabold text-neutral-900 dark:text-white mt-0.5">
+                    <p className="text-xl font-extrabold text-neutral-900 dark:text-slate-100 mt-0.5">
                       {results.minutes} <span className="text-xs font-semibold text-emerald-600">λεπτά (min)</span>
                     </p>
                   </div>

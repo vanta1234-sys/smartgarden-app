@@ -127,7 +127,7 @@ export const PlantDoctor: React.FC = () => {
           <Stethoscope className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-white tracking-tight">AI Φυτοπαθολογικός Σύμβουλος</h3>
+          <h3 className="text-lg font-bold text-slate-100 tracking-tight">AI Φυτοπαθολογικός Σύμβουλος</h3>
           <p className="text-xs text-slate-400">Ανεβάστε φωτογραφία ενός φύλλου ή φυτού για άμεση διάγνωση</p>
         </div>
       </div>
@@ -160,7 +160,7 @@ export const PlantDoctor: React.FC = () => {
             <img src={previewUrl} alt="Φωτογραφία φυτού προς διάγνωση" className="w-full max-h-72 object-contain bg-slate-900" />
             <button
               onClick={handleReset}
-              className="absolute top-2 right-2 bg-slate-950/80 hover:bg-slate-900 text-slate-300 hover:text-white p-1.5 rounded-lg border border-slate-700 cursor-pointer"
+              className="absolute top-2 right-2 bg-slate-950/80 hover:bg-slate-900 text-slate-300 hover:text-slate-100 p-1.5 rounded-lg border border-slate-700 cursor-pointer"
               title="Αφαίρεση εικόνας"
             >
               <X className="w-4 h-4" />
@@ -175,7 +175,7 @@ export const PlantDoctor: React.FC = () => {
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Προαιρετικό: περιγράψτε σύντομα τι παρατηρείτε (π.χ. κιτρίνισμα φύλλων)"
                 maxLength={200}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               />
               <button
                 onClick={handleDiagnose}
@@ -215,7 +215,7 @@ export const PlantDoctor: React.FC = () => {
               ) : (
                 <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
               )}
-              <h4 className="text-sm font-extrabold text-white">{result.problem}</h4>
+              <h4 className="text-sm font-extrabold text-slate-100">{result.problem}</h4>
               <span className="ml-auto text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border border-slate-700 text-slate-400">
                 {confidenceLabel(result.confidence)}
               </span>

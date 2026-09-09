@@ -107,7 +107,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
               <BookOpen className="w-3.5 h-3.5" />
               <span>{lang === 'el' ? 'Ψηφιακό Περιοδικό' : 'Digital Magazine'}</span>
             </div>
-            <h2 id="articles-heading" className="text-3xl sm:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+            <h2 id="articles-heading" className="text-3xl sm:text-4xl font-extrabold text-neutral-900 dark:text-slate-100 tracking-tight">
               {lang === 'el' ? 'Καθημερινά Άρθρα & Οδηγοί Φροντίδας' : 'Daily Articles & Care Guides'}
             </h2>
             <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-400 mt-2 max-w-xl">
@@ -127,7 +127,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={lang === 'el' ? 'Αναζήτηση άρθρων...' : 'Search articles...'}
-                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-xs sm:text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-xs sm:text-sm text-neutral-900 dark:text-slate-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs"
               />
             </div>
           </div>
@@ -156,7 +156,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
                   />
                 </div>
                 <div className="p-3">
-                  <h4 className="text-xs font-bold text-neutral-900 dark:text-white leading-snug line-clamp-2">
+                  <h4 className="text-xs font-bold text-neutral-900 dark:text-slate-100 leading-snug line-clamp-2">
                     {article.title[lang] || article.title.el}
                   </h4>
                   <span className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-1.5 flex items-center gap-1">
@@ -221,7 +221,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
                   <span className="px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider shadow-md">
                     ★ {lang === 'el' ? 'ΚΟΡΥΦΑΙΟ ΑΡΘΡΟ' : 'FEATURED GUIDE'}
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-xs font-medium">
+                  <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-slate-100 text-xs font-medium">
                     {featuredArticle.categoryLabel[lang] || featuredArticle.categoryLabel.el}
                   </span>
                 </div>
@@ -254,7 +254,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
                     )}
                   </div>
 
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-white tracking-tight leading-snug group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-neutral-900 dark:text-slate-100 tracking-tight leading-snug group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                     {featuredArticle.title[lang] || featuredArticle.title.el}
                   </h3>
 
@@ -351,7 +351,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
                       </span>
                     </div>
 
-                    <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white tracking-tight leading-snug group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
+                    <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-slate-100 tracking-tight leading-snug group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
                       {article.title[lang] || article.title.el}
                     </h3>
 

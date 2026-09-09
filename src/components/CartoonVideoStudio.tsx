@@ -539,7 +539,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
             <Film className="w-3.5 h-3.5" />
             <span>{lang === 'el' ? 'Multi-Agent 10s Cartoon Video Engine' : 'Multi-Agent 10s Cartoon Video Engine'}</span>
           </div>
-          <h3 className="text-2xl font-black tracking-tight text-neutral-900 dark:text-white">
+          <h3 className="text-2xl font-black tracking-tight text-neutral-900 dark:text-slate-100">
             {lang === 'el' ? '🎬 Δημιουργός 10-Second Fast-Motion Video' : '🎬 10-Second Fast-Motion Cartoon Video Generator'}
           </h3>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
@@ -558,7 +558,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
             id="video-article-select"
             value={selectedArticleId}
             onChange={(e) => setSelectedArticleId(e.target.value)}
-            className="px-3 py-2 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500 max-w-[260px] truncate"
+            className="px-3 py-2 rounded-xl text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 max-w-[260px] truncate"
           >
             {ARTICLES_DATA.map((art) => (
               <option key={art.id} value={art.id}>
@@ -625,10 +625,10 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
             {/* Big Play Overlay when paused at start */}
             {!isPlaying && currentTime === 0 && (
               <div 
-                className="absolute inset-0 bg-black/40 backdrop-blur-2xs flex flex-col items-center justify-center cursor-pointer text-white"
+                className="absolute inset-0 bg-black/40 backdrop-blur-2xs flex flex-col items-center justify-center cursor-pointer text-slate-100"
                 onClick={() => setIsPlaying(true)}
               >
-                <div className="w-16 h-16 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110">
+                <div className="w-16 h-16 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-100 flex items-center justify-center shadow-lg transition-transform hover:scale-110">
                   <Play className="w-8 h-8 ml-1 fill-white" />
                 </div>
                 <p className="text-xs font-bold mt-3 px-3 py-1 rounded-full bg-black/60">
@@ -691,7 +691,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
                     setCurrentTime(0);
                     setIsPlaying(true);
                   }}
-                  className="p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-white transition-all"
+                  className="p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-slate-100 transition-all"
                   title="Replay from 0:00"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -702,7 +702,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
                   onClick={() => {
                     setPlaybackSpeed((prev) => (prev === 1.0 ? 1.5 : prev === 1.5 ? 2.0 : 1.0));
                   }}
-                  className="px-3 py-2 rounded-xl text-xs font-bold bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-white flex items-center gap-1"
+                  className="px-3 py-2 rounded-xl text-xs font-bold bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-slate-100 flex items-center gap-1"
                 >
                   <FastForward className="w-3.5 h-3.5" />
                   <span>{playbackSpeed}x</span>
@@ -735,7 +735,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
         <div className="lg:col-span-6 space-y-5">
           
           {/* Multi-Agent Action Banner */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950 via-neutral-900 to-sky-950 text-white border border-emerald-800/60 flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950 via-neutral-900 to-sky-950 text-slate-100 border border-emerald-800/60 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-300">
                 <Bot className="w-5 h-5" />
@@ -767,7 +767,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
               className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                 activeAgentTab === 'agent1'
                   ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
-                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-slate-100'
               }`}
             >
               <Film className="w-3.5 h-3.5" />
@@ -779,7 +779,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
               className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                 activeAgentTab === 'agent2'
                   ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
-                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-slate-100'
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5" />
@@ -791,7 +791,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
               className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
                 activeAgentTab === 'agent3'
                   ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
-                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+                  : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-slate-100'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -874,7 +874,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
               </div>
 
               <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-850 border border-neutral-200 dark:border-neutral-800 space-y-3">
-                <p className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <p className="text-xs font-bold text-neutral-900 dark:text-slate-100 flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
                   <span>{lang === 'el' ? 'Διορθώσεις & Έλεγχοι Ασφαλείας Agent 2:' : 'Agent 2 Review Audit Checklist:'}</span>
                 </p>
@@ -894,7 +894,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
           {activeAgentTab === 'agent3' && (
             <div className="space-y-4 animate-in fade-in duration-200">
               <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-850 border border-neutral-200 dark:border-neutral-800 space-y-3">
-                <p className="text-xs font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <p className="text-xs font-bold text-neutral-900 dark:text-slate-100 flex items-center gap-2">
                   <Layers className="w-4 h-4 text-sky-500" />
                   <span>{project.agent3Animator.agentName}</span>
                 </p>
@@ -902,7 +902,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div className="p-3 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
                     <span className="text-neutral-500 dark:text-neutral-400 block text-[10px]">Render Frame Rate</span>
-                    <span className="font-bold text-neutral-900 dark:text-white text-sm">60 FPS Smooth Vector</span>
+                    <span className="font-bold text-neutral-900 dark:text-slate-100 text-sm">60 FPS Smooth Vector</span>
                   </div>
                   <div className="p-3 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
                     <span className="text-neutral-500 dark:text-neutral-400 block text-[10px]">Fast-Motion Scale</span>
@@ -912,7 +912,7 @@ export const CartoonVideoStudio: React.FC<CartoonVideoStudioProps> = ({
 
                 <div className="p-3 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-xs">
                   <span className="text-neutral-500 dark:text-neutral-400 block text-[10px]">Dynamic Sound Effects</span>
-                  <span className="font-bold text-neutral-900 dark:text-white">
+                  <span className="font-bold text-neutral-900 dark:text-slate-100">
                     Web Audio Procedural Synthesizer (Zero Latency)
                   </span>
                 </div>

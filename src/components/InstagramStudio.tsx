@@ -348,7 +348,7 @@ export const InstagramStudio: React.FC<{ onBack: () => void }> = ({ onBack }) =>
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div role="main" className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-6">
         <button onClick={onBack} className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer">
           <ArrowLeft className="w-4 h-4" />
@@ -360,7 +360,7 @@ export const InstagramStudio: React.FC<{ onBack: () => void }> = ({ onBack }) =>
             <Instagram className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Instagram Studio</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">Instagram Studio</h1>
             <p className="text-sm text-slate-400">Έτοιμα post 1080×1350 από τα δεδομένα του site, με λεζάντα</p>
           </div>
         </div>

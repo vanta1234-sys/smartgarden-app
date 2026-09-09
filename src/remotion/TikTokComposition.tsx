@@ -110,7 +110,7 @@ const SceneFrame: React.FC<{
   const activeColor = badgeColors[index % badgeColors.length];
 
   return (
-    <AbsoluteFill className="bg-slate-950 text-white overflow-hidden select-none">
+    <AbsoluteFill className="bg-slate-950 text-slate-100 overflow-hidden select-none">
       {/* 1. FULLSCREEN 2D ANIMATED CARTOON WORLD (CANVAS 100% W/H) */}
       <AbsoluteFill className="z-10">
         <SceneCartoonVisualizer
@@ -160,7 +160,7 @@ const SceneFrame: React.FC<{
           }}
           className="w-full max-w-md rounded-2xl px-4 py-3 border-2 border-emerald-400/60 backdrop-blur-xl bg-slate-950/85 text-center mb-3"
         >
-          <h2 className="text-xl font-black leading-snug text-white drop-shadow-md">
+          <h2 className="text-xl font-black leading-snug text-slate-100 drop-shadow-md">
             {scene.onScreenText}
           </h2>
         </div>
@@ -184,7 +184,7 @@ const SceneFrame: React.FC<{
                     isHighlight
                       ? 'text-yellow-300 scale-110 font-black underline decoration-yellow-400 decoration-2'
                       : isPast
-                      ? 'text-white'
+                      ? 'text-slate-100'
                       : 'text-slate-400'
                   }`}
                   style={{
@@ -256,7 +256,7 @@ export const TikTokComposition: React.FC<TikTokCompositionProps> = ({
       <div className="absolute top-8 inset-x-8 flex items-center justify-between z-50 pointer-events-none">
         <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-emerald-600/90 backdrop-blur-md shadow-lg border border-emerald-400/40">
           <span className="text-xl">🌿</span>
-          <span className="text-base font-black tracking-wide text-white">{brandName}</span>
+          <span className="text-base font-black tracking-wide text-slate-100">{brandName}</span>
         </div>
 
         <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 text-amber-400 text-sm font-bold shadow-md">

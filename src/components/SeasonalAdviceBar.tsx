@@ -321,7 +321,7 @@ export const SeasonalAdviceBar: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-white tracking-tight">
+              <h2 className="text-lg font-bold text-slate-100 tracking-tight">
                 Ημερολόγιο Μπαλκονιού: <span className="text-amber-400">{currentMonthName}</span>
               </h2>
               <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -354,7 +354,7 @@ export const SeasonalAdviceBar: React.FC = () => {
                   {task.badge}
                 </span>
               </div>
-              <h3 className="text-xs font-bold text-white leading-snug mb-1.5">{task.title}</h3>
+              <h3 className="text-xs font-bold text-slate-100 leading-snug mb-1.5">{task.title}</h3>
               <p className="text-[11px] text-slate-400 leading-relaxed">{task.desc}</p>
             </div>
           </div>

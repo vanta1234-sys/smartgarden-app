@@ -223,7 +223,7 @@ export const SprayDosageCalculator: React.FC<SprayDosageCalculatorProps> = ({ on
             <FlaskConical className="w-4 h-4" />
             <span>Επιστημονικός Υπολογιστής Δοσολογιών Ψεκαστήρα</span>
           </div>
-          <h3 className="text-xl font-bold text-white mt-1">
+          <h3 className="text-xl font-bold text-slate-100 mt-1">
             Υπολογισμός Βιολογικών Σκευασμάτων & Λιπασμάτων
           </h3>
         </div>
@@ -245,7 +245,7 @@ export const SprayDosageCalculator: React.FC<SprayDosageCalculatorProps> = ({ on
             value={selectedRecipeId}
             onChange={(e) => setSelectedRecipeId(e.target.value)}
             aria-label="Επιλέξτε Σκεύασμα & Πρόβλημα Φυτού"
-            className="w-full bg-slate-900 text-white text-sm font-semibold rounded-xl p-3 border border-slate-700 hover:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+            className="w-full bg-slate-900 text-slate-100 text-sm font-semibold rounded-xl p-3 border border-slate-700 hover:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
           >
             {RECIPES.map((r) => (
               <option key={r.id} value={r.id}>
@@ -281,7 +281,7 @@ export const SprayDosageCalculator: React.FC<SprayDosageCalculatorProps> = ({ on
             ))}
           </div>
           <p className="text-[11px] text-slate-400 pl-1">
-            Επιλεγμένο δοχείο: <strong className="text-white">{tankSize} Λίτρα</strong> ({TANK_SIZES.find(t => t.size === tankSize)?.label})
+            Επιλεγμένο δοχείο: <strong className="text-slate-100">{tankSize} Λίτρα</strong> ({TANK_SIZES.find(t => t.size === tankSize)?.label})
           </p>
         </div>
       </div>
@@ -393,7 +393,7 @@ export const SprayDosageCalculator: React.FC<SprayDosageCalculatorProps> = ({ on
         <div className="flex justify-end">
           <button
             onClick={() => onOpenArticle(recipe.articleSlug!)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition-all hover:scale-[1.02] cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-700 border border-emerald-500/40 text-xs font-bold transition-all hover:scale-[1.02] cursor-pointer"
           >
             <BookOpen className="w-4 h-4" />
             <span>Διαβάστε τον Πλήρη Τεχνικό Οδηγό για αυτό το Σκεύασμα</span>

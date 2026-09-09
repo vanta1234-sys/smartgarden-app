@@ -1120,7 +1120,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
             </span>
             <span className="text-xs text-slate-400 font-medium">SmartGarden • @smartgarden68 (smartgarden68@gmail.com)</span>
           </div>
-          <h2 className="text-2xl font-black text-white flex items-center gap-2.5">
+          <h2 className="text-2xl font-black text-slate-100 flex items-center gap-2.5">
             <Film className="w-6 h-6 text-pink-400" />
             Social Video & TikTok Studio
           </h2>
@@ -1160,8 +1160,8 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
           onClick={() => setActiveTab('remotion')}
           className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'remotion'
-              ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 shadow-lg shadow-emerald-500/25 scale-105'
-              : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-100 shadow-lg shadow-emerald-500/25 scale-105'
+              : 'bg-slate-950 text-slate-400 hover:text-slate-100 border border-slate-800'
           }`}
         >
           <Film className="w-4 h-4 text-emerald-950 fill-current" />
@@ -1173,7 +1173,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
           className={`px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'tiktok_direct'
               ? 'bg-gradient-to-r from-pink-600 via-rose-600 to-amber-500 text-white shadow-lg shadow-pink-500/20 scale-105'
-              : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              : 'bg-slate-950 text-slate-400 hover:text-slate-100 border border-slate-800'
           }`}
         >
           <Zap className="w-4 h-4 text-amber-200 fill-current" />
@@ -1185,7 +1185,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'history'
               ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-              : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              : 'bg-slate-950 text-slate-400 hover:text-slate-100 border border-slate-800'
           }`}
         >
           <Clock className="w-3.5 h-3.5 text-purple-300" />
@@ -1196,8 +1196,8 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
           onClick={() => setActiveTab('auto_generator')}
           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'auto_generator'
-              ? 'bg-emerald-600 text-slate-950 font-black shadow-lg shadow-emerald-500/20 scale-105'
-              : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              ? 'bg-emerald-600 text-slate-100 font-black shadow-lg shadow-emerald-500/20 scale-105'
+              : 'bg-slate-950 text-slate-400 hover:text-slate-100 border border-slate-800'
           }`}
         >
           <Wand2 className="w-3.5 h-3.5" />
@@ -1209,7 +1209,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'script'
               ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
-              : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              : 'bg-slate-950 text-slate-400 hover:text-slate-100 border border-slate-800'
           }`}
         >
           <Layers className="w-3.5 h-3.5" />
@@ -1220,8 +1220,8 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
           onClick={() => setActiveTab('tools')}
           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'tools'
-              ? 'bg-slate-800 text-white'
-              : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+              ? 'bg-slate-800 text-slate-100'
+              : 'bg-slate-950 text-slate-400 hover:text-slate-100 border border-slate-800'
           }`}
         >
           <Bot className="w-3.5 h-3.5" />
@@ -1255,7 +1255,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                     🎵
                   </div>
                   <div>
-                    <div className="font-extrabold text-white text-base flex items-center gap-2">
+                    <div className="font-extrabold text-slate-100 text-base flex items-center gap-2">
                       <span>TikTok Account: Smart Garden</span>
                       <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30">
                         LIVE CONNECTED
@@ -1278,7 +1278,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                   <Flame className="w-3.5 h-3.5 text-amber-400" />
                   Άρθρο προς Αυτόματη Δημοσίευση:
                 </div>
-                <h4 className="text-sm font-black text-white line-clamp-1">
+                <h4 className="text-sm font-black text-slate-100 line-clamp-1">
                   {currentArticle?.title?.el || currentArticle?.title}
                 </h4>
                 <p className="text-[11px] text-slate-300 line-clamp-2 mt-1">
@@ -1300,7 +1300,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                 <button
                   onClick={handleGenerateStaticImageAndPublish}
                   disabled={isGeneratingVideo}
-                  className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white font-bold text-sm py-3.5 px-6 rounded-2xl border border-slate-700 flex items-center justify-center gap-2.5 cursor-pointer transition-all"
+                  className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-100 font-bold text-sm py-3.5 px-6 rounded-2xl border border-slate-700 flex items-center justify-center gap-2.5 cursor-pointer transition-all"
                 >
                   <ImageIcon className="w-4 h-4 text-slate-300" />
                   <span>{isGeneratingVideo ? `⏳ ${generationProgress}%...` : '🖼️ Στατική Εικόνα (χωρίς video/ήχο)'}</span>
@@ -1344,7 +1344,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                     </div>
                     <button
                       onClick={() => setActiveTab('history')}
-                      className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-black shrink-0 cursor-pointer"
+                      className="bg-emerald-600 hover:bg-emerald-500 text-slate-100 px-3 py-1.5 rounded-lg text-xs font-black shrink-0 cursor-pointer"
                     >
                       Προβολή Ιστορικού
                     </button>
@@ -1428,7 +1428,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                 className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border flex items-center gap-1.5 cursor-pointer transition-all ${
                   !isAudioMuted
                     ? 'bg-emerald-600/30 text-emerald-300 border-emerald-500/50'
-                    : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                    : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-100'
                 }`}
               >
                 {!isAudioMuted ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5" />}
@@ -1478,14 +1478,14 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                   <div className="w-16 h-16 rounded-full bg-emerald-600/90 text-white flex items-center justify-center text-2xl shadow-2xl">
                     ▶
                   </div>
-                  <span className="text-white text-xs font-black mt-2 bg-black/60 px-3 py-1 rounded-full">
+                  <span className="text-slate-100 text-xs font-black mt-2 bg-black/60 px-3 py-1 rounded-full">
                     Κλικ για Αναπαραγωγή
                   </span>
                 </div>
               )}
 
               {/* Top TikTok Bar */}
-              <div className="relative z-10 flex items-center justify-between text-white text-[10px] font-bold pt-2">
+              <div className="relative z-10 flex items-center justify-between text-slate-100 text-[10px] font-bold pt-2">
                 <span className="bg-emerald-600 px-2.5 py-1 rounded-full uppercase tracking-wider shadow flex items-center gap-1">
                   <Flame className="w-3 h-3 text-amber-300 fill-current" />
                   🌿 SmartGarden
@@ -1500,10 +1500,10 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
 
               {/* Center Kinetic Captions */}
               <div className="relative z-10 text-center px-2 space-y-2 my-auto">
-                <div className="inline-block bg-amber-400 text-black font-black text-xs px-3 py-1.5 rounded-lg shadow-2xl transform -rotate-1 border border-amber-300 transition-all">
+                <div className="inline-block bg-amber-400 text-slate-100 font-black text-xs px-3 py-1.5 rounded-lg shadow-2xl transform -rotate-1 border border-amber-300 transition-all">
                   {tikTokScript.scenes[currentSceneIdx]?.onScreenText}
                 </div>
-                <div className="text-xs font-bold text-white drop-shadow-lg leading-snug line-clamp-3 bg-black/70 backdrop-blur-md p-3 rounded-2xl border border-white/20 shadow-xl transition-all">
+                <div className="text-xs font-bold text-slate-100 drop-shadow-lg leading-snug line-clamp-3 bg-black/70 backdrop-blur-md p-3 rounded-2xl border border-white/20 shadow-xl transition-all">
                   {tikTokScript.scenes[currentSceneIdx]?.voiceover}
                 </div>
               </div>
@@ -1531,8 +1531,8 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                       }}
                       className={`flex-1 py-0.5 rounded transition-all cursor-pointer truncate text-center ${
                         currentSceneIdx === i
-                          ? 'bg-amber-400 text-black font-black shadow'
-                          : 'bg-black/40 text-slate-300 hover:text-white'
+                          ? 'bg-amber-400 text-slate-100 font-black shadow'
+                          : 'bg-black/40 text-slate-300 hover:text-slate-100'
                       }`}
                     >
                       {s.tag.split(' ')[1] || s.tag}
@@ -1542,7 +1542,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
 
                 <div className="flex items-center justify-between pt-1">
                   <div className="bg-black/60 backdrop-blur-sm p-2 rounded-xl border border-white/10 max-w-[190px]">
-                    <div className="text-xs font-extrabold text-white flex items-center gap-1">
+                    <div className="text-xs font-extrabold text-slate-100 flex items-center gap-1">
                       <span>@smartgarden68</span>
                       <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 fill-current" />
                     </div>
@@ -1554,7 +1554,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                     </p>
                   </div>
 
-                  <div className="flex flex-col items-center gap-1.5 text-white text-[10px]">
+                  <div className="flex flex-col items-center gap-1.5 text-slate-100 text-[10px]">
                     <div className="w-8 h-8 rounded-full bg-slate-900/90 border border-white/20 flex items-center justify-center font-bold shadow-lg">
                       ❤️
                     </div>
@@ -1580,7 +1580,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                     window.speechSynthesis.cancel();
                   }
                 }}
-                className="text-xs font-bold text-slate-300 hover:text-white px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 flex items-center gap-1.5 cursor-pointer shadow"
+                className="text-xs font-bold text-slate-300 hover:text-slate-100 px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 flex items-center gap-1.5 cursor-pointer shadow"
               >
                 {isPlayingPreview ? <Pause className="w-3.5 h-3.5 text-amber-400" /> : <Play className="w-3.5 h-3.5 text-emerald-400 fill-current" />}
                 <span>{isPlayingPreview ? 'Παύση' : 'Αναπαραγωγή'}</span>
@@ -1588,7 +1588,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
 
               <button
                 onClick={() => setCurrentSceneIdx((prev) => (prev + 1) % tikTokScript.scenes.length)}
-                className="text-xs font-bold text-slate-300 hover:text-white px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-slate-300 hover:text-slate-100 px-3 py-2 rounded-xl bg-slate-800 border border-slate-700 flex items-center gap-1 cursor-pointer"
               >
                 <span>Επόμενη Σκηνή ⏭️</span>
               </button>
@@ -1603,7 +1603,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
         <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 space-y-6">
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <div>
-              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+              <h3 className="text-base font-extrabold text-slate-100 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-purple-400" />
                 Ιστορικό Αυτόματων Δημοσιεύσεων TikTok (@smartgarden68)
               </h3>
@@ -1649,7 +1649,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                     </span>
                   </div>
 
-                  <h4 className="text-sm font-black text-white line-clamp-1">{post.title}</h4>
+                  <h4 className="text-sm font-black text-slate-100 line-clamp-1">{post.title}</h4>
                   <p className="text-xs text-slate-300 line-clamp-2">{post.caption}</p>
 
                   <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
@@ -1680,7 +1680,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
         <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+              <h3 className="text-base font-extrabold text-slate-100 flex items-center gap-2">
                 <Wand2 className="w-5 h-5 text-emerald-400" />
                 Αυτόματος Renderer Βίντεο 9:16 (In-Browser MP4/WebM)
               </h3>
@@ -1692,9 +1692,9 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
             <button
               onClick={handleGenerateAndDownloadVideo}
               disabled={isGeneratingVideo}
-              className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs py-3 px-5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+              className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-slate-100 font-black text-xs py-3 px-5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 cursor-pointer transition-all active:scale-95"
             >
-              <Download className="w-4 h-4 text-slate-950" />
+              <Download className="w-4 h-4 text-slate-100" />
               {isGeneratingVideo ? `Παραγωγή (${generationProgress}%)...` : '⚡ Παραγωγή & Κατέβασμα Τώρα'}
             </button>
           </div>
@@ -1726,13 +1726,13 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
       {activeTab === 'script' && tikTokScript && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
+            <h3 className="text-sm font-extrabold text-slate-100 uppercase tracking-wider flex items-center gap-2">
               <Layers className="w-4 h-4 text-emerald-400" />
               Ανάλυση Σκηνών & Voiceover (Χρονισμός 30s)
             </h3>
             <button
               onClick={() => copyToClipboard(tikTokScript.fullScriptText, 'full_script')}
-              className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow active:scale-95"
+              className="bg-emerald-600 hover:bg-emerald-500 text-slate-100 px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow active:scale-95"
             >
               {copiedType === 'full_script' ? (
                 <>
@@ -1765,7 +1765,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                   <div className="text-[11px] font-bold text-pink-400 uppercase tracking-wide mb-1">
                     🗣️ Voiceover (Εκφώνηση):
                   </div>
-                  <p className="text-xs text-white font-medium leading-relaxed">
+                  <p className="text-xs text-slate-100 font-medium leading-relaxed">
                     {scene.voiceover}
                   </p>
                 </div>
@@ -1802,7 +1802,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                   <span className="text-[10px] text-slate-400 font-semibold">100% Free</span>
                 </div>
                 
-                <h3 className="text-base font-bold text-white group-hover:text-pink-400 transition-colors">
+                <h3 className="text-base font-bold text-slate-100 group-hover:text-pink-400 transition-colors">
                   {tool.name}
                 </h3>
                 

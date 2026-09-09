@@ -163,7 +163,7 @@ export const CompanionMatrix: React.FC = () => {
           <Sprout className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-white tracking-tight">Πίνακας Συγκαλλιέργειας</h3>
+          <h3 className="text-lg font-bold text-slate-100 tracking-tight">Πίνακας Συγκαλλιέργειας</h3>
           <p className="text-xs text-slate-400">Ποια φυτά ταιριάζουν μαζί στον λαχανόκηπο και ποια όχι</p>
         </div>
       </div>
@@ -175,7 +175,7 @@ export const CompanionMatrix: React.FC = () => {
             onClick={() => setSelected(name)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border cursor-pointer transition-colors ${
               selected === name
-                ? 'bg-lime-500 text-slate-950 border-lime-500'
+                ? 'bg-lime-500 text-slate-100 border-lime-500'
                 : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-lime-500/40'
             }`}
           >
@@ -193,7 +193,7 @@ export const CompanionMatrix: React.FC = () => {
           </div>
           {entry.friends.map((f) => (
             <div key={f.plant} className="text-xs">
-              <span className="font-bold text-white">{f.plant}: </span>
+              <span className="font-bold text-slate-100">{f.plant}: </span>
               <span className="text-slate-400">{f.reason}</span>
             </div>
           ))}
@@ -206,7 +206,7 @@ export const CompanionMatrix: React.FC = () => {
           </div>
           {entry.enemies.map((e) => (
             <div key={e.plant} className="text-xs">
-              <span className="font-bold text-white">{e.plant}: </span>
+              <span className="font-bold text-slate-100">{e.plant}: </span>
               <span className="text-slate-400">{e.reason}</span>
             </div>
           ))}

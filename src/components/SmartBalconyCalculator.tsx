@@ -196,7 +196,7 @@ export const SmartBalconyCalculator: React.FC = () => {
             <Sparkles className="w-3.5 h-3.5" />
             Διαδραστικό Εργαλείο Μπαλκονιού
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight flex items-center gap-3">
             <span>Υπολογιστής Ποτίσματος & Γλάστρας</span>
             <span className="text-emerald-400 text-xl font-normal hidden sm:inline">| Smart Balcony AI</span>
           </h2>
@@ -243,7 +243,7 @@ export const SmartBalconyCalculator: React.FC = () => {
                   onClick={() => setSelectedPlantId(p.id)}
                   className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                     selectedPlantId === p.id
-                      ? 'bg-emerald-950/60 border-emerald-500 text-white ring-1 ring-emerald-500 shadow-md shadow-emerald-950'
+                      ? 'bg-emerald-950/60 border-emerald-500 text-slate-100 ring-1 ring-emerald-500 shadow-md shadow-emerald-950'
                       : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 text-slate-300'
                   }`}
                 >
@@ -385,7 +385,7 @@ export const SmartBalconyCalculator: React.FC = () => {
           {/* Main Numbers */}
           <div className="bg-gradient-to-br from-emerald-950/50 to-slate-900 border border-emerald-500/20 rounded-2xl p-5 text-center">
             <div className="text-xs font-semibold text-slate-400 mb-1">Προτεινόμενη Ποσότητα ανά Πότισμα</div>
-            <div className="text-4xl sm:text-5xl font-black text-white tracking-tight flex items-baseline justify-center gap-2">
+            <div className="text-4xl sm:text-5xl font-black text-slate-100 tracking-tight flex items-baseline justify-center gap-2">
               <span>{calculation.finalWaterMl.toLocaleString('el-GR')}</span>
               <span className="text-emerald-400 text-xl font-bold">ml</span>
             </div>
@@ -401,7 +401,7 @@ export const SmartBalconyCalculator: React.FC = () => {
                 <Calendar className="w-3.5 h-3.5 text-amber-400" />
                 Συχνότητα
               </div>
-              <div className="text-xs font-bold text-white leading-tight">
+              <div className="text-xs font-bold text-slate-100 leading-tight">
                 {calculation.frequency}
               </div>
             </div>
@@ -411,7 +411,7 @@ export const SmartBalconyCalculator: React.FC = () => {
                 <Sun className="w-3.5 h-3.5 text-cyan-400" />
                 Δείκτης Εξάτμισης (ET)
               </div>
-              <div className="text-xs font-bold text-white flex items-center gap-2">
+              <div className="text-xs font-bold text-slate-100 flex items-center gap-2">
                 <span className={calculation.etScore > 7 ? 'text-rose-400 font-extrabold' : 'text-emerald-400 font-bold'}>
                   {calculation.etScore}/10
                 </span>
@@ -452,7 +452,7 @@ export const SmartBalconyCalculator: React.FC = () => {
             ☀️
           </div>
           <div>
-            <div className="text-xs font-bold text-white">Ώρα Ποτίσματος</div>
+            <div className="text-xs font-bold text-slate-100">Ώρα Ποτίσματος</div>
             <div className="text-[11px] text-slate-400">06:30 - 08:30 π.μ. (Αποφυγή εγκαυμάτων)</div>
           </div>
         </div>
@@ -462,7 +462,7 @@ export const SmartBalconyCalculator: React.FC = () => {
             🧪
           </div>
           <div>
-            <div className="text-xs font-bold text-white">Καλοκαιρινή Λίπανση</div>
+            <div className="text-xs font-bold text-slate-100">Καλοκαιρινή Λίπανση</div>
             <div className="text-[11px] text-slate-400">Αποφεύγετε άζωτο σε καύσωνα • Προτιμήστε Κάλιο</div>
           </div>
         </div>
@@ -472,7 +472,7 @@ export const SmartBalconyCalculator: React.FC = () => {
             📡
           </div>
           <div>
-            <div className="text-xs font-bold text-white">Τεστ Υγρασίας</div>
+            <div className="text-xs font-bold text-slate-100">Τεστ Υγρασίας</div>
             <div className="text-[11px] text-slate-400">Βυθίστε το δάκτυλο 3cm πριν ανοίξετε το νερό</div>
           </div>
         </div>

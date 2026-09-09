@@ -587,7 +587,7 @@ export const FullscreenCartoonGrowth: React.FC<{ frame: number; fps: number }> =
       </svg>
 
       {/* Floating Success Pill */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 bg-emerald-500 text-slate-950 font-black px-8 py-3.5 rounded-3xl border-4 border-white shadow-2xl flex items-center gap-3 text-lg uppercase tracking-wide">
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 bg-emerald-500 text-slate-100 font-black px-8 py-3.5 rounded-3xl border-4 border-white shadow-2xl flex items-center gap-3 text-lg uppercase tracking-wide">
         <span className="text-2xl">🌱</span>
         <span>ΧΡΥΣΟΣ ΚΑΝΟΝΑΣ ΦΟΥΝΤΩΜΑΤΟΣ</span>
       </div>
@@ -650,14 +650,14 @@ export const FullscreenCartoonBalconyCTA: React.FC<{ frame: number; fps: number 
               <div className="w-24 h-24 rounded-3xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-5xl mb-3 shadow-lg shadow-emerald-500/30">
                 🌿
               </div>
-              <div className="text-3xl font-black text-white tracking-tight">SmartGarden.gr</div>
+              <div className="text-3xl font-black text-slate-100 tracking-tight">SmartGarden.gr</div>
               <div className="text-base text-emerald-300 font-bold mt-1">Οδηγός Φυτών & Αυτοματισμοί</div>
             </div>
 
             {/* Pulsing Save Button Inside Phone */}
             <div
               style={{ transform: `scale(${pulse})` }}
-              className="w-full py-4 rounded-2xl bg-emerald-500 text-slate-950 font-black text-lg flex items-center justify-center gap-2 shadow-2xl shadow-emerald-500/50"
+              className="w-full py-4 rounded-2xl bg-emerald-500 text-slate-100 font-black text-lg flex items-center justify-center gap-2 shadow-2xl shadow-emerald-500/50"
             >
               <span>🔖</span>
               <span>ΑΠΟΘΗΚΕΥΣΗ ΟΔΗΓΟΥ</span>

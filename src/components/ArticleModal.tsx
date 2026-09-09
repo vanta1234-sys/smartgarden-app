@@ -88,7 +88,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
           <button
             id="close-article-modal-btn"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2.5 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md transition-all shadow-md z-10"
+            className="absolute top-4 right-4 p-2.5 rounded-full bg-black/50 hover:bg-black/80 text-slate-100 backdrop-blur-md transition-all shadow-md z-10"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -121,7 +121,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
           </div>
 
           {/* Title on Image bottom */}
-          <div className="absolute bottom-4 left-4 right-4 text-white pointer-events-none">
+          <div className="absolute bottom-4 left-4 right-4 text-slate-100 pointer-events-none">
             <div className="flex items-center gap-2 mb-1.5">
               <span className="px-2.5 py-0.5 rounded-full bg-emerald-600/90 backdrop-blur-md text-white text-xs font-bold tracking-wide uppercase shadow-sm">
                 {article.categoryLabel[lang]}
@@ -147,7 +147,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
               className="w-10 h-10 rounded-full object-cover border-2 border-emerald-500"
             />
             <div>
-              <p className="text-xs font-bold text-neutral-900 dark:text-white">
+              <p className="text-xs font-bold text-neutral-900 dark:text-slate-100">
                 {article.author.name}
               </p>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
@@ -198,7 +198,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
             </span>
             <button 
               onClick={() => setIsPlayingAudio(false)}
-              className="text-neutral-500 hover:text-neutral-800 dark:hover:text-white"
+              className="text-neutral-500 hover:text-neutral-800 dark:hover:text-slate-100"
             >
               <VolumeX className="w-4 h-4" />
             </button>
@@ -295,7 +295,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
                 onClose();
                 onOpenSocialStudio();
               }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-900 dark:bg-neutral-800 hover:bg-neutral-800 text-white text-xs font-bold shadow-xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-900 dark:bg-neutral-800 hover:bg-neutral-800 text-slate-100 text-xs font-bold shadow-xs"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span>{lang === 'el' ? 'Social Studio' : 'Social Studio'}</span>

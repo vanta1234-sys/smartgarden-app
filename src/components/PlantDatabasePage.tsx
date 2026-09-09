@@ -110,7 +110,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
     const survivesRecordLow = regionMin !== null && selected.minTempC <= regionMin;
 
     return (
-      <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div role="main" className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-6">
           <button onClick={closePlant} className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer">
             <ArrowLeft className="w-4 h-4" />
@@ -121,7 +121,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
             <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-emerald-600/20 text-emerald-300 border border-emerald-600/30">
               {PLANT_CATEGORY_LABELS[selected.category]}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-3">{selected.name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight mt-3">{selected.name}</h1>
             <p className="text-sm text-slate-400 italic">{selected.botanical} · Οικογένεια {selected.family}</p>
           </div>
 
@@ -138,7 +138,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
                   {s.icon}
                   {s.label}
                 </div>
-                <div className="text-sm font-bold text-white leading-snug">{s.value}</div>
+                <div className="text-sm font-bold text-slate-100 leading-snug">{s.value}</div>
               </div>
             ))}
           </div>
@@ -165,7 +165,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
                 'Φόρτωση δεδομένων περιοχής...'
               ) : !tender ? (
                 <>
-                  Το φυτό αντέχει έως <strong className="text-white">{selected.minTempC}°C</strong>
+                  Το φυτό αντέχει έως <strong className="text-slate-100">{selected.minTempC}°C</strong>
                   {survivesRecordLow ? (
                     <> — χαμηλότερα από το απόλυτο ελάχιστο 20ετίας της περιοχής {frostLocation.name} ({regionMin}°C). Μπορείτε να το φυτέψετε οποιαδήποτε εποχή προβλέπεται για το είδος, χωρίς φόβο ζημιάς από παγετό.</>
                   ) : (
@@ -175,15 +175,15 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
               ) : regionHasFrost && regionSafeDate ? (
                 <>
                   Ευαίσθητο φυτό — καταστρέφεται κάτω από{' '}
-                  <strong className="text-white">{selected.minTempC}°C</strong>. Στην περιοχή{' '}
-                  <strong className="text-white">{frostLocation.name}</strong> φυτέψτε το με ασφάλεια{' '}
+                  <strong className="text-slate-100">{selected.minTempC}°C</strong>. Στην περιοχή{' '}
+                  <strong className="text-slate-100">{frostLocation.name}</strong> φυτέψτε το με ασφάλεια{' '}
                   <strong className="text-emerald-400">μετά τις {regionSafeDate}</strong>. Νωρίτερη φύτευση
                   απαιτεί προστασία (θερμοκήπιο, αντιπαγετικό ύφασμα ή μεταφορά της γλάστρας σε στεγασμένο χώρο τις ψυχρές νύχτες).
                 </>
               ) : (
                 <>
                   Ευαίσθητο φυτό (όριο {selected.minTempC}°C), αλλά στην περιοχή{' '}
-                  <strong className="text-white">{frostLocation.name}</strong> δεν καταγράφηκε παγετός την
+                  <strong className="text-slate-100">{frostLocation.name}</strong> δεν καταγράφηκε παγετός την
                   τελευταία 20ετία — με απόλυτο ελάχιστο {regionMin}°C. Μπορείτε να το καλλιεργείτε
                   εκτός σχεδόν όλο τον χρόνο.
                 </>
@@ -229,7 +229,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
 
           {selected.companions && selected.companions.length > 0 && (
             <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5">
-              <h2 className="text-sm font-bold text-white mb-2">Καλοί γείτονες στη συγκαλλιέργεια</h2>
+              <h2 className="text-sm font-bold text-slate-100 mb-2">Καλοί γείτονες στη συγκαλλιέργεια</h2>
               <div className="flex flex-wrap gap-2">
                 {selected.companions.map((c) => (
                   <span key={c} className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-200 border border-slate-700">
@@ -241,7 +241,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
           )}
 
           <div>
-            <h2 className="text-sm font-bold text-white mb-3">Άλλα φυτά της ίδιας κατηγορίας</h2>
+            <h2 className="text-sm font-bold text-slate-100 mb-3">Άλλα φυτά της ίδιας κατηγορίας</h2>
             <div className="flex flex-wrap gap-2">
               {PLANTS.filter((p) => p.category === selected.category && p.slug !== selected.slug).slice(0, 10).map((p) => (
                 <button
@@ -260,7 +260,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div role="main" className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-6">
         <button onClick={onBack} className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer">
           <ArrowLeft className="w-4 h-4" />
@@ -272,7 +272,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
             <Leaf className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Βάση Δεδομένων Φυτών</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">Βάση Δεδομένων Φυτών</h1>
             <p className="text-sm text-slate-400">
               {PLANTS.length} φυτά με πραγματικά δεδομένα καλλιέργειας για το ελληνικό κλίμα
             </p>
@@ -329,7 +329,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
             >
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
-                  <h2 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">{p.name}</h2>
+                  <h2 className="text-base font-bold text-slate-100 group-hover:text-emerald-400 transition-colors">{p.name}</h2>
                   <p className="text-[11px] text-slate-500 italic">{p.botanical}</p>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 shrink-0">

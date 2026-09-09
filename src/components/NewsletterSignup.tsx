@@ -44,7 +44,7 @@ export const NewsletterSignup: React.FC = () => {
           <Mail className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-base font-bold text-white">Μείνετε ενημερωμένοι</h3>
+          <h3 className="text-base font-bold text-slate-100">Μείνετε ενημερωμένοι</h3>
           <p className="text-xs text-slate-400">Εβδομαδιαίες συμβουλές κηπουρικής &amp; ειδοποιήσεις καιρού στο email σας, δωρεάν.</p>
         </div>
       </div>
@@ -55,7 +55,7 @@ export const NewsletterSignup: React.FC = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="το-email-σας@example.com"
-          className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
         />
         <button
           type="submit"

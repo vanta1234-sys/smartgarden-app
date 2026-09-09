@@ -96,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="text-xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+                <span className="text-xl font-extrabold tracking-tight text-neutral-900 dark:text-slate-100">
                   SmartGarden<span className="text-emerald-600 dark:text-emerald-400">.gr</span>
                 </span>
               </div>

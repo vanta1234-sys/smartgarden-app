@@ -64,7 +64,7 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Left Column: Heading, Subtitle, CTAs, Metrics */}
           <div className="lg:col-span-7 flex flex-col justify-center">
             
-            <h1 id="hero-heading" className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight text-neutral-900 dark:text-white leading-[1.15] mb-5">
+            <h1 id="hero-heading" className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight text-neutral-900 dark:text-slate-100 leading-[1.15] mb-5">
               {lang === 'el' ? (
                 <>
                   Οδηγοί για <span className="text-[#0d9488] dark:text-[#14b8a6]">Μπαλκόνι &amp; Κήπο</span> με Τεχνητή Νοημοσύνη.
@@ -106,7 +106,7 @@ export const Hero: React.FC<HeroProps> = ({
             {/* Key Metrics / Stats Row */}
             <div id="hero-metrics-row" className="grid grid-cols-3 gap-4 pt-6 border-t border-neutral-200/80 dark:border-neutral-800">
               <div id="metric-articles" className="flex flex-col">
-                <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-slate-100 tracking-tight">
                   3×/ημέρα
                 </span>
                 <span className="text-[11px] font-bold tracking-wider uppercase text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -115,7 +115,7 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
 
               <div id="metric-social" className="flex flex-col">
-                <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-slate-100 tracking-tight">
                   100%
                 </span>
                 <span className="text-[11px] font-bold tracking-wider uppercase text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -124,7 +124,7 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
 
               <div id="metric-gear" className="flex flex-col">
-                <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+                <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-slate-100 tracking-tight">
                   Top Gear
                 </span>
                 <span className="text-[11px] font-bold tracking-wider uppercase text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -170,8 +170,8 @@ export const Hero: React.FC<HeroProps> = ({
                       onClick={() => setSelectedCityId(city.id)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
                         isSelected
-                          ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs'
-                          : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                          ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-slate-100 shadow-xs'
+                          : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-slate-100'
                       }`}
                     >
                       {label}
@@ -183,7 +183,7 @@ export const Hero: React.FC<HeroProps> = ({
               {/* City Info & Temperature */}
               <div className="flex items-start justify-between mt-6">
                 <div>
-                  <h3 id="telemetry-city-name" className="text-xl font-bold text-neutral-900 dark:text-white">
+                  <h3 id="telemetry-city-name" className="text-xl font-bold text-neutral-900 dark:text-slate-100">
                     {currentCity.name[lang]}
                   </h3>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
@@ -191,7 +191,7 @@ export const Hero: React.FC<HeroProps> = ({
                   </p>
                 </div>
 
-                <div id="telemetry-temperature" className="flex items-center gap-1.5 text-neutral-900 dark:text-white">
+                <div id="telemetry-temperature" className="flex items-center gap-1.5 text-neutral-900 dark:text-slate-100">
                   <Sun className="w-6 h-6 text-amber-500 stroke-[2.2]" />
                   <span className="text-3xl font-extrabold tracking-tight">
                     {currentCity.temp}°C
@@ -207,7 +207,7 @@ export const Hero: React.FC<HeroProps> = ({
                   <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
                     {lang === 'el' ? 'Υγρασία' : 'Humidity'}
                   </span>
-                  <span className="text-base font-bold text-neutral-900 dark:text-white mt-1">
+                  <span className="text-base font-bold text-neutral-900 dark:text-slate-100 mt-1">
                     {currentCity.humidity}%
                   </span>
                 </div>

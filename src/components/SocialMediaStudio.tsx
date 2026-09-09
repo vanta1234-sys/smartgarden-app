@@ -41,7 +41,7 @@ export const SocialMediaStudio: React.FC<SocialMediaStudioProps> = ({ lang }) =>
   const fullScriptText = `🎬 TITLE: ${activeScript.title[lang]}\n\n🛑 HOOK:\n${activeScript.hook[lang]}\n\n📋 SCENES:\n${activeScript.scriptScenes.map((s) => `[${s.timestamp}]\nVisual: ${s.visual[lang]}\nVoiceover: ${s.voiceover[lang]}\nText: ${s.onScreenText[lang]}`).join('\n\n')}\n\n📝 CAPTION:\n${activeScript.caption[lang]}\n\n# HASHTAGS:\n${activeScript.hashtags.join(' ')}\n\n👉 CTA:\n${activeScript.callToAction[lang]}`;
 
   return (
-    <section id="social-studio-section" className="py-14 sm:py-20 bg-neutral-900 text-white border-t border-neutral-800">
+    <section id="social-studio-section" className="py-14 sm:py-20 bg-neutral-900 text-slate-100 border-t border-neutral-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -83,7 +83,7 @@ export const SocialMediaStudio: React.FC<SocialMediaStudioProps> = ({ lang }) =>
                 className={`px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 border ${
                   isSelected
                     ? 'bg-emerald-800 text-white border-emerald-500 shadow-md'
-                    : 'bg-neutral-800 text-neutral-400 border-neutral-700 hover:text-white hover:border-neutral-600'
+                    : 'bg-neutral-800 text-neutral-400 border-neutral-700 hover:text-slate-100 hover:border-neutral-600'
                 }`}
               >
                 {script.platform === 'tiktok' ? <Video className="w-3.5 h-3.5 text-pink-400" /> : <Instagram className="w-3.5 h-3.5 text-amber-400" />}
@@ -108,13 +108,13 @@ export const SocialMediaStudio: React.FC<SocialMediaStudioProps> = ({ lang }) =>
                 </span>
                 <button
                   onClick={() => handleCopy(activeScript.hook[lang], 'hook')}
-                  className="text-xs text-neutral-400 hover:text-white flex items-center gap-1"
+                  className="text-xs text-neutral-400 hover:text-slate-100 flex items-center gap-1"
                 >
                   {copiedSection === 'hook' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedSection === 'hook' ? (lang === 'el' ? 'Αντιγράφηκε' : 'Copied') : (lang === 'el' ? 'Αντιγραφή Hook' : 'Copy')}</span>
                 </button>
               </div>
-              <p className="text-base font-bold text-white leading-relaxed">
+              <p className="text-base font-bold text-slate-100 leading-relaxed">
                 "{activeScript.hook[lang]}"
               </p>
             </div>
@@ -153,7 +153,7 @@ export const SocialMediaStudio: React.FC<SocialMediaStudioProps> = ({ lang }) =>
                         <span className="text-[10px] font-bold uppercase text-neutral-500 block mb-0.5">
                           {lang === 'el' ? '🎙️ Voiceover:' : '🎙️ Voiceover:'}
                         </span>
-                        <p className="text-white font-medium">"{scene.voiceover[lang]}"</p>
+                        <p className="text-slate-100 font-medium">"{scene.voiceover[lang]}"</p>
                       </div>
 
                       <div className="sm:col-span-1">
@@ -181,7 +181,7 @@ export const SocialMediaStudio: React.FC<SocialMediaStudioProps> = ({ lang }) =>
                 </span>
                 <button
                   onClick={() => handleCopy(activeScript.caption[lang], 'caption')}
-                  className="text-xs text-neutral-400 hover:text-white flex items-center gap-1"
+                  className="text-xs text-neutral-400 hover:text-slate-100 flex items-center gap-1"
                 >
                   {copiedSection === 'caption' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedSection === 'caption' ? 'Done' : 'Copy'}</span>
@@ -201,7 +201,7 @@ export const SocialMediaStudio: React.FC<SocialMediaStudioProps> = ({ lang }) =>
                 </span>
                 <button
                   onClick={() => handleCopy(activeScript.hashtags.join(' '), 'tags')}
-                  className="text-xs text-neutral-400 hover:text-white flex items-center gap-1"
+                  className="text-xs text-neutral-400 hover:text-slate-100 flex items-center gap-1"
                 >
                   {copiedSection === 'tags' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedSection === 'tags' ? 'Done' : 'Copy'}</span>

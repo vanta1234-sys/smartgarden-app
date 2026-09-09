@@ -32,7 +32,7 @@ export const RoboticMowersSection: React.FC<RoboticMowersSectionProps> = ({ lang
             <span>{lang === 'el' ? 'Top Gear & Hardware Reviews 2026' : 'Top Gear & Hardware Reviews 2026'}</span>
           </div>
 
-          <h2 id="mowers-title" className="text-3xl sm:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+          <h2 id="mowers-title" className="text-3xl sm:text-4xl font-extrabold text-neutral-900 dark:text-slate-100 tracking-tight">
             {lang === 'el' ? 'Τα Καλύτερα Ρομποτικά Χλοοκοπτικά Χωρίς Καλώδιο' : 'Best Wire-Free Robotic Lawn Mowers'}
           </h2>
 
@@ -64,7 +64,7 @@ export const RoboticMowersSection: React.FC<RoboticMowersSectionProps> = ({ lang
                       {mower.badge}
                     </span>
                   )}
-                  <span className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/70 backdrop-blur-md text-white font-extrabold text-sm">
+                  <span className="absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/70 backdrop-blur-md text-slate-100 font-extrabold text-sm">
                     {mower.price}
                   </span>
                 </div>
@@ -82,7 +82,7 @@ export const RoboticMowersSection: React.FC<RoboticMowersSectionProps> = ({ lang
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-bold text-neutral-900 dark:text-white tracking-tight">
+                  <h3 className="text-lg font-bold text-neutral-900 dark:text-slate-100 tracking-tight">
                     {mower.name}
                   </h3>
 
@@ -138,7 +138,7 @@ export const RoboticMowersSection: React.FC<RoboticMowersSectionProps> = ({ lang
                 <a
                   href="#affiliate"
                   onClick={(e) => e.preventDefault()}
-                  className="w-full py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                  className="w-full py-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-slate-100 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-xs"
                 >
                   <span>{lang === 'el' ? 'Αναλυτικό Review & Τιμές' : 'Full Review & Specs'}</span>
                   <ExternalLink className="w-3.5 h-3.5" />

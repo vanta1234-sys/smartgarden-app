@@ -95,7 +95,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400 gap-2">
+      <div role="main" className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400 gap-2">
         <RotateCw className="w-5 h-5 animate-spin" />
         Φόρτωση δεδομένων παγετού...
       </div>
@@ -104,7 +104,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
 
   if (!data || !selected) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400">
+      <div role="main" className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400">
         Τα δεδομένα παγετού δεν είναι προσωρινά διαθέσιμα.
       </div>
     );
@@ -115,7 +115,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
   const noFrost = hf.frost_probability_pct === 0;
 
   return (
-    <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div role="main" className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-6">
         <button
           onClick={onBack}
@@ -130,7 +130,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
             <Snowflake className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">
               Ημερομηνίες Παγετού & Ασφαλής Φύτευση στην Ελλάδα
             </h1>
             <p className="text-sm text-slate-400">
@@ -146,23 +146,23 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
           <p className="text-sm text-slate-200 leading-relaxed">
             {noFrost ? (
               <>
-                Στην περιοχή <strong className="text-white">{selected.name}</strong> δεν καταγράφηκε παγετός
+                Στην περιοχή <strong className="text-slate-100">{selected.name}</strong> δεν καταγράφηκε παγετός
                 (≤0°C) σε καμία από τις {hf.years_analysed} χρονιές που εξετάστηκαν. Μπορείτε να φυτεύετε
                 ευαίσθητα φυτά ({TENDER_CROPS}) σχεδόν όλο τον χρόνο, με μόνη επιφύλαξη τις πιο ψυχρές νύχτες
                 του Ιανουαρίου — το απόλυτο ελάχιστο της 20ετίας ήταν {selected.absolute_min_c}°C.
               </>
             ) : (
               <>
-                Στην περιοχή <strong className="text-white">{selected.name}</strong> ο τελευταίος ανοιξιάτικος
+                Στην περιοχή <strong className="text-slate-100">{selected.name}</strong> ο τελευταίος ανοιξιάτικος
                 παγετός σημειώνεται κατά μέσο όρο στις{' '}
-                <strong className="text-white">{hf.last_spring_frost?.label}</strong>
+                <strong className="text-slate-100">{hf.last_spring_frost?.label}</strong>
                 {hf.first_autumn_frost ? (
-                  <> και ο πρώτος φθινοπωρινός στις <strong className="text-white">{hf.first_autumn_frost.label}</strong>.</>
+                  <> και ο πρώτος φθινοπωρινός στις <strong className="text-slate-100">{hf.first_autumn_frost.label}</strong>.</>
                 ) : (
                   <>, ενώ πριν το τέλος του έτους δεν καταγράφεται συνήθως παγετός — ο κίνδυνος περιορίζεται στον Ιανουάριο και τον Φεβρουάριο.</>
                 )}{' '}
                 Για να είστε ασφαλείς σε 9 στις 10 χρονιές, φυτέψτε ευαίσθητα φυτά ({TENDER_CROPS}) μετά τις{' '}
-                <strong className="text-white">{hf.safe_planting_date?.label}</strong>. Ανθεκτικά λαχανικά
+                <strong className="text-slate-100">{hf.safe_planting_date?.label}</strong>. Ανθεκτικά λαχανικά
                 ({HARDY_CROPS}) αντέχουν και νωρίτερα. Παγετός εμφανίστηκε σε {hf.frost_probability_pct}% των
                 ετών, με {hf.avg_frost_days_per_year} ημέρες παγετού τον χρόνο κατά μέσο όρο.
               </>
@@ -198,7 +198,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
               <Snowflake className="w-3.5 h-3.5 text-sky-400" />
               Τελευταίος παγετός
             </div>
-            <div className="text-xl font-extrabold text-white">{hf.last_spring_frost?.label ?? '—'}</div>
+            <div className="text-xl font-extrabold text-slate-100">{hf.last_spring_frost?.label ?? '—'}</div>
             <p className="text-[11px] text-slate-400 mt-1">Μέσος όρος άνοιξης (≤0°C)</p>
           </div>
 
@@ -216,7 +216,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
               <CalendarDays className="w-3.5 h-3.5 text-amber-400" />
               Πρώτος παγετός
             </div>
-            <div className="text-xl font-extrabold text-white">{hf.first_autumn_frost?.label ?? '—'}</div>
+            <div className="text-xl font-extrabold text-slate-100">{hf.first_autumn_frost?.label ?? '—'}</div>
             <p className="text-[11px] text-slate-400 mt-1">Μέσος όρος φθινοπώρου</p>
           </div>
 
@@ -225,7 +225,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
               <Sprout className="w-3.5 h-3.5 text-lime-400" />
               Περίοδος ανάπτυξης
             </div>
-            <div className="text-xl font-extrabold text-white">
+            <div className="text-xl font-extrabold text-slate-100">
               {hf.growing_season_days
                 ? `${hf.growing_season_days} ημέρες`
                 : noFrost
@@ -244,7 +244,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 space-y-3">
-            <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2">
               <ThermometerSnowflake className="w-4 h-4 text-sky-400" />
               Ελαφρύς παγετός (≤{data.thresholds.light_frost_c}°C)
             </h2>
@@ -271,7 +271,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
           </div>
 
           <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 space-y-3">
-            <h2 className="text-sm font-bold text-white">Στοιχεία περιοχής</h2>
+            <h2 className="text-sm font-bold text-slate-100">Στοιχεία περιοχής</h2>
             <dl className="text-xs space-y-1.5">
               <div className="flex justify-between border-b border-slate-900 pb-1.5">
                 <dt className="text-slate-400">Υψόμετρο</dt>
@@ -298,7 +298,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
         </div>
 
         <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 space-y-3">
-          <h2 className="text-base font-bold text-white">Σύγκριση όλων των περιοχών</h2>
+          <h2 className="text-base font-bold text-slate-100">Σύγκριση όλων των περιοχών</h2>
           <p className="text-xs text-slate-400">
             Ταξινομημένες από την περιοχή με τον πιο όψιμο ανοιξιάτικο παγετό (φυτεύετε τελευταίοι) προς την
             πιο ήπια.
@@ -343,7 +343,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
         </div>
 
         <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-2">
-          <h2 className="text-sm font-bold text-white">Μεθοδολογία & πηγή δεδομένων</h2>
+          <h2 className="text-sm font-bold text-slate-100">Μεθοδολογία & πηγή δεδομένων</h2>
           <p className="text-xs text-slate-400 leading-relaxed">
             Τα δεδομένα προέρχονται από την {data.source}, περίοδος {data.period}. Για κάθε έτος και κάθε
             τοποθεσία εντοπίζεται η τελευταία ημέρα πριν την 1η Ιουλίου και η πρώτη ημέρα μετά την 1η Ιουλίου

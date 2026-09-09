@@ -425,7 +425,7 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleTogglePlay}
-                  className="p-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black flex items-center justify-center transition-transform active:scale-95 cursor-pointer"
+                  className="p-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-100 font-black flex items-center justify-center transition-transform active:scale-95 cursor-pointer"
                   title={isPlaying ? 'Παύση' : 'Αναπαραγωγή'}
                 >
                   {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
@@ -433,7 +433,7 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
 
                 <button
                   onClick={handleRestart}
-                  className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition-transform active:scale-95 cursor-pointer"
+                  className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold transition-transform active:scale-95 cursor-pointer"
                   title="Επανεκκίνηση"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -481,7 +481,7 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
                 <span>🎨 2D Κινούμενα Σχέδια (Cartoons)</span>
               </div>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white">
+            <h3 className="text-xl sm:text-2xl font-black text-slate-100">
               {script.title || 'Αυτόματο Βίντεο Remotion'}
             </h3>
             <p className="text-sm text-slate-300 mt-1">
@@ -516,8 +516,8 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
                     }}
                     className={`py-2 px-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
                       selectedVoiceProfile === 'deep_male'
-                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                        ? 'bg-emerald-500 text-slate-100 shadow-md shadow-emerald-500/20'
+                        : 'text-slate-300 hover:text-slate-100 hover:bg-slate-800'
                     }`}
                   >
                     <span>🧔</span>
@@ -534,8 +534,8 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
                     }}
                     className={`py-2 px-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
                       selectedVoiceProfile === 'light_female'
-                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                        ? 'bg-emerald-500 text-slate-100 shadow-md shadow-emerald-500/20'
+                        : 'text-slate-300 hover:text-slate-100 hover:bg-slate-800'
                     }`}
                   >
                     <span>👩</span>
@@ -552,8 +552,8 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
                     }}
                     className={`py-2 px-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1 ${
                       selectedVoiceProfile === 'warm_female'
-                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                        ? 'bg-emerald-500 text-slate-100 shadow-md shadow-emerald-500/20'
+                        : 'text-slate-300 hover:text-slate-100 hover:bg-slate-800'
                     }`}
                   >
                     <span>🎙️</span>
@@ -578,8 +578,8 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
                       }}
                       className={`py-2 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                         selectedVoiceSpeed === speed
-                          ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                          : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                          ? 'bg-emerald-500 text-slate-100 shadow-sm'
+                          : 'text-slate-300 hover:text-slate-100 hover:bg-slate-800'
                       }`}
                     >
                       {speed}x
@@ -602,7 +602,7 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-xs font-black text-white truncate">{scene.onScreenText}</h4>
+                    <h4 className="text-xs font-black text-slate-100 truncate">{scene.onScreenText}</h4>
                     <span className="text-[10px] font-mono text-emerald-400 shrink-0">{scene.timestamp}</span>
                   </div>
                   <p className="text-xs text-slate-300 mt-1 line-clamp-2">{scene.voiceover}</p>
@@ -616,7 +616,7 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
             <button
               onClick={handleExportRemotionVideo}
               disabled={isExporting}
-              className="w-full sm:flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2.5 transition-all transform active:scale-98 disabled:opacity-50"
+              className="w-full sm:flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-slate-100 font-black text-sm shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2.5 transition-all transform active:scale-98 disabled:opacity-50"
             >
               {isExporting ? (
                 <>

@@ -176,7 +176,7 @@ export const AIAgronomist: React.FC<AIAgronomistProps> = ({ lang, onOpenTelemetr
             <span>{lang === 'el' ? 'Τεχνητή Νοημοσύνη & Βοτανική Επιστήμη' : 'AI Plant Doctor & Botany'}</span>
           </div>
 
-          <h2 id="agronomist-title" className="text-3xl sm:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+          <h2 id="agronomist-title" className="text-3xl sm:text-4xl font-extrabold text-neutral-900 dark:text-slate-100 tracking-tight">
             {lang === 'el' ? 'Ρώτησε τον AI Γεωπόνο του SmartGarden' : 'Ask SmartGarden\'s AI Agronomist'}
           </h2>
 
@@ -197,7 +197,7 @@ export const AIAgronomist: React.FC<AIAgronomistProps> = ({ lang, onOpenTelemetr
                 <Stethoscope className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                <h3 className="text-sm font-bold text-neutral-900 dark:text-slate-100">
                   {lang === 'el' ? 'Γρήγορη Διάγνωση Φυτού (Express Tool)' : 'Quick Plant Diagnostic Tool'}
                 </h3>
                 <p className="text-[11px] text-neutral-500">
@@ -216,7 +216,7 @@ export const AIAgronomist: React.FC<AIAgronomistProps> = ({ lang, onOpenTelemetr
                   id="diag-select-plant"
                   value={selectedPlant}
                   onChange={(e) => setSelectedPlant(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="gardenia">{lang === 'el' ? 'Γαρδένια (Gardenia)' : 'Gardenia'}</option>
                   <option value="tomato">{lang === 'el' ? 'Ντοματιά / Ντοματίνια' : 'Cherry Tomatoes'}</option>
@@ -235,7 +235,7 @@ export const AIAgronomist: React.FC<AIAgronomistProps> = ({ lang, onOpenTelemetr
                   id="diag-select-symptom"
                   value={selectedSymptom}
                   onChange={(e) => setSelectedSymptom(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="yellow_leaves">{lang === 'el' ? 'Κίτρινα φύλλα με πράσινα νεύρα' : 'Yellowing leaves with green veins'}</option>
                   <option value="wilting">{lang === 'el' ? 'Μαρασμός / Πεσμένα φύλλα παρά το πότισμα' : 'Wilting despite regular watering'}</option>
@@ -252,7 +252,7 @@ export const AIAgronomist: React.FC<AIAgronomistProps> = ({ lang, onOpenTelemetr
                   id="diag-select-sun"
                   value={selectedSun}
                   onChange={(e) => setSelectedSun(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-3 py-2.5 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="full_sun">{lang === 'el' ? 'Άμεσος ήλιος (>6 ώρες/μέρα)' : 'Direct sunlight (>6 hrs/day)'}</option>
                   <option value="partial_shade">{lang === 'el' ? 'Πρωινός ήλιος & απογευματινή σκιά' : 'Morning sun & afternoon shade'}</option>
@@ -326,7 +326,7 @@ export const AIAgronomist: React.FC<AIAgronomistProps> = ({ lang, onOpenTelemetr
           <div className="lg:col-span-7 bg-white dark:bg-neutral-850 border border-neutral-200 dark:border-neutral-750 rounded-3xl overflow-hidden shadow-lg flex flex-col h-[580px]">
             
             {/* Chat Header */}
-            <div className="p-4 sm:px-6 bg-emerald-900 text-white flex items-center justify-between">
+            <div className="p-4 sm:px-6 bg-emerald-900 text-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-emerald-700 flex items-center justify-center text-emerald-200 border border-emerald-500/50">
                   <Bot className="w-5 h-5" />
@@ -415,7 +415,7 @@ export const AIAgronomist: React.FC<AIAgronomistProps> = ({ lang, onOpenTelemetr
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder={lang === 'el' ? 'Ρωτήστε για οποιοδήποτε φυτό, πότισμα ή σύμπτωμα...' : 'Ask about any plant, watering schedule, or symptom...'}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-xs sm:text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-xs sm:text-sm text-neutral-900 dark:text-slate-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
                 <button
                   id="send-agronomist-msg-btn"

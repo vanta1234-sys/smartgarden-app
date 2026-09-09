@@ -13,7 +13,7 @@ export const FaqAccordion: React.FC<FaqAccordionProps> = ({ faqs }) => {
 
   return (
     <div className="space-y-3 pt-4 border-t border-slate-800">
-      <div className="flex items-center gap-2 text-sm font-bold text-white">
+      <div className="flex items-center gap-2 text-sm font-bold text-slate-100">
         <HelpCircle className="w-4 h-4 text-emerald-400" />
         Συχνές Ερωτήσεις
       </div>

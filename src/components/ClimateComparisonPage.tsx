@@ -35,7 +35,7 @@ export const ClimateComparisonPage: React.FC<ClimateComparisonPageProps> = ({ on
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div role="main" className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
         <button onClick={onBack} className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer">
           <ArrowLeft className="w-4 h-4" />
@@ -47,7 +47,7 @@ export const ClimateComparisonPage: React.FC<ClimateComparisonPageProps> = ({ on
             <Gauge className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Ζωντανή Σύγκριση ET₀ Ελληνικών Πόλεων</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">Ζωντανή Σύγκριση ET₀ Ελληνικών Πόλεων</h1>
             <p className="text-sm text-slate-400">Ποιες περιοχές έχουν τη μεγαλύτερη ανάγκη ποτίσματος σήμερα, με πραγματικά δεδομένα</p>
           </div>
         </div>
@@ -78,7 +78,7 @@ export const ClimateComparisonPage: React.FC<ClimateComparisonPageProps> = ({ on
                 {results.map((r, idx) => (
                   <tr key={r.cityId} className="border-b border-slate-800/60 hover:bg-slate-950/40">
                     <td className="py-2.5 pr-3 text-slate-500">{idx + 1}</td>
-                    <td className="py-2.5 pr-3 font-bold text-white">{r.cityName}</td>
+                    <td className="py-2.5 pr-3 font-bold text-slate-100">{r.cityName}</td>
                     <td className="py-2.5 pr-3">
                       <span className={`font-mono font-bold ${r.evapotranspiration >= 6 ? 'text-rose-400' : r.evapotranspiration >= 4 ? 'text-amber-400' : 'text-emerald-400'}`}>
                         {r.evapotranspiration}

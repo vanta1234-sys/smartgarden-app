@@ -184,7 +184,7 @@ export const PinGenerator: React.FC<PinGeneratorProps> = ({ articlesList, lang }
             <select
               value={selectedId}
               onChange={(e) => setSelectedId(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500"
             >
               {articlesList.map((a) => (
                 <option key={a.id} value={a.id}>

@@ -51,7 +51,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <Sprout className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-xl font-extrabold tracking-tight text-white">
+                <span className="text-xl font-extrabold tracking-tight text-slate-100">
                   SmartGarden<span className="text-emerald-400">.gr</span>
                 </span>
               </div>
@@ -71,7 +71,7 @@ export const Footer: React.FC<FooterProps> = ({
 
           {/* Nav Col 1 */}
           <div className="lg:col-span-2 space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-100">
               {lang === 'el' ? 'Θεματικές' : 'Sections'}
             </h4>
             <ul className="space-y-2 text-xs text-neutral-400">
@@ -100,7 +100,7 @@ export const Footer: React.FC<FooterProps> = ({
 
           {/* Nav Col 2 */}
           <div className="lg:col-span-2 space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-100">
               {lang === 'el' ? 'Εργαλεία AI' : 'AI Tools'}
             </h4>
             <ul className="space-y-2 text-xs text-neutral-400">
@@ -125,7 +125,7 @@ export const Footer: React.FC<FooterProps> = ({
 
           {/* Newsletter Col */}
           <div className="lg:col-span-3 space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-100">
               {lang === 'el' ? 'Καθημερινό Newsletter' : 'Daily Newsletter'}
             </h4>
             <p className="text-xs text-neutral-400">
@@ -140,7 +140,7 @@ export const Footer: React.FC<FooterProps> = ({
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="name@example.gr"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-xs text-slate-100 placeholder-neutral-500 focus:outline-none focus:border-emerald-500"
                 />
               </div>
               <button

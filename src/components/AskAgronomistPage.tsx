@@ -101,7 +101,7 @@ export const AskAgronomistPage: React.FC<AskAgronomistPageProps> = ({ onBack }) 
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div role="main" className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto space-y-6">
         <button onClick={onBack} className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer">
           <ArrowLeft className="w-4 h-4" />
@@ -113,7 +113,7 @@ export const AskAgronomistPage: React.FC<AskAgronomistPageProps> = ({ onBack }) 
             <MessageCircleQuestion className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Ρωτήστε τον Γεωπόνο</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">Ρωτήστε τον Γεωπόνο</h1>
             <p className="text-sm text-slate-400">Πραγματικές ερωτήσεις αναγνωστών, με τεκμηριωμένες απαντήσεις</p>
           </div>
         </div>
@@ -184,7 +184,7 @@ export const AskAgronomistPage: React.FC<AskAgronomistPageProps> = ({ onBack }) 
         </div>
 
         <div className="space-y-3">
-          <h2 className="text-base font-bold text-white">
+          <h2 className="text-base font-bold text-slate-100">
             Απαντημένες ερωτήσεις {questions.length > 0 && <span className="text-slate-500 font-semibold">({questions.length})</span>}
           </h2>
 
@@ -206,7 +206,7 @@ export const AskAgronomistPage: React.FC<AskAgronomistPageProps> = ({ onBack }) 
                   className="w-full text-left p-4 flex items-start justify-between gap-3 cursor-pointer hover:bg-slate-900/60 transition-colors"
                 >
                   <div>
-                    <h3 className="text-sm font-bold text-white leading-snug">{q.question}</h3>
+                    <h3 className="text-sm font-bold text-slate-100 leading-snug">{q.question}</h3>
                     <p className="text-[11px] text-slate-500 mt-1">
                       {q.askedBy ? `${q.askedBy} · ` : ''}
                       {q.approvedAt?.slice(0, 10)}

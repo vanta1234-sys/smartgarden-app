@@ -173,7 +173,7 @@ export const SymptomWizard: React.FC<SymptomWizardProps> = ({ onJumpToDosageCalc
           <HelpCircle className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-white tracking-tight">Γρήγορος Διαγνώστης Συμπτωμάτων</h3>
+          <h3 className="text-lg font-bold text-slate-100 tracking-tight">Γρήγορος Διαγνώστης Συμπτωμάτων</h3>
           <p className="text-xs text-slate-400">Απαντήστε 1-2 ερωτήσεις για άμεση διάγνωση, χωρίς φωτογραφία</p>
         </div>
       </div>
@@ -199,7 +199,7 @@ export const SymptomWizard: React.FC<SymptomWizardProps> = ({ onJumpToDosageCalc
       {result && (
         <div className="space-y-3">
           <div className="bg-rose-950/30 border border-rose-500/30 rounded-2xl p-4">
-            <h4 className="text-sm font-extrabold text-white mb-2">{result.problem}</h4>
+            <h4 className="text-sm font-extrabold text-slate-100 mb-2">{result.problem}</h4>
             <p className="text-xs text-slate-300 leading-relaxed mb-2">
               <span className="font-bold text-slate-200">Αιτία: </span>{result.cause}
             </p>

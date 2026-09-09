@@ -938,18 +938,18 @@ pause
   }
 
   return (
-    <div id="smartgarden-app-root" className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+    <div id="smartgarden-app-root" className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-100">
       {/* Top Control Bar: Visible ONLY in Studio / Admin / Dev Environment */}
       {isAdmin ? (
         <header id="top-control-bar" className="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-50 backdrop-blur px-4 py-3">
           <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <Globe className="w-5 h-5 text-slate-950 font-bold" />
+                <Globe className="w-5 h-5 text-slate-100 font-bold" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-white tracking-tight text-base">SmartGarden.gr</span>
+                  <span className="font-bold text-slate-100 tracking-tight text-base">SmartGarden.gr</span>
                   <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     Visual Studio & Live Site
                   </span>
@@ -965,8 +965,8 @@ pause
                 onClick={() => setViewMode('live_preview')}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
                   viewMode === 'live_preview'
-                    ? 'bg-emerald-500 text-slate-950 shadow font-bold'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    ? 'bg-emerald-500 text-white shadow font-bold'
+                    : 'text-slate-300 hover:text-slate-100 hover:bg-slate-800'
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
@@ -978,8 +978,8 @@ pause
                 onClick={() => setViewMode('article_editor')}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
                   viewMode === 'article_editor'
-                    ? 'bg-emerald-500 text-slate-950 shadow font-bold'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    ? 'bg-emerald-500 text-white shadow font-bold'
+                    : 'text-slate-300 hover:text-slate-100 hover:bg-slate-800'
                 }`}
               >
                 <Edit3 className="w-3.5 h-3.5" />
@@ -992,7 +992,7 @@ pause
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
                   viewMode === 'tiktok_studio'
                     ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow font-bold'
-                    : 'text-pink-300 hover:text-white hover:bg-pink-950/40 border border-pink-500/20'
+                    : 'text-pink-300 hover:text-slate-100 hover:bg-pink-950/40 border border-pink-500/20'
                 }`}
               >
                 <Film className="w-3.5 h-3.5 text-pink-400" />
@@ -1004,8 +1004,8 @@ pause
                 onClick={() => setViewMode('json_export')}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
                   viewMode === 'json_export'
-                    ? 'bg-emerald-500 text-slate-950 shadow font-bold'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                    ? 'bg-emerald-500 text-white shadow font-bold'
+                    : 'text-slate-300 hover:text-slate-100 hover:bg-slate-800'
                 }`}
               >
                 <Download className="w-3.5 h-3.5" />
@@ -1019,10 +1019,10 @@ pause
                   handleDeployNow();
                 }}
                 disabled={deployStatus === 'running'}
-                className="bg-gradient-to-r from-amber-400 to-emerald-400 hover:from-amber-300 hover:to-emerald-300 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-extrabold flex items-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                className="bg-gradient-to-r from-amber-400 to-emerald-400 hover:from-amber-300 hover:to-emerald-300 text-slate-100 px-3 py-1.5 rounded-lg text-xs font-extrabold flex items-center gap-1.5 shadow-md shadow-emerald-500/20 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                 title="Απευθείας Build και FTP Upload στο smartgarden.gr με 1 κλικ"
               >
-                <Zap className="w-3.5 h-3.5 text-slate-950 fill-current" />
+                <Zap className="w-3.5 h-3.5 text-slate-100 fill-current" />
                 {deployStatus === 'running' ? 'Deploying...' : '🚀 1-Click Deploy'}
               </button>
             </div>
@@ -1034,10 +1034,10 @@ pause
           <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <Globe className="w-5 h-5 text-slate-950 font-bold" />
+                <Globe className="w-5 h-5 text-slate-100 font-bold" />
               </div>
               <div>
-                <span className="font-extrabold text-white tracking-tight text-lg">SmartGarden.gr</span>
+                <span className="font-extrabold text-slate-100 tracking-tight text-lg">SmartGarden.gr</span>
                 <p className="text-[11px] text-emerald-400 font-medium hidden sm:block">Ψηφιακό Περιοδικό Κηπουρικής, Μπαλκονιού & IoT</p>
               </div>
             </div>
@@ -1074,7 +1074,7 @@ pause
                     <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                     SmartGarden Digital Magazine & Media Hub
                   </div>
-                  <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                  <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight leading-tight">
                     Οδηγοί για <span className="text-emerald-400">Μπαλκόνι & Κήπο</span> με Τεχνητή Νοημοσύνη.
                   </h1>
                   <p className="text-sm text-slate-300 leading-relaxed">
@@ -1188,7 +1188,7 @@ pause
             {/* Articles Grid Preview */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-emerald-400" />
                   Δημοσιευμένα Άρθρα & Οδηγοί
                 </h3>
@@ -1261,7 +1261,7 @@ pause
                       </div>
 
                       <div className="p-5 space-y-3">
-                        <h4 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors leading-snug">
+                        <h4 className="text-base font-bold text-slate-100 group-hover:text-emerald-400 transition-colors leading-snug">
                           {art.title.el}
                         </h4>
                         <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
@@ -1320,7 +1320,7 @@ pause
         <div id="article-editor-view" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 p-4 rounded-2xl border border-slate-800">
             <div>
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-emerald-400" />
                 Επεξεργαστής Άρθρων & Περιεχομένου 2.200 Λέξεων
               </h2>
@@ -1357,7 +1357,7 @@ pause
               <button
                 id="btn-add-new"
                 onClick={handleAddNewArticle}
-                className="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 cursor-pointer"
+                className="bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5 text-emerald-400" />
                 + Κενό
@@ -1374,7 +1374,7 @@ pause
               <button
                 id="btn-save-article"
                 onClick={handleSaveArticle}
-                className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer"
+                className="bg-emerald-500 hover:bg-emerald-400 text-slate-100 text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer"
               >
                 <Check className="w-3.5 h-3.5" />
                 Αποθήκευση
@@ -1415,7 +1415,7 @@ pause
                       />
                       <div className="flex-1 min-w-0">
                         <div className="text-[10px] font-bold text-emerald-400 uppercase">{art.categoryLabel.el}</div>
-                        <div className="text-xs font-bold text-white truncate">{art.title.el}</div>
+                        <div className="text-xs font-bold text-slate-100 truncate">{art.title.el}</div>
                         <div className="text-[10px] text-slate-500 mt-1">📅 {art.date} • ⏱️ {art.readTime}</div>
                       </div>
                     </button>
@@ -1468,7 +1468,7 @@ pause
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
 
@@ -1479,7 +1479,7 @@ pause
                       type="text"
                       value={editCategory}
                       onChange={(e) => setEditCategory(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                     />
                   </div>
                   <div>
@@ -1488,7 +1488,7 @@ pause
                       type="text"
                       value={editReadTime}
                       onChange={(e) => setEditReadTime(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                     />
                   </div>
                 </div>
@@ -1597,7 +1597,7 @@ pause
                       placeholder="π.χ. /videos/my_video.mp4 ή https://example.com/video.mp4"
                       value={editVideoUrl}
                       onChange={(e) => setEditVideoUrl(e.target.value)}
-                      className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-pink-500 font-mono text-[11px]"
+                      className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-pink-500 font-mono text-[11px]"
                     />
                     <label className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl cursor-pointer transition-all flex items-center gap-1.5 shrink-0 shadow-md shadow-pink-500/20">
                       <Upload className="w-3.5 h-3.5" />
@@ -1738,7 +1738,7 @@ pause
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
             <div className="flex items-center justify-between border-b border-slate-800 pb-4">
               <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                   <Download className="w-5 h-5 text-emerald-400" />
                   Εξαγωγή & Ενημέρωση του smartgarden.gr
                 </h3>
@@ -1766,9 +1766,9 @@ pause
                   id="btn-deploy-now"
                   onClick={handleDeployNow}
                   disabled={deployStatus === 'running'}
-                  className="bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-400 hover:from-amber-300 hover:to-teal-300 text-slate-950 text-xs font-black px-6 py-2.5 rounded-xl shadow-xl shadow-emerald-500/30 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse"
+                  className="bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-400 hover:from-amber-300 hover:to-teal-300 text-slate-100 text-xs font-black px-6 py-2.5 rounded-xl shadow-xl shadow-emerald-500/30 flex items-center gap-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse"
                 >
-                  <Zap className="w-4 h-4 text-slate-950 fill-current" />
+                  <Zap className="w-4 h-4 text-slate-100 fill-current" />
                   {deployStatus === 'running' ? '⏳ Γίνεται Deploy...' : '🚀 1-CLICK DEPLOY NOW'}
                 </button>
                 <button
@@ -1800,7 +1800,7 @@ pause
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-extrabold text-white">Google Instant Indexing API</h3>
+                      <h3 className="text-sm font-extrabold text-slate-100">Google Instant Indexing API</h3>
                       <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[10px] font-bold">
                         DIRECT CRAWL BOT
                       </span>
@@ -1861,7 +1861,7 @@ pause
                   ) : (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-xs font-bold">
-                        <span className="text-white">Αποτελέσματα Google Indexing:</span>
+                        <span className="text-slate-100">Αποτελέσματα Google Indexing:</span>
                         <span className="text-emerald-400">
                           ✅ Επιτυχία: {googleIndexingResults.successCount} / {googleIndexingResults.total}
                         </span>
@@ -1981,12 +1981,12 @@ pause
                   setIsArticleReadingAudioActive(false);
                   setIsReadingModalOpen(false);
                 }}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-950/80 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold border border-slate-700 cursor-pointer z-20"
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-950/80 text-slate-300 hover:text-slate-100 flex items-center justify-center text-sm font-bold border border-slate-700 cursor-pointer z-20"
               >
                 ✕
               </button>
               <div className="absolute bottom-4 left-4 right-4 pointer-events-none z-10">
-                <h2 className="text-xl sm:text-2xl font-bold text-white leading-snug">{selectedArticle.title.el}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-100 leading-snug">{selectedArticle.title.el}</h2>
               </div>
             </div>
 
@@ -2012,7 +2012,7 @@ pause
                         window.history.pushState(null, '', '/syntaktis');
                         window.location.reload();
                       }}
-                      className="font-bold text-white text-xs hover:text-emerald-400 transition-colors cursor-pointer"
+                      className="font-bold text-slate-100 text-xs hover:text-emerald-400 transition-colors cursor-pointer"
                     >
                       {selectedArticle.author.name}
                     </a>
@@ -2024,12 +2024,12 @@ pause
                     onClick={() => handleToggleArticleSpeech(`${selectedArticle.title.el}. ${selectedArticle.summary.el}`)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                       isArticleReadingAudioActive
-                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold animate-pulse shadow-md shadow-emerald-500/30'
+                        ? 'bg-emerald-500 text-white border-emerald-400 font-bold animate-pulse shadow-md shadow-emerald-500/30'
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
                     }`}
                     title={isArticleReadingAudioActive ? 'Διακοπή εκφώνησης' : 'Άκουσε το άρθρο με AI φωνή'}
                   >
-                    <Volume2 className={`w-3.5 h-3.5 ${isArticleReadingAudioActive ? 'text-slate-950' : 'text-emerald-400'}`} />
+                    <Volume2 className={`w-3.5 h-3.5 ${isArticleReadingAudioActive ? 'text-slate-100' : 'text-emerald-400'}`} />
                     {isArticleReadingAudioActive ? 'Παύση Ήχου' : 'Άκουσε το'}
                   </button>
 
@@ -2076,8 +2076,8 @@ pause
                           }}
                           className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all cursor-pointer ${
                             readingVoiceProfile === 'deep_male'
-                              ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm'
-                              : 'text-slate-300 hover:text-white'
+                              ? 'bg-emerald-500 text-white font-bold shadow-sm'
+                              : 'text-slate-300 hover:text-slate-100'
                           }`}
                         >
                           🧔 Ανδρική Βαθιά
@@ -2096,8 +2096,8 @@ pause
                           }}
                           className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all cursor-pointer ${
                             readingVoiceProfile === 'light_female'
-                              ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm'
-                              : 'text-slate-300 hover:text-white'
+                              ? 'bg-emerald-500 text-white font-bold shadow-sm'
+                              : 'text-slate-300 hover:text-slate-100'
                           }`}
                         >
                           👩 Γυναικεία Clear
@@ -2116,8 +2116,8 @@ pause
                           }}
                           className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all cursor-pointer ${
                             readingVoiceProfile === 'warm_female'
-                              ? 'bg-emerald-500 text-slate-950 font-bold shadow-sm'
-                              : 'text-slate-300 hover:text-white'
+                              ? 'bg-emerald-500 text-white font-bold shadow-sm'
+                              : 'text-slate-300 hover:text-slate-100'
                           }`}
                         >
                           🎙️ Γυναικεία Ζεστή
@@ -2147,8 +2147,8 @@ pause
                             }}
                             className={`px-2 py-0.5 rounded font-mono text-[11px] font-semibold transition-all cursor-pointer ${
                               readingSpeed === speed
-                                ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                                : 'text-slate-300 hover:text-white'
+                                ? 'bg-emerald-500 text-white shadow-sm'
+                                : 'text-slate-300 hover:text-slate-100'
                             }`}
                           >
                             {speed}x
@@ -2165,7 +2165,7 @@ pause
                 <div className="bg-black/90 border border-pink-500/40 rounded-2xl overflow-hidden shadow-xl">
                   <div className="bg-gradient-to-r from-pink-600 via-rose-600 to-amber-500 px-4 py-2 flex items-center justify-between text-white text-xs font-bold">
                     <span className="flex items-center gap-2">
-                      <Film className="w-4 h-4 text-white animate-pulse" />
+                      <Film className="w-4 h-4 text-slate-100 animate-pulse" />
                       🎬 Επίσημο Βίντεο Οδηγός (Smart Garden Video)
                     </span>
                     <span className="bg-black/40 px-2 py-0.5 rounded text-[10px] uppercase font-mono">
@@ -2287,7 +2287,7 @@ pause
                       setIsReadingModalOpen(false);
                       setViewMode('article_editor');
                     }}
-                    className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-100 text-xs font-bold flex items-center gap-1.5 shadow cursor-pointer"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                     Επεξεργασία αυτού του άρθρου
@@ -2311,7 +2311,7 @@ pause
                   </span>
                   <span className="text-xs text-slate-400">Πραγματική Εξειδικευμένη Σύνταξη</span>
                 </div>
-                <h3 className="text-xl font-extrabold text-white mt-1.5 flex items-center gap-2">
+                <h3 className="text-xl font-extrabold text-slate-100 mt-1.5 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-emerald-400" />
                   Δημιουργία Άρθρου με Δικό σας Θέμα
                 </h3>
@@ -2321,7 +2321,7 @@ pause
               </div>
               <button
                 onClick={() => setShowCustomTopicModal(false)}
-                className="text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 cursor-pointer"
+                className="text-slate-400 hover:text-slate-100 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 cursor-pointer"
               >
                 ✕
               </button>
@@ -2337,7 +2337,7 @@ pause
                   placeholder="π.χ. Καλλιέργεια Ακτινιδίου (Actinidia deliciosa) & πότισμα"
                   value={customTopicTitle}
                   onChange={(e) => setCustomTopicTitle(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 placeholder:text-slate-600"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 placeholder:text-slate-600"
                 />
               </div>
 
@@ -2347,7 +2347,7 @@ pause
                   <select
                     value={customCategory}
                     onChange={(e) => setCustomCategory(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                   >
                     <option value="plant_care">Φροντίδα Φυτών</option>
                     <option value="balcony">Μπαλκόνι & Γλάστρες</option>
@@ -2363,7 +2363,7 @@ pause
                   <select
                     value={customDifficulty}
                     onChange={(e) => setCustomDifficulty(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                   >
                     <option value="Εύκολο">Εύκολο</option>
                     <option value="Μέτριο">Μέτριο</option>
@@ -2377,7 +2377,7 @@ pause
                     type="text"
                     value={customReadTime}
                     onChange={(e) => setCustomReadTime(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
               </div>
@@ -2406,7 +2406,7 @@ pause
               <button
                 onClick={handleGenerateCustomTopicArticle}
                 disabled={customAiLoading || !customTopicTitle.trim()}
-                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-extrabold px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/25 flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-all hover:scale-105 active:scale-95"
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-100 text-xs font-extrabold px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/25 flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-all hover:scale-105 active:scale-95"
               >
                 <Sparkles className="w-4 h-4" />
                 {customAiLoading ? 'Δημιουργία 2.200 λέξεων...' : '🚀 AI Δημιουργία Πλήρους Οδηγού'}
@@ -2425,7 +2425,7 @@ pause
                 <Trash2 className="w-5 h-5" />
               </div>
               <div className="flex-1">
-                <h3 className="text-base font-bold text-white">Διαγραφή Άρθρου</h3>
+                <h3 className="text-base font-bold text-slate-100">Διαγραφή Άρθρου</h3>
                 <p className="text-xs text-slate-400 mt-1">
                   Είστε σίγουροι ότι θέλετε να διαγράψετε το άρθρο:
                 </p>
@@ -2474,7 +2474,7 @@ pause
                   </span>
                   <span className="text-xs text-slate-400">Εβδομάδα Αυγούστου 2026</span>
                 </div>
-                <h3 className="text-xl font-extrabold text-white mt-1.5 flex items-center gap-2">
+                <h3 className="text-xl font-extrabold text-slate-100 mt-1.5 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-amber-400" />
                   Top 20 Προτεινόμενα Θέματα (Hot Trends Κηπουρικής & IoT)
                 </h3>
@@ -2484,7 +2484,7 @@ pause
               </div>
               <button
                 onClick={() => setShowTrendsModal(false)}
-                className="text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 cursor-pointer"
+                className="text-slate-400 hover:text-slate-100 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 cursor-pointer"
               >
                 ✕
               </button>
@@ -2500,12 +2500,12 @@ pause
                     placeholder="Αναζήτηση στα 20 trends (π.χ. ντομάτα, γκαζόν, πότισμα, φράουλα)..."
                     value={trendsSearchFilter}
                     onChange={(e) => setTrendsSearchFilter(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
+                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
                   />
                   {trendsSearchFilter && (
                     <button
                       onClick={() => setTrendsSearchFilter('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-100 text-xs"
                     >
                       ✕
                     </button>
@@ -2514,7 +2514,7 @@ pause
                 <button
                   onClick={handleLiveTrendsSearch}
                   disabled={trendsLiveLoading}
-                  className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 text-xs font-extrabold px-4 py-2 rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 cursor-pointer disabled:opacity-50 whitespace-nowrap transition-all"
+                  className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-100 text-xs font-extrabold px-4 py-2 rounded-xl flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 cursor-pointer disabled:opacity-50 whitespace-nowrap transition-all"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   {trendsLiveLoading ? '🔍 Ερευνητής AI...' : '⚡ Live AI Web Research'}
@@ -2536,7 +2536,7 @@ pause
                     onClick={() => setTrendsCategoryFilter(cat.id)}
                     className={`px-3 py-1 rounded-lg font-bold transition-all whitespace-nowrap cursor-pointer ${
                       trendsCategoryFilter === cat.id
-                        ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                        ? 'bg-amber-500 text-slate-100 shadow-md shadow-amber-500/20'
                         : 'bg-slate-900 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                     }`}
                   >
@@ -2588,7 +2588,7 @@ pause
                         </span>
                       </div>
 
-                      <h4 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors leading-snug">
+                      <h4 className="text-base font-bold text-slate-100 group-hover:text-amber-300 transition-colors leading-snug">
                         {trend.title}
                       </h4>
 
@@ -2605,7 +2605,7 @@ pause
                     <div className="shrink-0 self-end md:self-center">
                       <button
                         onClick={() => handleSelectTrendingTopic(trend)}
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition-all hover:scale-105"
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-100 text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 cursor-pointer whitespace-nowrap transition-all hover:scale-105"
                       >
                         <Plus className="w-4 h-4" />
                         Επιλογή & Δημιουργία
@@ -2642,7 +2642,7 @@ pause
                   <Clock className="w-3.5 h-3.5" />
                   Αυτοματοποιημένος Χρονοπρογραμματισμός (No-Odin)
                 </div>
-                <h3 className="text-xl font-extrabold text-white mt-1.5 flex items-center gap-2">
+                <h3 className="text-xl font-extrabold text-slate-100 mt-1.5 flex items-center gap-2">
                   ⏰ Auto-Publish Webhook Endpoint
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
@@ -2651,7 +2651,7 @@ pause
               </div>
               <button
                 onClick={() => setShowCronScheduleModal(false)}
-                className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"
+                className="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-100 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2707,7 +2707,7 @@ pause
               </div>
 
               <div className="space-y-3">
-                <h4 className="font-bold text-white text-xs uppercase tracking-wider text-slate-300">
+                <h4 className="font-bold text-slate-100 text-xs uppercase tracking-wider text-slate-300">
                   📋 Πώς να το ρυθμίσετε δωρεάν σε 1 λεπτό (π.χ. στο cron-job.org ή Zapier / Make / Plesk):
                 </h4>
                 <ol className="list-decimal list-inside space-y-2 text-xs text-slate-300 bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
@@ -2727,7 +2727,7 @@ pause
               <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h5 className="font-bold text-white text-xs">Δοκιμαστική Εκτέλεση Τώρα (Live Test)</h5>
+                    <h5 className="font-bold text-slate-100 text-xs">Δοκιμαστική Εκτέλεση Τώρα (Live Test)</h5>
                     <p className="text-[11px] text-slate-400">Εκτέλεση ενός αυτόματου κύκλου άρθρου 2.200 λέξεων και deploy</p>
                   </div>
                   <button

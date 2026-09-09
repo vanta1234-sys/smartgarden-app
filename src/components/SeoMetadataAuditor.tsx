@@ -688,7 +688,7 @@ export function SeoMetadataAuditor({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+              <h3 className="text-base font-extrabold text-slate-100 flex items-center gap-2">
                 SEO Metadata Auditor
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold tracking-wide uppercase">
                   Real-Time Engine
@@ -723,7 +723,7 @@ export function SeoMetadataAuditor({
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
-              <span className="absolute text-xs font-black text-white">{totalScore}%</span>
+              <span className="absolute text-xs font-black text-slate-100">{totalScore}%</span>
             </div>
             <div>
               <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">SEO Score</div>
@@ -764,7 +764,7 @@ export function SeoMetadataAuditor({
               placeholder="π.χ. λίπασμα σιδήρου, αυτόματο πότισμα..."
               value={targetKeywordInput}
               onChange={(e) => setTargetKeywordInput(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-medium"
+              className="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-medium"
             />
           </div>
 
@@ -805,7 +805,7 @@ export function SeoMetadataAuditor({
 
           <div className="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80 flex items-center justify-between">
             <span className="text-slate-400">Εμφανίσεις στο Κείμενο:</span>
-            <span className="font-mono font-bold text-white">{keywordStats.contentCount} φορές</span>
+            <span className="font-mono font-bold text-slate-100">{keywordStats.contentCount} φορές</span>
           </div>
 
           <div className="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80 flex items-center justify-between">
@@ -829,7 +829,7 @@ export function SeoMetadataAuditor({
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4 text-sky-400" />
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-slate-100 uppercase tracking-wider">
               Προεπισκόπηση Αποτελεσμάτων Αναζήτησης (SERP Preview)
             </h4>
           </div>
@@ -840,7 +840,7 @@ export function SeoMetadataAuditor({
                 type="button"
                 onClick={() => setPreviewTab('serp')}
                 className={`px-2.5 py-1 rounded-md transition-all cursor-pointer font-semibold ${
-                  previewTab === 'serp' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                  previewTab === 'serp' ? 'bg-slate-800 text-slate-100 shadow' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 Google Search
@@ -849,7 +849,7 @@ export function SeoMetadataAuditor({
                 type="button"
                 onClick={() => setPreviewTab('social')}
                 className={`px-2.5 py-1 rounded-md transition-all cursor-pointer font-semibold ${
-                  previewTab === 'social' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                  previewTab === 'social' ? 'bg-slate-800 text-slate-100 shadow' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 Social Card (OG)
@@ -896,7 +896,7 @@ export function SeoMetadataAuditor({
                 🌿
               </div>
               <div className="min-w-0 text-xs text-[#dadce0] truncate">
-                <span className="font-semibold text-white">SmartGarden.gr</span>
+                <span className="font-semibold text-slate-100">SmartGarden.gr</span>
                 <span className="text-[#9aa0a6] text-[11px] ml-1">
                   https://smartgarden.gr › άρθρα › {cleanSlug}
                 </span>
@@ -951,7 +951,7 @@ export function SeoMetadataAuditor({
               <div className="text-[11px] text-emerald-400 font-bold uppercase tracking-wider">
                 SMARTGARDEN.GR • ΕΠΙΣΤΗΜΟΝΙΚΗ ΓΕΩΠΟΝΙΑ
               </div>
-              <div className="text-sm font-bold text-white line-clamp-2 leading-snug">{title}</div>
+              <div className="text-sm font-bold text-slate-100 line-clamp-2 leading-snug">{title}</div>
               <div className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{summary}</div>
             </div>
           </div>
@@ -963,7 +963,7 @@ export function SeoMetadataAuditor({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Lightbulb className="w-4 h-4 text-amber-400" />
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-slate-100 uppercase tracking-wider">
               Αναλυτικός Έλεγχος SEO & Προτάσεις Βελτίωσης
             </h4>
           </div>
@@ -974,7 +974,7 @@ export function SeoMetadataAuditor({
               type="button"
               onClick={() => setFilterTab('all')}
               className={`px-2.5 py-1 rounded-md transition-all cursor-pointer font-semibold ${
-                filterTab === 'all' ? 'bg-slate-800 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+                filterTab === 'all' ? 'bg-slate-800 text-slate-100 shadow' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Όλα ({checks.length})
@@ -1025,7 +1025,7 @@ export function SeoMetadataAuditor({
                 </div>
                 <div className="min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-bold text-white">{chk.label}</span>
+                    <span className="text-xs font-bold text-slate-100">{chk.label}</span>
                     <span
                       className={`text-[10px] font-mono px-2 py-0.5 rounded ${
                         chk.status === 'pass'
@@ -1048,7 +1048,7 @@ export function SeoMetadataAuditor({
                 <button
                   type="button"
                   onClick={chk.quickFix.apply}
-                  className="bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 hover:text-white border border-emerald-500/40 text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer transition-all shrink-0 hover:scale-105 active:scale-95 self-start sm:self-center"
+                  className="bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 hover:text-slate-100 border border-emerald-500/40 text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 cursor-pointer transition-all shrink-0 hover:scale-105 active:scale-95 self-start sm:self-center"
                 >
                   <Sparkles className="w-3 h-3 text-emerald-400" />
                   {chk.quickFix.label}
@@ -1097,14 +1097,14 @@ export function SeoMetadataAuditor({
       <div className="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-teal-950/40 border border-emerald-500/30 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-emerald-400" />
-          <span className="text-xs font-bold text-white">Γρήγορες Ενέργειες SEO Βελτιστοποίησης:</span>
+          <span className="text-xs font-bold text-slate-100">Γρήγορες Ενέργειες SEO Βελτιστοποίησης:</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handleOptimizeTitle}
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 cursor-pointer transition-colors"
+            className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-slate-100 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 cursor-pointer transition-colors"
           >
             <Sparkles className="w-3 h-3 text-emerald-400" />
             Τέλεια Προσαρμογή Τίτλου
@@ -1113,7 +1113,7 @@ export function SeoMetadataAuditor({
           <button
             type="button"
             onClick={handleOptimizeSummary}
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 cursor-pointer transition-colors"
+            className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-slate-100 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 cursor-pointer transition-colors"
           >
             <Sparkles className="w-3 h-3 text-teal-400" />
             Βελτιστοποίηση Meta Description
@@ -1126,7 +1126,7 @@ export function SeoMetadataAuditor({
               setCopiedLink(true);
               setTimeout(() => setCopiedLink(false), 2000);
             }}
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 cursor-pointer transition-colors"
+            className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-slate-100 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 cursor-pointer transition-colors"
           >
             {copiedLink ? (
               <>
