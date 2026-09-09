@@ -1755,7 +1755,7 @@ foreach ($staticPages as $page) {
 
 // Client-rendered hub pages (category listings, author bio, planting calendar) — no
 // server-side route/file, but real crawlable URLs the SPA handles via pathname routing.
-$appRoutes = array('syntaktis', 'imerologio-sporas', 'klima-kipoy', 'pagetos', 'fyta', 'rotiste');
+$appRoutes = array('syntaktis', 'imerologio-sporas', 'klima-kipoy', 'pagetos', 'fyta', 'rotiste', 'selini');
 foreach ($appRoutes as $route) {
     $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/" . $route . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n";
 }

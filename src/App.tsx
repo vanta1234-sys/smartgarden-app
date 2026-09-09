@@ -18,6 +18,7 @@ import { PlantDatabasePage } from './components/PlantDatabasePage';
 import { AskAgronomistPage } from './components/AskAgronomistPage';
 import { InstagramStudio } from './components/InstagramStudio';
 import { ArticleToolLinks } from './components/ArticleToolLinks';
+import { LunarCalendarPage, LunarBadge } from './components/LunarCalendarPage';
 import { SoilCalculator } from './components/SoilCalculator';
 import { SymptomWizard } from './components/SymptomWizard';
 import { CompanionMatrix } from './components/CompanionMatrix';
@@ -219,7 +220,7 @@ export default function App() {
   // without adding it here silently breaks that page's <title>/meta tags, since this
   // effect still runs and overwrites them regardless of what JSX actually renders.
   const isStaticPageRoute = typeof window !== 'undefined'
-    && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy|pagetos|fyta|rotiste|instagram-studio)/.test(window.location.pathname);
+    && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy|pagetos|fyta|rotiste|selini|instagram-studio)/.test(window.location.pathname);
 
   // Auto-fetch live articles from latest_articles.json on mount & inject SEO Schema
   useEffect(() => {
@@ -924,6 +925,9 @@ pause
   if (pathname.match(/^\/pagetos\/?/)) {
     return <FrostDatesPage onBack={handleBackToHome} />;
   }
+  if (pathname.match(/^\/selini\/?/)) {
+    return <LunarCalendarPage onBack={handleBackToHome} />;
+  }
   if (pathname.match(/^\/rotiste\/?/)) {
     return <AskAgronomistPage onBack={handleBackToHome} />;
   }
@@ -1142,6 +1146,10 @@ pause
                 </div>
               </div>
             </div>
+
+            {/* Moon phase — changes daily on its own, so it is one of the few things on
+                the page that gives a returning visitor something new every morning. */}
+            <LunarBadge />
 
             {/* Seasonal Advice Strip (Garden Calendar) */}
             <SeasonalAdviceBar />
