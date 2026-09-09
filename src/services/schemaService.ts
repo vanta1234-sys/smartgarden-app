@@ -67,6 +67,9 @@ export function injectGlobalSiteSchema() {
           // Handle confirmed by the owner 2026-09-09. Was @smartgarden.gr here and
           // @smartgarden everywhere else in the codebase; neither existed.
           'https://www.tiktok.com/@smartgarden68',
+          // Added 2026-09-09 once the account actually existed. An earlier Instagram
+          // entry was removed from this list precisely because it had been invented.
+          'https://www.instagram.com/smartgarden.gr/',
           // Real, publicly live channel with real uploaded content (2026-09-08).
           'https://www.youtube.com/@Smartgarden-h4f',
         ],

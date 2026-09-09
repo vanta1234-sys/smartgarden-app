@@ -16,6 +16,7 @@ import { ClimateComparisonPage } from './components/ClimateComparisonPage';
 import { FrostDatesPage } from './components/FrostDatesPage';
 import { PlantDatabasePage } from './components/PlantDatabasePage';
 import { AskAgronomistPage } from './components/AskAgronomistPage';
+import { InstagramStudio } from './components/InstagramStudio';
 import { SoilCalculator } from './components/SoilCalculator';
 import { SymptomWizard } from './components/SymptomWizard';
 import { CompanionMatrix } from './components/CompanionMatrix';
@@ -76,7 +77,8 @@ import {
   Facebook,
   Snowflake,
   Leaf,
-  MessageCircleQuestion
+  MessageCircleQuestion,
+  Instagram
 } from 'lucide-react';
 import { ArticleItem } from './types';
 import { WEEKLY_TRENDING_TOPICS, TrendingTopic } from './data/trendingTopics';
@@ -213,7 +215,7 @@ export default function App() {
   // without adding it here silently breaks that page's <title>/meta tags, since this
   // effect still runs and overwrites them regardless of what JSX actually renders.
   const isStaticPageRoute = typeof window !== 'undefined'
-    && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy|pagetos|fyta|rotiste)/.test(window.location.pathname);
+    && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy|pagetos|fyta|rotiste|instagram-studio)/.test(window.location.pathname);
 
   // Auto-fetch live articles from latest_articles.json on mount & inject SEO Schema
   useEffect(() => {
@@ -920,6 +922,11 @@ pause
   }
   if (pathname.match(/^\/rotiste\/?/)) {
     return <AskAgronomistPage onBack={handleBackToHome} />;
+  }
+  // Internal content tool — reachable by URL but deliberately kept out of the sitemap,
+  // the footer and llms.txt, since it is for producing posts, not for readers.
+  if (pathname.match(/^\/instagram-studio\/?/)) {
+    return <InstagramStudio onBack={handleBackToHome} />;
   }
   const plantMatch = pathname.match(/^\/fyta(?:\/([^/]+))?\/?$/);
   if (plantMatch) {
@@ -2836,6 +2843,17 @@ pause
             >
               <Facebook className="w-3.5 h-3.5 text-blue-500" />
               <span>Facebook</span>
+            </a>
+
+            <a
+              href="https://www.instagram.com/smartgarden.gr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-pink-400 flex items-center gap-1 transition-colors"
+              title="SmartGarden.gr στο Instagram"
+            >
+              <Instagram className="w-3.5 h-3.5 text-pink-500" />
+              <span>Instagram</span>
             </a>
 
             <a
