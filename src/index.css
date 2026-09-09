@@ -20,6 +20,35 @@
   (the colour of a Greek clay pot, and the second accent the all-emerald original
   never had).
 */
+/*
+  Botanical page background. A vertical border illustration tiled down the page, so the
+  content columns sit in the clear middle and the fruit sits in the gutters.
+
+  background-color is set first and separately: the cream paints on the very first frame
+  while the 44KB WebP is still in flight, so there is no white flash and nothing shifts
+  when it lands. The image is purely decorative, which is also why a soft upscale on wide
+  screens is acceptable and why it never blocks text.
+*/
+#smartgarden-app-root {
+  background-color: #FBF6EC;
+  background-image: url('/botanical-bg.webp');
+  background-repeat: repeat-y;
+  background-position: top center;
+  background-size: 100% auto;
+}
+
+@media (max-width: 640px) {
+  #smartgarden-app-root {
+    background-image: url('/botanical-bg-sm.webp');
+  }
+}
+
+/* The illustration has to be visible through the page body, so the content layer stops
+   painting its own opaque ground and the individual section cards provide it instead. */
+#live-site-view {
+  background-color: transparent !important;
+}
+
 @theme {
   /* Surfaces — lightest at the 950 end, because that is what the markup asks for. */
   --color-slate-950: #FBF6EC;
