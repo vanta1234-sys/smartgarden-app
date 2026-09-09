@@ -73,7 +73,10 @@ import {
   Upload,
   X,
   Youtube,
-  Facebook
+  Facebook,
+  Snowflake,
+  Leaf,
+  MessageCircleQuestion
 } from 'lucide-react';
 import { ArticleItem } from './types';
 import { WEEKLY_TRENDING_TOPICS, TrendingTopic } from './data/trendingTopics';
@@ -1116,6 +1119,30 @@ pause
                     >
                       <Sparkles className="w-4 h-4 text-lime-400" />
                       Ημερολόγιο Σποράς &amp; Εργασιών
+                    </button>
+                    <button
+                      id="btn-jump-frost"
+                      onClick={() => { window.location.href = '/pagetos'; }}
+                      className="bg-gradient-to-r from-sky-950/80 to-indigo-950/80 hover:from-sky-900 hover:to-indigo-900 text-sky-300 font-bold px-5 py-3 rounded-xl border border-sky-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
+                    >
+                      <Snowflake className="w-4 h-4 text-sky-400" />
+                      Ημερομηνίες Παγετού ανά Περιοχή
+                    </button>
+                    <button
+                      id="btn-jump-plants"
+                      onClick={() => { window.location.href = '/fyta'; }}
+                      className="bg-gradient-to-r from-green-950/80 to-lime-950/80 hover:from-green-900 hover:to-lime-900 text-green-300 font-bold px-5 py-3 rounded-xl border border-green-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
+                    >
+                      <Leaf className="w-4 h-4 text-green-400" />
+                      Βάση Δεδομένων Φυτών
+                    </button>
+                    <button
+                      id="btn-jump-qa"
+                      onClick={() => { window.location.href = '/rotiste'; }}
+                      className="bg-gradient-to-r from-amber-950/80 to-orange-950/80 hover:from-amber-900 hover:to-orange-900 text-amber-300 font-bold px-5 py-3 rounded-xl border border-amber-500/30 flex items-center gap-2 text-sm transition-all transform hover:-translate-y-0.5 cursor-pointer shadow-lg"
+                    >
+                      <MessageCircleQuestion className="w-4 h-4 text-amber-400" />
+                      Ρωτήστε τον Γεωπόνο
                     </button>
                     {isAdmin && (
                       <button
