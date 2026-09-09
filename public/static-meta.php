@@ -58,6 +58,39 @@ if ($route === 'kategoria' && $slug) {
     $title = 'Ζωντανή Σύγκριση Εξατμισοδιαπνοής (ET₀) Ελληνικών Πόλεων — SmartGarden.gr';
     $description = 'Ζωντανά δεδομένα εξατμισοδιαπνοής (ET₀), θερμοκρασίας και υγρασίας για 15 ελληνικές πόλεις — δείτε ποια περιοχή έχει τη μεγαλύτερη ανάγκη ποτίσματος σήμερα.';
     $url = 'https://smartgarden.gr/klima-kipoy';
+} elseif ($route === 'fyta') {
+    // /fyta and /fyta/<slug>. Plant data is mirrored into plants.json from the TS source
+    // (src/data/plantDatabase.ts) precisely so this crawler-facing path can read it.
+    $plantSlug = isset($_GET['slug']) ? $_GET['slug'] : '';
+    $plant = null;
+    if ($plantSlug !== '') {
+        $plantsRaw = @file_get_contents(__DIR__ . '/plants.json');
+        $plants = $plantsRaw ? json_decode($plantsRaw, true) : array();
+        if (is_array($plants)) {
+            foreach ($plants as $p) {
+                if (isset($p['slug']) && $p['slug'] === $plantSlug) { $plant = $p; break; }
+            }
+        }
+    }
+    if ($plant) {
+        $title = $plant['name'] . ' (' . $plant['botanical'] . '): Καλλιέργεια & Φροντίδα στην Ελλάδα | SmartGarden.gr';
+        $description = $plant['name'] . ' (' . $plant['botanical'] . '): αντοχή στο κρύο έως ' . $plant['minTempC']
+            . '°C, ιδανικό pH ' . $plant['ph'] . ', ' . mb_strtolower($plant['sun'], 'UTF-8')
+            . '. Πότε φυτεύεται στην περιοχή σας και ποιο είναι το συχνότερο λάθος.';
+        $url = 'https://smartgarden.gr/fyta/' . rawurlencode($plant['slug']);
+    } else {
+        $title = 'Βάση Δεδομένων Φυτών: Καλλιέργεια & Φροντίδα στο Ελληνικό Κλίμα | SmartGarden.gr';
+        $description = 'Αναλυτικά δεδομένα καλλιέργειας για δεκάδες φυτά προσαρμοσμένα στο ελληνικό κλίμα: αντοχή στον παγετό, pH, μέγεθος γλάστρας, μήνες σποράς και το συχνότερο λάθος για κάθε φυτό.';
+        $url = 'https://smartgarden.gr/fyta';
+    }
+} elseif ($route === 'rotiste') {
+    $title = 'Ρωτήστε τον Γεωπόνο: Απαντήσεις σε Πραγματικές Ερωτήσεις Κηπουρικής | SmartGarden.gr';
+    $description = 'Στείλτε την ερώτησή σας για φυτά, γλάστρες, ασθένειες ή πότισμα και πάρτε τεκμηριωμένη απάντηση. Δείτε απαντήσεις σε πραγματικές ερωτήσεις άλλων αναγνωστών.';
+    $url = 'https://smartgarden.gr/rotiste';
+} elseif ($route === 'pagetos') {
+    $title = 'Ημερομηνίες Παγετού & Ασφαλής Φύτευση ανά Περιοχή στην Ελλάδα — SmartGarden.gr';
+    $description = 'Πραγματικές ημερομηνίες πρώτου και τελευταίου παγετού για 50+ ελληνικές περιοχές, από 20 χρόνια μετεωρολογικών δεδομένων. Δείτε πότε μπορείτε με ασφάλεια να φυτέψετε ντομάτες, βασιλικό και άλλα ευαίσθητα φυτά στην περιοχή σας.';
+    $url = 'https://smartgarden.gr/pagetos';
 }
 
 if ($title && $description) {

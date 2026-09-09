@@ -1,0 +1,2725 @@
+{
+ "generated": "2026-09-09",
+ "source": "Open-Meteo Historical Weather API (ERA5 reanalysis)",
+ "period": "2005-01-01 — 2024-12-31",
+ "thresholds": {
+  "hard_frost_c": 0,
+  "light_frost_c": 2
+ },
+ "locations": [
+  {
+   "id": "athens",
+   "name": "Αθήνα",
+   "region": "Αττική",
+   "lat": 37.9838,
+   "lon": 23.7275,
+   "elevation_m": 92,
+   "absolute_min_c": -3.2,
+   "absolute_min_date": "2017-01-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 11,
+    "frost_probability_pct": 55,
+    "avg_frost_days_per_year": 2.4,
+    "last_spring_frost": {
+     "doy": 46,
+     "label": "15 Φεβρουαρίου",
+     "years_observed": 11
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 60,
+     "label": "1 Μαρτίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 19,
+    "frost_probability_pct": 95,
+    "avg_frost_days_per_year": 9.1,
+    "last_spring_frost": {
+     "doy": 48,
+     "label": "17 Φεβρουαρίου",
+     "years_observed": 19
+    },
+    "first_autumn_frost": {
+     "doy": 354,
+     "label": "20 Δεκεμβρίου",
+     "years_observed": 9
+    },
+    "safe_planting_date": {
+     "doy": 72,
+     "label": "13 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 346,
+     "label": "12 Δεκεμβρίου"
+    },
+    "growing_season_days": 306
+   }
+  },
+  {
+   "id": "piraeus",
+   "name": "Πειραιάς",
+   "region": "Αττική",
+   "lat": 37.942,
+   "lon": 23.6465,
+   "elevation_m": 32,
+   "absolute_min_c": -2.1,
+   "absolute_min_date": "2017-01-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 7,
+    "frost_probability_pct": 35,
+    "avg_frost_days_per_year": 1.1,
+    "last_spring_frost": {
+     "doy": 43,
+     "label": "12 Φεβρουαρίου",
+     "years_observed": 7
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 58,
+     "label": "27 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 19,
+    "frost_probability_pct": 95,
+    "avg_frost_days_per_year": 5.7,
+    "last_spring_frost": {
+     "doy": 48,
+     "label": "17 Φεβρουαρίου",
+     "years_observed": 17
+    },
+    "first_autumn_frost": {
+     "doy": 356,
+     "label": "22 Δεκεμβρίου",
+     "years_observed": 6
+    },
+    "safe_planting_date": {
+     "doy": 70,
+     "label": "11 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 350,
+     "label": "16 Δεκεμβρίου"
+    },
+    "growing_season_days": 308
+   }
+  },
+  {
+   "id": "marathonas",
+   "name": "Μαραθώνας",
+   "region": "Αττική",
+   "lat": 38.155,
+   "lon": 23.963,
+   "elevation_m": 45,
+   "absolute_min_c": -2.1,
+   "absolute_min_date": "2008-02-19",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 10,
+    "frost_probability_pct": 50,
+    "avg_frost_days_per_year": 1.6,
+    "last_spring_frost": {
+     "doy": 40,
+     "label": "9 Φεβρουαρίου",
+     "years_observed": 10
+    },
+    "first_autumn_frost": {
+     "doy": 359,
+     "label": "25 Δεκεμβρίου",
+     "years_observed": 2
+    },
+    "safe_planting_date": {
+     "doy": 69,
+     "label": "10 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 357,
+     "label": "23 Δεκεμβρίου"
+    },
+    "growing_season_days": 319
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 17,
+    "frost_probability_pct": 85,
+    "avg_frost_days_per_year": 7.7,
+    "last_spring_frost": {
+     "doy": 43,
+     "label": "12 Φεβρουαρίου",
+     "years_observed": 17
+    },
+    "first_autumn_frost": {
+     "doy": 356,
+     "label": "22 Δεκεμβρίου",
+     "years_observed": 6
+    },
+    "safe_planting_date": {
+     "doy": 70,
+     "label": "11 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 344,
+     "label": "10 Δεκεμβρίου"
+    },
+    "growing_season_days": 313
+   }
+  },
+  {
+   "id": "thiva",
+   "name": "Θήβα",
+   "region": "Βοιωτία",
+   "lat": 38.322,
+   "lon": 23.319,
+   "elevation_m": 195,
+   "absolute_min_c": -11,
+   "absolute_min_date": "2017-01-10",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 18,
+    "frost_probability_pct": 90,
+    "avg_frost_days_per_year": 7,
+    "last_spring_frost": {
+     "doy": 47,
+     "label": "16 Φεβρουαρίου",
+     "years_observed": 18
+    },
+    "first_autumn_frost": {
+     "doy": 355,
+     "label": "21 Δεκεμβρίου",
+     "years_observed": 9
+    },
+    "safe_planting_date": {
+     "doy": 64,
+     "label": "5 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 352,
+     "label": "18 Δεκεμβρίου"
+    },
+    "growing_season_days": 308
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 20.1,
+    "last_spring_frost": {
+     "doy": 57,
+     "label": "26 Φεβρουαρίου",
+     "years_observed": 19
+    },
+    "first_autumn_frost": {
+     "doy": 349,
+     "label": "15 Δεκεμβρίου",
+     "years_observed": 16
+    },
+    "safe_planting_date": {
+     "doy": 81,
+     "label": "22 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 328,
+     "label": "24 Νοεμβρίου"
+    },
+    "growing_season_days": 292
+   }
+  },
+  {
+   "id": "lamia",
+   "name": "Λαμία",
+   "region": "Φθιώτιδα",
+   "lat": 38.9,
+   "lon": 22.434,
+   "elevation_m": 92,
+   "absolute_min_c": -9.5,
+   "absolute_min_date": "2021-02-16",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 9.4,
+    "last_spring_frost": {
+     "doy": 49,
+     "label": "18 Φεβρουαρίου",
+     "years_observed": 18
+    },
+    "first_autumn_frost": {
+     "doy": 354,
+     "label": "20 Δεκεμβρίου",
+     "years_observed": 13
+    },
+    "safe_planting_date": {
+     "doy": 77,
+     "label": "18 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 327,
+     "label": "23 Νοεμβρίου"
+    },
+    "growing_season_days": 305
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 25.3,
+    "last_spring_frost": {
+     "doy": 68,
+     "label": "9 Μαρτίου",
+     "years_observed": 19
+    },
+    "first_autumn_frost": {
+     "doy": 345,
+     "label": "11 Δεκεμβρίου",
+     "years_observed": 18
+    },
+    "safe_planting_date": {
+     "doy": 86,
+     "label": "27 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 319,
+     "label": "15 Νοεμβρίου"
+    },
+    "growing_season_days": 277
+   }
+  },
+  {
+   "id": "chalkida",
+   "name": "Χαλκίδα",
+   "region": "Εύβοια",
+   "lat": 38.464,
+   "lon": 23.599,
+   "elevation_m": 23,
+   "absolute_min_c": -7.4,
+   "absolute_min_date": "2017-01-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 12,
+    "frost_probability_pct": 60,
+    "avg_frost_days_per_year": 1.5,
+    "last_spring_frost": {
+     "doy": 40,
+     "label": "9 Φεβρουαρίου",
+     "years_observed": 12
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 59,
+     "label": "28 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 19,
+    "frost_probability_pct": 95,
+    "avg_frost_days_per_year": 8.2,
+    "last_spring_frost": {
+     "doy": 48,
+     "label": "17 Φεβρουαρίου",
+     "years_observed": 19
+    },
+    "first_autumn_frost": {
+     "doy": 354,
+     "label": "20 Δεκεμβρίου",
+     "years_observed": 6
+    },
+    "safe_planting_date": {
+     "doy": 69,
+     "label": "10 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 339,
+     "label": "5 Δεκεμβρίου"
+    },
+    "growing_season_days": 306
+   }
+  },
+  {
+   "id": "karpenisi",
+   "name": "Καρπενήσι",
+   "region": "Ευρυτανία",
+   "lat": 38.913,
+   "lon": 21.793,
+   "elevation_m": 932,
+   "absolute_min_c": -15.5,
+   "absolute_min_date": "2019-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 52.3,
+    "last_spring_frost": {
+     "doy": 88,
+     "label": "29 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 331,
+     "label": "27 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 103,
+     "label": "13 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 314,
+     "label": "10 Νοεμβρίου"
+    },
+    "growing_season_days": 244
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 85.8,
+    "last_spring_frost": {
+     "doy": 105,
+     "label": "15 Απριλίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 321,
+     "label": "17 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 116,
+     "label": "26 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 303,
+     "label": "30 Οκτωβρίου"
+    },
+    "growing_season_days": 216
+   }
+  },
+  {
+   "id": "patras",
+   "name": "Πάτρα",
+   "region": "Αχαΐα",
+   "lat": 38.2466,
+   "lon": 21.7346,
+   "elevation_m": 13,
+   "absolute_min_c": -4,
+   "absolute_min_date": "2006-01-26",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 11,
+    "frost_probability_pct": 55,
+    "avg_frost_days_per_year": 2,
+    "last_spring_frost": {
+     "doy": 48,
+     "label": "17 Φεβρουαρίου",
+     "years_observed": 10
+    },
+    "first_autumn_frost": {
+     "doy": 355,
+     "label": "21 Δεκεμβρίου",
+     "years_observed": 2
+    },
+    "safe_planting_date": {
+     "doy": 61,
+     "label": "2 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 348,
+     "label": "14 Δεκεμβρίου"
+    },
+    "growing_season_days": 308
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 15,
+    "frost_probability_pct": 75,
+    "avg_frost_days_per_year": 8.4,
+    "last_spring_frost": {
+     "doy": 47,
+     "label": "16 Φεβρουαρίου",
+     "years_observed": 15
+    },
+    "first_autumn_frost": {
+     "doy": 349,
+     "label": "15 Δεκεμβρίου",
+     "years_observed": 8
+    },
+    "safe_planting_date": {
+     "doy": 76,
+     "label": "17 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 333,
+     "label": "29 Νοεμβρίου"
+    },
+    "growing_season_days": 302
+   }
+  },
+  {
+   "id": "kalamata",
+   "name": "Καλαμάτα",
+   "region": "Μεσσηνία",
+   "lat": 37.0389,
+   "lon": 22.1142,
+   "elevation_m": 28,
+   "absolute_min_c": -2.4,
+   "absolute_min_date": "2017-01-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 6,
+    "frost_probability_pct": 30,
+    "avg_frost_days_per_year": 0.8,
+    "last_spring_frost": {
+     "doy": 44,
+     "label": "13 Φεβρουαρίου",
+     "years_observed": 6
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 61,
+     "label": "2 Μαρτίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 14,
+    "frost_probability_pct": 70,
+    "avg_frost_days_per_year": 2.6,
+    "last_spring_frost": {
+     "doy": 43,
+     "label": "12 Φεβρουαρίου",
+     "years_observed": 13
+    },
+    "first_autumn_frost": {
+     "doy": 360,
+     "label": "26 Δεκεμβρίου",
+     "years_observed": 4
+    },
+    "safe_planting_date": {
+     "doy": 54,
+     "label": "23 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 355,
+     "label": "21 Δεκεμβρίου"
+    },
+    "growing_season_days": 317
+   }
+  },
+  {
+   "id": "nafplio",
+   "name": "Ναύπλιο",
+   "region": "Αργολίδα",
+   "lat": 37.5673,
+   "lon": 22.8055,
+   "elevation_m": 3,
+   "absolute_min_c": -3.2,
+   "absolute_min_date": "2006-01-26",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 7,
+    "frost_probability_pct": 35,
+    "avg_frost_days_per_year": 1.3,
+    "last_spring_frost": {
+     "doy": 39,
+     "label": "8 Φεβρουαρίου",
+     "years_observed": 7
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 58,
+     "label": "27 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 19,
+    "frost_probability_pct": 95,
+    "avg_frost_days_per_year": 6.4,
+    "last_spring_frost": {
+     "doy": 46,
+     "label": "15 Φεβρουαρίου",
+     "years_observed": 19
+    },
+    "first_autumn_frost": {
+     "doy": 354,
+     "label": "20 Δεκεμβρίου",
+     "years_observed": 7
+    },
+    "safe_planting_date": {
+     "doy": 70,
+     "label": "11 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 338,
+     "label": "4 Δεκεμβρίου"
+    },
+    "growing_season_days": 308
+   }
+  },
+  {
+   "id": "tripoli",
+   "name": "Τρίπολη",
+   "region": "Αρκαδία",
+   "lat": 37.51,
+   "lon": 22.372,
+   "elevation_m": 670,
+   "absolute_min_c": -10.9,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 26.6,
+    "last_spring_frost": {
+     "doy": 76,
+     "label": "17 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 344,
+     "label": "10 Δεκεμβρίου",
+     "years_observed": 18
+    },
+    "safe_planting_date": {
+     "doy": 93,
+     "label": "3 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 324,
+     "label": "20 Νοεμβρίου"
+    },
+    "growing_season_days": 269
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 52.3,
+    "last_spring_frost": {
+     "doy": 89,
+     "label": "30 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 335,
+     "label": "1 Δεκεμβρίου",
+     "years_observed": 19
+    },
+    "safe_planting_date": {
+     "doy": 109,
+     "label": "19 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 314,
+     "label": "10 Νοεμβρίου"
+    },
+    "growing_season_days": 247
+   }
+  },
+  {
+   "id": "sparti",
+   "name": "Σπάρτη",
+   "region": "Λακωνία",
+   "lat": 37.074,
+   "lon": 22.43,
+   "elevation_m": 207,
+   "absolute_min_c": -5.8,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 14,
+    "frost_probability_pct": 70,
+    "avg_frost_days_per_year": 3,
+    "last_spring_frost": {
+     "doy": 46,
+     "label": "15 Φεβρουαρίου",
+     "years_observed": 14
+    },
+    "first_autumn_frost": {
+     "doy": 363,
+     "label": "29 Δεκεμβρίου",
+     "years_observed": 4
+    },
+    "safe_planting_date": {
+     "doy": 71,
+     "label": "12 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 356,
+     "label": "22 Δεκεμβρίου"
+    },
+    "growing_season_days": 318
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 19,
+    "frost_probability_pct": 95,
+    "avg_frost_days_per_year": 11.4,
+    "last_spring_frost": {
+     "doy": 50,
+     "label": "19 Φεβρουαρίου",
+     "years_observed": 19
+    },
+    "first_autumn_frost": {
+     "doy": 354,
+     "label": "20 Δεκεμβρίου",
+     "years_observed": 14
+    },
+    "safe_planting_date": {
+     "doy": 80,
+     "label": "21 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 344,
+     "label": "10 Δεκεμβρίου"
+    },
+    "growing_season_days": 304
+   }
+  },
+  {
+   "id": "korinthos",
+   "name": "Κόρινθος",
+   "region": "Κορινθία",
+   "lat": 37.938,
+   "lon": 22.927,
+   "elevation_m": 11,
+   "absolute_min_c": -1.8,
+   "absolute_min_date": "2017-01-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 4,
+    "frost_probability_pct": 20,
+    "avg_frost_days_per_year": 0.3,
+    "last_spring_frost": {
+     "doy": 19,
+     "label": "19 Ιανουαρίου",
+     "years_observed": 4
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 42,
+     "label": "11 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 12,
+    "frost_probability_pct": 60,
+    "avg_frost_days_per_year": 2.5,
+    "last_spring_frost": {
+     "doy": 46,
+     "label": "15 Φεβρουαρίου",
+     "years_observed": 12
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 68,
+     "label": "9 Μαρτίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "pyrgos",
+   "name": "Πύργος",
+   "region": "Ηλεία",
+   "lat": 37.675,
+   "lon": 21.441,
+   "elevation_m": 27,
+   "absolute_min_c": -1.8,
+   "absolute_min_date": "2022-01-26",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 6,
+    "frost_probability_pct": 30,
+    "avg_frost_days_per_year": 0.3,
+    "last_spring_frost": {
+     "doy": 29,
+     "label": "29 Ιανουαρίου",
+     "years_observed": 6
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 44,
+     "label": "13 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 15,
+    "frost_probability_pct": 75,
+    "avg_frost_days_per_year": 3,
+    "last_spring_frost": {
+     "doy": 42,
+     "label": "11 Φεβρουαρίου",
+     "years_observed": 15
+    },
+    "first_autumn_frost": {
+     "doy": 364,
+     "label": "30 Δεκεμβρίου",
+     "years_observed": 3
+    },
+    "safe_planting_date": {
+     "doy": 52,
+     "label": "21 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 357,
+     "label": "23 Δεκεμβρίου"
+    },
+    "growing_season_days": 322
+   }
+  },
+  {
+   "id": "larissa",
+   "name": "Λάρισα",
+   "region": "Θεσσαλία",
+   "lat": 39.639,
+   "lon": 22.4191,
+   "elevation_m": 82,
+   "absolute_min_c": -11.7,
+   "absolute_min_date": "2017-01-13",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 26.8,
+    "last_spring_frost": {
+     "doy": 56,
+     "label": "25 Φεβρουαρίου",
+     "years_observed": 19
+    },
+    "first_autumn_frost": {
+     "doy": 336,
+     "label": "2 Δεκεμβρίου",
+     "years_observed": 19
+    },
+    "safe_planting_date": {
+     "doy": 78,
+     "label": "19 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 326,
+     "label": "22 Νοεμβρίου"
+    },
+    "growing_season_days": 280
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 47.8,
+    "last_spring_frost": {
+     "doy": 75,
+     "label": "16 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 334,
+     "label": "30 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 89,
+     "label": "30 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 320,
+     "label": "16 Νοεμβρίου"
+    },
+    "growing_season_days": 260
+   }
+  },
+  {
+   "id": "volos",
+   "name": "Βόλος",
+   "region": "Μαγνησία",
+   "lat": 39.3621,
+   "lon": 22.9422,
+   "elevation_m": 2,
+   "absolute_min_c": -4.2,
+   "absolute_min_date": "2017-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 11,
+    "frost_probability_pct": 55,
+    "avg_frost_days_per_year": 2.5,
+    "last_spring_frost": {
+     "doy": 43,
+     "label": "12 Φεβρουαρίου",
+     "years_observed": 11
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 55,
+     "label": "24 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 8,
+    "last_spring_frost": {
+     "doy": 49,
+     "label": "18 Φεβρουαρίου",
+     "years_observed": 18
+    },
+    "first_autumn_frost": {
+     "doy": 357,
+     "label": "23 Δεκεμβρίου",
+     "years_observed": 8
+    },
+    "safe_planting_date": {
+     "doy": 70,
+     "label": "11 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 348,
+     "label": "14 Δεκεμβρίου"
+    },
+    "growing_season_days": 308
+   }
+  },
+  {
+   "id": "trikala",
+   "name": "Τρίκαλα",
+   "region": "Θεσσαλία",
+   "lat": 39.555,
+   "lon": 21.768,
+   "elevation_m": 113,
+   "absolute_min_c": -16.3,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 32.2,
+    "last_spring_frost": {
+     "doy": 74,
+     "label": "15 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 341,
+     "label": "7 Δεκεμβρίου",
+     "years_observed": 17
+    },
+    "safe_planting_date": {
+     "doy": 87,
+     "label": "28 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 317,
+     "label": "13 Νοεμβρίου"
+    },
+    "growing_season_days": 268
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 55.1,
+    "last_spring_frost": {
+     "doy": 85,
+     "label": "26 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 328,
+     "label": "24 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 102,
+     "label": "12 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 306,
+     "label": "2 Νοεμβρίου"
+    },
+    "growing_season_days": 243
+   }
+  },
+  {
+   "id": "karditsa",
+   "name": "Καρδίτσα",
+   "region": "Θεσσαλία",
+   "lat": 39.364,
+   "lon": 21.921,
+   "elevation_m": 113,
+   "absolute_min_c": -16,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 27.6,
+    "last_spring_frost": {
+     "doy": 65,
+     "label": "6 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 343,
+     "label": "9 Δεκεμβρίου",
+     "years_observed": 17
+    },
+    "safe_planting_date": {
+     "doy": 86,
+     "label": "27 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 318,
+     "label": "14 Νοεμβρίου"
+    },
+    "growing_season_days": 279
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 49,
+    "last_spring_frost": {
+     "doy": 85,
+     "label": "26 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 330,
+     "label": "26 Νοεμβρίου",
+     "years_observed": 19
+    },
+    "safe_planting_date": {
+     "doy": 101,
+     "label": "11 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 306,
+     "label": "2 Νοεμβρίου"
+    },
+    "growing_season_days": 245
+   }
+  },
+  {
+   "id": "ioannina",
+   "name": "Ιωάννινα",
+   "region": "Ήπειρος",
+   "lat": 39.665,
+   "lon": 20.8537,
+   "elevation_m": 498,
+   "absolute_min_c": -12.5,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 37.6,
+    "last_spring_frost": {
+     "doy": 76,
+     "label": "17 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 335,
+     "label": "1 Δεκεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 89,
+     "label": "30 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 307,
+     "label": "3 Νοεμβρίου"
+    },
+    "growing_season_days": 259
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 66.5,
+    "last_spring_frost": {
+     "doy": 90,
+     "label": "31 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 324,
+     "label": "20 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 108,
+     "label": "18 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 301,
+     "label": "28 Οκτωβρίου"
+    },
+    "growing_season_days": 235
+   }
+  },
+  {
+   "id": "arta",
+   "name": "Άρτα",
+   "region": "Ήπειρος",
+   "lat": 39.1606,
+   "lon": 20.9853,
+   "elevation_m": 39,
+   "absolute_min_c": -7.5,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 19,
+    "frost_probability_pct": 95,
+    "avg_frost_days_per_year": 9.4,
+    "last_spring_frost": {
+     "doy": 45,
+     "label": "14 Φεβρουαρίου",
+     "years_observed": 18
+    },
+    "first_autumn_frost": {
+     "doy": 353,
+     "label": "19 Δεκεμβρίου",
+     "years_observed": 9
+    },
+    "safe_planting_date": {
+     "doy": 70,
+     "label": "11 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 350,
+     "label": "16 Δεκεμβρίου"
+    },
+    "growing_season_days": 308
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 22.6,
+    "last_spring_frost": {
+     "doy": 70,
+     "label": "11 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 342,
+     "label": "8 Δεκεμβρίου",
+     "years_observed": 15
+    },
+    "safe_planting_date": {
+     "doy": 86,
+     "label": "27 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 321,
+     "label": "17 Νοεμβρίου"
+    },
+    "growing_season_days": 273
+   }
+  },
+  {
+   "id": "preveza",
+   "name": "Πρέβεζα",
+   "region": "Ήπειρος",
+   "lat": 38.9592,
+   "lon": 20.7516,
+   "elevation_m": 12,
+   "absolute_min_c": -0.6,
+   "absolute_min_date": "2017-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 5,
+    "frost_probability_pct": 25,
+    "avg_frost_days_per_year": 0.3,
+    "last_spring_frost": {
+     "doy": 39,
+     "label": "8 Φεβρουαρίου",
+     "years_observed": 5
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 48,
+     "label": "17 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 11,
+    "frost_probability_pct": 55,
+    "avg_frost_days_per_year": 1.6,
+    "last_spring_frost": {
+     "doy": 24,
+     "label": "24 Ιανουαρίου",
+     "years_observed": 10
+    },
+    "first_autumn_frost": {
+     "doy": 366,
+     "label": "1 Ιανουαρίου",
+     "years_observed": 1
+    },
+    "safe_planting_date": {
+     "doy": 51,
+     "label": "20 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 366,
+     "label": "1 Ιανουαρίου"
+    },
+    "growing_season_days": 343
+   }
+  },
+  {
+   "id": "igoumenitsa",
+   "name": "Ηγουμενίτσα",
+   "region": "Θεσπρωτία",
+   "lat": 39.504,
+   "lon": 20.266,
+   "elevation_m": 34,
+   "absolute_min_c": -4.4,
+   "absolute_min_date": "2006-01-27",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 11,
+    "frost_probability_pct": 55,
+    "avg_frost_days_per_year": 2.2,
+    "last_spring_frost": {
+     "doy": 39,
+     "label": "8 Φεβρουαρίου",
+     "years_observed": 11
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 59,
+     "label": "28 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 11.1,
+    "last_spring_frost": {
+     "doy": 46,
+     "label": "15 Φεβρουαρίου",
+     "years_observed": 19
+    },
+    "first_autumn_frost": {
+     "doy": 353,
+     "label": "19 Δεκεμβρίου",
+     "years_observed": 15
+    },
+    "safe_planting_date": {
+     "doy": 69,
+     "label": "10 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 330,
+     "label": "26 Νοεμβρίου"
+    },
+    "growing_season_days": 307
+   }
+  },
+  {
+   "id": "metsovo",
+   "name": "Μέτσοβο",
+   "region": "Ήπειρος",
+   "lat": 39.771,
+   "lon": 21.181,
+   "elevation_m": 1183,
+   "absolute_min_c": -19.1,
+   "absolute_min_date": "2017-01-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 71.7,
+    "last_spring_frost": {
+     "doy": 96,
+     "label": "6 Απριλίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 328,
+     "label": "24 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 110,
+     "label": "20 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 307,
+     "label": "3 Νοεμβρίου"
+    },
+    "growing_season_days": 232
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 110.3,
+    "last_spring_frost": {
+     "doy": 114,
+     "label": "24 Απριλίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 311,
+     "label": "7 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 125,
+     "label": "5 Μαΐου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 288,
+     "label": "15 Οκτωβρίου"
+    },
+    "growing_season_days": 197
+   }
+  },
+  {
+   "id": "thessaloniki",
+   "name": "Θεσσαλονίκη",
+   "region": "Κεντρική Μακεδονία",
+   "lat": 40.6401,
+   "lon": 22.9444,
+   "elevation_m": 42,
+   "absolute_min_c": -10.8,
+   "absolute_min_date": "2017-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 22.3,
+    "last_spring_frost": {
+     "doy": 54,
+     "label": "23 Φεβρουαρίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 351,
+     "label": "17 Δεκεμβρίου",
+     "years_observed": 16
+    },
+    "safe_planting_date": {
+     "doy": 72,
+     "label": "13 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 331,
+     "label": "27 Νοεμβρίου"
+    },
+    "growing_season_days": 297
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 43.2,
+    "last_spring_frost": {
+     "doy": 72,
+     "label": "13 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 334,
+     "label": "30 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 85,
+     "label": "26 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 324,
+     "label": "20 Νοεμβρίου"
+    },
+    "growing_season_days": 263
+   }
+  },
+  {
+   "id": "kavala",
+   "name": "Καβάλα",
+   "region": "Ανατολική Μακεδονία",
+   "lat": 40.9396,
+   "lon": 24.4129,
+   "elevation_m": 48,
+   "absolute_min_c": -7.4,
+   "absolute_min_date": "2005-02-07",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 15.8,
+    "last_spring_frost": {
+     "doy": 50,
+     "label": "19 Φεβρουαρίου",
+     "years_observed": 19
+    },
+    "first_autumn_frost": {
+     "doy": 351,
+     "label": "17 Δεκεμβρίου",
+     "years_observed": 17
+    },
+    "safe_planting_date": {
+     "doy": 80,
+     "label": "21 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 329,
+     "label": "25 Νοεμβρίου"
+    },
+    "growing_season_days": 301
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 35,
+    "last_spring_frost": {
+     "doy": 71,
+     "label": "12 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 335,
+     "label": "1 Δεκεμβρίου",
+     "years_observed": 19
+    },
+    "safe_planting_date": {
+     "doy": 95,
+     "label": "5 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 323,
+     "label": "19 Νοεμβρίου"
+    },
+    "growing_season_days": 264
+   }
+  },
+  {
+   "id": "serres",
+   "name": "Σέρρες",
+   "region": "Κεντρική Μακεδονία",
+   "lat": 41.085,
+   "lon": 23.548,
+   "elevation_m": 46,
+   "absolute_min_c": -8.1,
+   "absolute_min_date": "2017-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 24.4,
+    "last_spring_frost": {
+     "doy": 51,
+     "label": "20 Φεβρουαρίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 341,
+     "label": "7 Δεκεμβρίου",
+     "years_observed": 16
+    },
+    "safe_planting_date": {
+     "doy": 80,
+     "label": "21 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 322,
+     "label": "18 Νοεμβρίου"
+    },
+    "growing_season_days": 291
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 47.9,
+    "last_spring_frost": {
+     "doy": 78,
+     "label": "19 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 330,
+     "label": "26 Νοεμβρίου",
+     "years_observed": 19
+    },
+    "safe_planting_date": {
+     "doy": 89,
+     "label": "30 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 306,
+     "label": "2 Νοεμβρίου"
+    },
+    "growing_season_days": 253
+   }
+  },
+  {
+   "id": "katerini",
+   "name": "Κατερίνη",
+   "region": "Πιερία",
+   "lat": 40.271,
+   "lon": 22.502,
+   "elevation_m": 44,
+   "absolute_min_c": -12.3,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 11.3,
+    "last_spring_frost": {
+     "doy": 49,
+     "label": "18 Φεβρουαρίου",
+     "years_observed": 18
+    },
+    "first_autumn_frost": {
+     "doy": 356,
+     "label": "22 Δεκεμβρίου",
+     "years_observed": 14
+    },
+    "safe_planting_date": {
+     "doy": 71,
+     "label": "12 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 347,
+     "label": "13 Δεκεμβρίου"
+    },
+    "growing_season_days": 307
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 26.8,
+    "last_spring_frost": {
+     "doy": 60,
+     "label": "1 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 336,
+     "label": "2 Δεκεμβρίου",
+     "years_observed": 18
+    },
+    "safe_planting_date": {
+     "doy": 81,
+     "label": "22 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 325,
+     "label": "21 Νοεμβρίου"
+    },
+    "growing_season_days": 276
+   }
+  },
+  {
+   "id": "kozani",
+   "name": "Κοζάνη",
+   "region": "Δυτική Μακεδονία",
+   "lat": 40.301,
+   "lon": 21.789,
+   "elevation_m": 718,
+   "absolute_min_c": -20.7,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 56.5,
+    "last_spring_frost": {
+     "doy": 82,
+     "label": "23 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 326,
+     "label": "22 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 99,
+     "label": "9 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 305,
+     "label": "1 Νοεμβρίου"
+    },
+    "growing_season_days": 244
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 90.9,
+    "last_spring_frost": {
+     "doy": 97,
+     "label": "7 Απριλίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 306,
+     "label": "2 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 110,
+     "label": "20 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 291,
+     "label": "18 Οκτωβρίου"
+    },
+    "growing_season_days": 210
+   }
+  },
+  {
+   "id": "florina",
+   "name": "Φλώρινα",
+   "region": "Δυτική Μακεδονία",
+   "lat": 40.781,
+   "lon": 21.409,
+   "elevation_m": 663,
+   "absolute_min_c": -19.1,
+   "absolute_min_date": "2012-01-17",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 56,
+    "last_spring_frost": {
+     "doy": 82,
+     "label": "23 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 327,
+     "label": "23 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 100,
+     "label": "10 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 304,
+     "label": "31 Οκτωβρίου"
+    },
+    "growing_season_days": 245
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 95.2,
+    "last_spring_frost": {
+     "doy": 99,
+     "label": "9 Απριλίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 308,
+     "label": "4 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 112,
+     "label": "22 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 287,
+     "label": "14 Οκτωβρίου"
+    },
+    "growing_season_days": 209
+   }
+  },
+  {
+   "id": "grevena",
+   "name": "Γρεβενά",
+   "region": "Δυτική Μακεδονία",
+   "lat": 40.084,
+   "lon": 21.427,
+   "elevation_m": 533,
+   "absolute_min_c": -20.4,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 57.9,
+    "last_spring_frost": {
+     "doy": 85,
+     "label": "26 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 326,
+     "label": "22 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 101,
+     "label": "11 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 305,
+     "label": "1 Νοεμβρίου"
+    },
+    "growing_season_days": 241
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 91.3,
+    "last_spring_frost": {
+     "doy": 102,
+     "label": "12 Απριλίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 306,
+     "label": "2 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 109,
+     "label": "19 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 292,
+     "label": "19 Οκτωβρίου"
+    },
+    "growing_season_days": 204
+   }
+  },
+  {
+   "id": "veria",
+   "name": "Βέροια",
+   "region": "Ημαθία",
+   "lat": 40.524,
+   "lon": 22.203,
+   "elevation_m": 151,
+   "absolute_min_c": -18.7,
+   "absolute_min_date": "2006-01-26",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 39.9,
+    "last_spring_frost": {
+     "doy": 74,
+     "label": "15 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 328,
+     "label": "24 Νοεμβρίου",
+     "years_observed": 17
+    },
+    "safe_planting_date": {
+     "doy": 89,
+     "label": "30 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 305,
+     "label": "1 Νοεμβρίου"
+    },
+    "growing_season_days": 255
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 63.8,
+    "last_spring_frost": {
+     "doy": 88,
+     "label": "29 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 320,
+     "label": "16 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 102,
+     "label": "12 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 292,
+     "label": "19 Οκτωβρίου"
+    },
+    "growing_season_days": 232
+   }
+  },
+  {
+   "id": "drama",
+   "name": "Δράμα",
+   "region": "Ανατολική Μακεδονία",
+   "lat": 41.15,
+   "lon": 24.147,
+   "elevation_m": 112,
+   "absolute_min_c": -16.7,
+   "absolute_min_date": "2005-12-20",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 37.9,
+    "last_spring_frost": {
+     "doy": 74,
+     "label": "15 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 329,
+     "label": "25 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 94,
+     "label": "4 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 308,
+     "label": "4 Νοεμβρίου"
+    },
+    "growing_season_days": 255
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 66,
+    "last_spring_frost": {
+     "doy": 88,
+     "label": "29 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 318,
+     "label": "14 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 103,
+     "label": "13 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 303,
+     "label": "30 Οκτωβρίου"
+    },
+    "growing_season_days": 230
+   }
+  },
+  {
+   "id": "xanthi",
+   "name": "Ξάνθη",
+   "region": "Θράκη",
+   "lat": 41.14,
+   "lon": 24.888,
+   "elevation_m": 88,
+   "absolute_min_c": -12.5,
+   "absolute_min_date": "2006-02-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 27.7,
+    "last_spring_frost": {
+     "doy": 70,
+     "label": "11 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 336,
+     "label": "2 Δεκεμβρίου",
+     "years_observed": 19
+    },
+    "safe_planting_date": {
+     "doy": 88,
+     "label": "29 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 324,
+     "label": "20 Νοεμβρίου"
+    },
+    "growing_season_days": 266
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 52.5,
+    "last_spring_frost": {
+     "doy": 88,
+     "label": "29 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 330,
+     "label": "26 Νοεμβρίου",
+     "years_observed": 19
+    },
+    "safe_planting_date": {
+     "doy": 103,
+     "label": "13 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 307,
+     "label": "3 Νοεμβρίου"
+    },
+    "growing_season_days": 243
+   }
+  },
+  {
+   "id": "komotini",
+   "name": "Κομοτηνή",
+   "region": "Θράκη",
+   "lat": 41.122,
+   "lon": 25.406,
+   "elevation_m": 43,
+   "absolute_min_c": -13.3,
+   "absolute_min_date": "2005-12-20",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 34.1,
+    "last_spring_frost": {
+     "doy": 75,
+     "label": "16 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 335,
+     "label": "1 Δεκεμβρίου",
+     "years_observed": 19
+    },
+    "safe_planting_date": {
+     "doy": 88,
+     "label": "29 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 320,
+     "label": "16 Νοεμβρίου"
+    },
+    "growing_season_days": 260
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 55.4,
+    "last_spring_frost": {
+     "doy": 87,
+     "label": "28 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 329,
+     "label": "25 Νοεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 101,
+     "label": "11 Απριλίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 306,
+     "label": "2 Νοεμβρίου"
+    },
+    "growing_season_days": 242
+   }
+  },
+  {
+   "id": "alexandroupoli",
+   "name": "Αλεξανδρούπολη",
+   "region": "Θράκη",
+   "lat": 40.845,
+   "lon": 25.874,
+   "elevation_m": 20,
+   "absolute_min_c": -11.5,
+   "absolute_min_date": "2006-02-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 18,
+    "last_spring_frost": {
+     "doy": 54,
+     "label": "23 Φεβρουαρίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 355,
+     "label": "21 Δεκεμβρίου",
+     "years_observed": 14
+    },
+    "safe_planting_date": {
+     "doy": 72,
+     "label": "13 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 339,
+     "label": "5 Δεκεμβρίου"
+    },
+    "growing_season_days": 301
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 20,
+    "frost_probability_pct": 100,
+    "avg_frost_days_per_year": 35.4,
+    "last_spring_frost": {
+     "doy": 70,
+     "label": "11 Μαρτίου",
+     "years_observed": 20
+    },
+    "first_autumn_frost": {
+     "doy": 338,
+     "label": "4 Δεκεμβρίου",
+     "years_observed": 20
+    },
+    "safe_planting_date": {
+     "doy": 87,
+     "label": "28 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 325,
+     "label": "21 Νοεμβρίου"
+    },
+    "growing_season_days": 268
+   }
+  },
+  {
+   "id": "corfu",
+   "name": "Κέρκυρα",
+   "region": "Ιόνιο",
+   "lat": 39.6243,
+   "lon": 19.9217,
+   "elevation_m": 18,
+   "absolute_min_c": 0.1,
+   "absolute_min_date": "2017-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 6,
+    "frost_probability_pct": 30,
+    "avg_frost_days_per_year": 0.6,
+    "last_spring_frost": {
+     "doy": 25,
+     "label": "25 Ιανουαρίου",
+     "years_observed": 6
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 48,
+     "label": "17 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "zakynthos",
+   "name": "Ζάκυνθος",
+   "region": "Ιόνιο",
+   "lat": 37.787,
+   "lon": 20.899,
+   "elevation_m": 9,
+   "absolute_min_c": 0.1,
+   "absolute_min_date": "2017-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 1,
+    "frost_probability_pct": 5,
+    "avg_frost_days_per_year": 0.1,
+    "last_spring_frost": {
+     "doy": 10,
+     "label": "10 Ιανουαρίου",
+     "years_observed": 1
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 10,
+     "label": "10 Ιανουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "kefalonia",
+   "name": "Κεφαλονιά",
+   "region": "Ιόνιο",
+   "lat": 38.175,
+   "lon": 20.489,
+   "elevation_m": 12,
+   "absolute_min_c": 1.5,
+   "absolute_min_date": "2017-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 2,
+    "frost_probability_pct": 10,
+    "avg_frost_days_per_year": 0.1,
+    "last_spring_frost": {
+     "doy": 18,
+     "label": "18 Ιανουαρίου",
+     "years_observed": 2
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 24,
+     "label": "24 Ιανουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "lefkada",
+   "name": "Λευκάδα",
+   "region": "Ιόνιο",
+   "lat": 38.832,
+   "lon": 20.707,
+   "elevation_m": 6,
+   "absolute_min_c": -0.7,
+   "absolute_min_date": "2017-01-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 3,
+    "frost_probability_pct": 15,
+    "avg_frost_days_per_year": 0.3,
+    "last_spring_frost": {
+     "doy": 47,
+     "label": "16 Φεβρουαρίου",
+     "years_observed": 3
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 67,
+     "label": "8 Μαρτίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 10,
+    "frost_probability_pct": 50,
+    "avg_frost_days_per_year": 1.8,
+    "last_spring_frost": {
+     "doy": 36,
+     "label": "5 Φεβρουαρίου",
+     "years_observed": 10
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 51,
+     "label": "20 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "rhodes",
+   "name": "Ρόδος",
+   "region": "Δωδεκάνησα",
+   "lat": 36.4349,
+   "lon": 28.2176,
+   "elevation_m": 46,
+   "absolute_min_c": 2.5,
+   "absolute_min_date": "2015-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "kos",
+   "name": "Κως",
+   "region": "Δωδεκάνησα",
+   "lat": 36.893,
+   "lon": 27.288,
+   "elevation_m": 11,
+   "absolute_min_c": 1.9,
+   "absolute_min_date": "2015-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 1,
+    "frost_probability_pct": 5,
+    "avg_frost_days_per_year": 0.1,
+    "last_spring_frost": {
+     "doy": 8,
+     "label": "8 Ιανουαρίου",
+     "years_observed": 1
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 8,
+     "label": "8 Ιανουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "mykonos",
+   "name": "Μύκονος",
+   "region": "Κυκλάδες",
+   "lat": 37.445,
+   "lon": 25.329,
+   "elevation_m": 7,
+   "absolute_min_c": 2.3,
+   "absolute_min_date": "2022-01-23",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "santorini",
+   "name": "Σαντορίνη",
+   "region": "Κυκλάδες",
+   "lat": 36.393,
+   "lon": 25.461,
+   "elevation_m": 101,
+   "absolute_min_c": 2.8,
+   "absolute_min_date": "2015-02-19",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "syros",
+   "name": "Σύρος",
+   "region": "Κυκλάδες",
+   "lat": 37.445,
+   "lon": 24.943,
+   "elevation_m": 29,
+   "absolute_min_c": 2.1,
+   "absolute_min_date": "2008-02-18",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "naxos",
+   "name": "Νάξος",
+   "region": "Κυκλάδες",
+   "lat": 37.105,
+   "lon": 25.376,
+   "elevation_m": 16,
+   "absolute_min_c": 1.7,
+   "absolute_min_date": "2022-01-24",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 2,
+    "frost_probability_pct": 10,
+    "avg_frost_days_per_year": 0.1,
+    "last_spring_frost": {
+     "doy": 37,
+     "label": "6 Φεβρουαρίου",
+     "years_observed": 2
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 47,
+     "label": "16 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "lesvos",
+   "name": "Λέσβος (Μυτιλήνη)",
+   "region": "Βόρειο Αιγαίο",
+   "lat": 39.11,
+   "lon": 26.555,
+   "elevation_m": 10,
+   "absolute_min_c": -2,
+   "absolute_min_date": "2017-01-07",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 8,
+    "frost_probability_pct": 40,
+    "avg_frost_days_per_year": 0.8,
+    "last_spring_frost": {
+     "doy": 29,
+     "label": "29 Ιανουαρίου",
+     "years_observed": 8
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 49,
+     "label": "18 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 15,
+    "frost_probability_pct": 75,
+    "avg_frost_days_per_year": 4.3,
+    "last_spring_frost": {
+     "doy": 47,
+     "label": "16 Φεβρουαρίου",
+     "years_observed": 15
+    },
+    "first_autumn_frost": {
+     "doy": 358,
+     "label": "24 Δεκεμβρίου",
+     "years_observed": 5
+    },
+    "safe_planting_date": {
+     "doy": 70,
+     "label": "11 Μαρτίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 347,
+     "label": "13 Δεκεμβρίου"
+    },
+    "growing_season_days": 311
+   }
+  },
+  {
+   "id": "chios",
+   "name": "Χίος",
+   "region": "Βόρειο Αιγαίο",
+   "lat": 38.368,
+   "lon": 26.136,
+   "elevation_m": 11,
+   "absolute_min_c": -0.7,
+   "absolute_min_date": "2017-01-07",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 3,
+    "frost_probability_pct": 15,
+    "avg_frost_days_per_year": 0.3,
+    "last_spring_frost": {
+     "doy": 8,
+     "label": "8 Ιανουαρίου",
+     "years_observed": 3
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 41,
+     "label": "10 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 12,
+    "frost_probability_pct": 60,
+    "avg_frost_days_per_year": 1.7,
+    "last_spring_frost": {
+     "doy": 35,
+     "label": "4 Φεβρουαρίου",
+     "years_observed": 12
+    },
+    "first_autumn_frost": {
+     "doy": 365,
+     "label": "31 Δεκεμβρίου",
+     "years_observed": 1
+    },
+    "safe_planting_date": {
+     "doy": 50,
+     "label": "19 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": {
+     "doy": 365,
+     "label": "31 Δεκεμβρίου"
+    },
+    "growing_season_days": 331
+   }
+  },
+  {
+   "id": "samos",
+   "name": "Σάμος",
+   "region": "Βόρειο Αιγαίο",
+   "lat": 37.754,
+   "lon": 26.977,
+   "elevation_m": 1,
+   "absolute_min_c": -0.4,
+   "absolute_min_date": "2015-01-08",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 1,
+    "frost_probability_pct": 5,
+    "avg_frost_days_per_year": 0.1,
+    "last_spring_frost": {
+     "doy": 8,
+     "label": "8 Ιανουαρίου",
+     "years_observed": 1
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 8,
+     "label": "8 Ιανουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 9,
+    "frost_probability_pct": 45,
+    "avg_frost_days_per_year": 1,
+    "last_spring_frost": {
+     "doy": 48,
+     "label": "17 Φεβρουαρίου",
+     "years_observed": 9
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 64,
+     "label": "5 Μαρτίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "heraklion",
+   "name": "Ηράκλειο",
+   "region": "Κρήτη",
+   "lat": 35.3387,
+   "lon": 25.1442,
+   "elevation_m": 17,
+   "absolute_min_c": 0.2,
+   "absolute_min_date": "2017-01-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 4,
+    "frost_probability_pct": 20,
+    "avg_frost_days_per_year": 0.3,
+    "last_spring_frost": {
+     "doy": 17,
+     "label": "17 Ιανουαρίου",
+     "years_observed": 4
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 42,
+     "label": "11 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "chania",
+   "name": "Χανιά",
+   "region": "Κρήτη",
+   "lat": 35.5138,
+   "lon": 24.018,
+   "elevation_m": 10,
+   "absolute_min_c": 0.9,
+   "absolute_min_date": "2008-02-17",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 0,
+    "frost_probability_pct": 0,
+    "avg_frost_days_per_year": 0,
+    "last_spring_frost": null,
+    "first_autumn_frost": null,
+    "safe_planting_date": null,
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 3,
+    "frost_probability_pct": 15,
+    "avg_frost_days_per_year": 0.3,
+    "last_spring_frost": {
+     "doy": 9,
+     "label": "9 Ιανουαρίου",
+     "years_observed": 3
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 41,
+     "label": "10 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "rethymno",
+   "name": "Ρέθυμνο",
+   "region": "Κρήτη",
+   "lat": 35.366,
+   "lon": 24.482,
+   "elevation_m": 4,
+   "absolute_min_c": -1,
+   "absolute_min_date": "2017-01-09",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 1,
+    "frost_probability_pct": 5,
+    "avg_frost_days_per_year": 0.1,
+    "last_spring_frost": {
+     "doy": 9,
+     "label": "9 Ιανουαρίου",
+     "years_observed": 1
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 9,
+     "label": "9 Ιανουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 4,
+    "frost_probability_pct": 20,
+    "avg_frost_days_per_year": 0.3,
+    "last_spring_frost": {
+     "doy": 18,
+     "label": "18 Ιανουαρίου",
+     "years_observed": 4
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 42,
+     "label": "11 Φεβρουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  },
+  {
+   "id": "agios-nikolaos",
+   "name": "Άγιος Νικόλαος",
+   "region": "Κρήτη",
+   "lat": 35.19,
+   "lon": 25.716,
+   "elevation_m": 35,
+   "absolute_min_c": 0,
+   "absolute_min_date": "2022-01-25",
+   "hard_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 1,
+    "frost_probability_pct": 5,
+    "avg_frost_days_per_year": 0.1,
+    "last_spring_frost": {
+     "doy": 25,
+     "label": "25 Ιανουαρίου",
+     "years_observed": 1
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 25,
+     "label": "25 Ιανουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   },
+   "light_frost": {
+    "years_analysed": 20,
+    "years_with_frost": 3,
+    "frost_probability_pct": 15,
+    "avg_frost_days_per_year": 0.2,
+    "last_spring_frost": {
+     "doy": 9,
+     "label": "9 Ιανουαρίου",
+     "years_observed": 3
+    },
+    "first_autumn_frost": null,
+    "safe_planting_date": {
+     "doy": 22,
+     "label": "22 Ιανουαρίου"
+    },
+    "first_risk_date_autumn": null,
+    "growing_season_days": null
+   }
+  }
+ ]
+}

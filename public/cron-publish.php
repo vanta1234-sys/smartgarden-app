@@ -1299,6 +1299,29 @@ if (file_exists($latestFile)) {
     }
 }
 
+// Cap publishing at one article per day. Google's March 2026 core update explicitly
+// targeted "scaled content abuse" — sites publishing AI-written articles in volume with
+// no human editorial review lost 50-80% of their traffic. This site was on a 3x/day
+// cron with zero review, which is the same pattern at a smaller scale. One well-formed
+// article a day keeps the pipeline alive without matching the profile Google penalises.
+// ?force=1 bypasses this for manual/testing runs.
+$forcePublish = isset($_GET['force']) && $_GET['force'] === '1';
+if (!$forcePublish) {
+    $today = date('Y-m-d');
+    foreach ($existingArticles as $existing) {
+        if (isset($existing['date']) && $existing['date'] === $today) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(array(
+                'success' => false,
+                'skipped' => true,
+                'reason' => 'An article was already published today (' . $today . '). Daily publishing cap is 1 article/day.',
+                'existing_slug' => isset($existing['slug']) ? $existing['slug'] : null,
+            ), JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+    }
+}
+
 // Select the LEAST-published topic in the pool, not blind round-robin.
 // The old formula (topicIndex = totalExisting % count($topicPool)) guaranteed every
 // topic got re-published every N articles forever, and once the pool had fully cycled
@@ -1407,7 +1430,14 @@ function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
             . "Εστίαση θέματος:\n{$topic['prompt_focus']}\n\n";
 
         $promptA = $sharedIntro
-            . "Γράψε ΜΟΝΟ τις εξής 3 ενότητες σε Markdown (##). ΚΑΘΕ ενότητα πρέπει να έχει ΤΟΥΛΑΧΙΣΤΟΝ 450 λέξεις, με πολλές τεχνικές λεπτομέρειες, δοσολογίες, παραδείγματα και αριθμημένες λίστες. Μην συνοψίζεις, ανάπτυξε διεξοδικά:\n\n"
+            . "Γράψε ΜΟΝΟ τις εξής ενότητες σε Markdown (##). Οι αριθμημένες ενότητες 1-3 πρέπει να έχουν ΤΟΥΛΑΧΙΣΤΟΝ 450 λέξεις η καθεμία, με πολλές τεχνικές λεπτομέρειες, δοσολογίες, παραδείγματα και αριθμημένες λίστες. Μην συνοψίζεις, ανάπτυξε διεξοδικά:\n\n"
+            // Answer-first block for Answer Engine Optimization. AI search engines
+            // (ChatGPT, Perplexity, Google AI Overviews) cite self-contained blocks that
+            // open with the direct answer and use concrete numbers instead of hedged
+            // prose. Keeping it short and putting it first also serves human readers,
+            // who otherwise hit 450 words of botany before the practical answer.
+            . "## Σύντομη Απάντηση\n"
+            . "3-5 προτάσεις που απαντούν ΑΜΕΣΑ και αυτοτελώς στο βασικό ερώτημα του τίτλου, ΠΡΙΝ από κάθε θεωρία. Ξεκίνα με την απάντηση, όχι με εισαγωγή. Χρησιμοποίησε συγκεκριμένους αριθμούς (θερμοκρασίες, δοσολογίες, ημέρες, εποχές, μεγέθη) αντί για γενικόλογες διατυπώσεις όπως «αρκετό» ή «τακτικά». Πρέπει να στέκει μόνη της, χωρίς να προϋποθέτει ότι ο αναγνώστης διάβασε κάτι άλλο.\n\n"
             . "## 1. Επιστημονικό Υπόβαθρο & Βοτανική Φυσιολογία\n"
             . "Αναλυτική περιγραφή φυσιολογίας, κυτταρικών μηχανισμών και ιδιαιτεροτήτων του θέματος/τεχνολογίας.\n\n"
             . "## 2. Τεχνικές Προδιαγραφές & Πίνακας Παραμέτρων\n"
@@ -1516,6 +1546,7 @@ function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
         if ($secondsRemaining >= 8) {
             $singlePrompt = $sharedIntro
                 . "Γράψε ένα εξαιρετικά αναλυτικό, επιστημονικά άρτιο και πρακτικό άρθρο 2.300 έως 2.600 λέξεων, με την εξής υποχρεωτική δομή:\n\n"
+                . "## Σύντομη Απάντηση\n(3-5 προτάσεις που απαντούν ΑΜΕΣΑ και αυτοτελώς στο ερώτημα του τίτλου, με συγκεκριμένους αριθμούς αντί για γενικόλογες διατυπώσεις, ΠΡΙΝ από κάθε θεωρία.)\n"
                 . "## 1. Επιστημονικό Υπόβαθρο & Βοτανική Φυσιολογία\n## 2. Τεχνικές Προδιαγραφές & Πίνακας Παραμέτρων\n## 3. Βήμα-προς-Βήμα Μεθοδολογία & Εφαρμογή\n"
                 . "## 4. Ολοκληρωμένη Βιολογική Φυτοπροστασία / Τεχνολογική Διάταξη\n## 5. Πρόγραμμα Θρέψης, Άρδευσης & Συντήρησης\n## 6. Συχνότερα Λάθη & Οδηγίες Αποφυγής\n\n"
                 . "Γράψε ΜΟΝΟ το κυρίως κείμενο του άρθρου σε Markdown. Το τελικό άρθρο πρέπει υποχρεωτικά να έχει τουλάχιστον 2.200 λέξεις. Χωρίς εισαγωγικά μετα-σχόλια.";
@@ -1724,9 +1755,20 @@ foreach ($staticPages as $page) {
 
 // Client-rendered hub pages (category listings, author bio, planting calendar) — no
 // server-side route/file, but real crawlable URLs the SPA handles via pathname routing.
-$appRoutes = array('syntaktis', 'imerologio-sporas', 'klima-kipoy');
+$appRoutes = array('syntaktis', 'imerologio-sporas', 'klima-kipoy', 'pagetos', 'fyta', 'rotiste');
 foreach ($appRoutes as $route) {
     $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/" . $route . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n";
+}
+
+// One URL per plant in the reference database. Each carries genuinely distinct data
+// (cold tolerance, pH, sowing months, its own failure mode), not template substitutions.
+$plantsRaw = @file_get_contents(__DIR__ . '/plants.json');
+$plantsList = $plantsRaw ? json_decode($plantsRaw, true) : array();
+if (is_array($plantsList)) {
+    foreach ($plantsList as $plant) {
+        if (!isset($plant['slug'])) continue;
+        $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/fyta/" . rawurlencode($plant['slug']) . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.5</priority>\n  </url>\n";
+    }
 }
 $categoriesSeen = array();
 foreach ($existingArticles as $art) {

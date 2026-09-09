@@ -13,6 +13,9 @@ import { CategoryPage } from './components/CategoryPage';
 import { AuthorBioPage } from './components/AuthorBioPage';
 import { PlantingCalendarPage } from './components/PlantingCalendarPage';
 import { ClimateComparisonPage } from './components/ClimateComparisonPage';
+import { FrostDatesPage } from './components/FrostDatesPage';
+import { PlantDatabasePage } from './components/PlantDatabasePage';
+import { AskAgronomistPage } from './components/AskAgronomistPage';
 import { SoilCalculator } from './components/SoilCalculator';
 import { SymptomWizard } from './components/SymptomWizard';
 import { CompanionMatrix } from './components/CompanionMatrix';
@@ -207,7 +210,7 @@ export default function App() {
   // without adding it here silently breaks that page's <title>/meta tags, since this
   // effect still runs and overwrites them regardless of what JSX actually renders.
   const isStaticPageRoute = typeof window !== 'undefined'
-    && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy)/.test(window.location.pathname);
+    && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy|pagetos|fyta|rotiste)/.test(window.location.pathname);
 
   // Auto-fetch live articles from latest_articles.json on mount & inject SEO Schema
   useEffect(() => {
@@ -908,6 +911,16 @@ pause
   }
   if (pathname.match(/^\/klima-kipoy\/?/)) {
     return <ClimateComparisonPage onBack={handleBackToHome} />;
+  }
+  if (pathname.match(/^\/pagetos\/?/)) {
+    return <FrostDatesPage onBack={handleBackToHome} />;
+  }
+  if (pathname.match(/^\/rotiste\/?/)) {
+    return <AskAgronomistPage onBack={handleBackToHome} />;
+  }
+  const plantMatch = pathname.match(/^\/fyta(?:\/([^/]+))?\/?$/);
+  if (plantMatch) {
+    return <PlantDatabasePage onBack={handleBackToHome} initialSlug={plantMatch[1] ? decodeURIComponent(plantMatch[1]) : undefined} />;
   }
 
   return (
@@ -2842,6 +2855,30 @@ pause
               className="text-slate-400 hover:text-emerald-400 transition-colors"
             >
               Κλίμα &amp; ET₀ Πόλεων
+            </a>
+
+            <a
+              href="/pagetos"
+              onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/pagetos'); window.location.reload(); }}
+              className="text-slate-400 hover:text-emerald-400 transition-colors"
+            >
+              Ημερομηνίες Παγετού
+            </a>
+
+            <a
+              href="/fyta"
+              onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/fyta'); window.location.reload(); }}
+              className="text-slate-400 hover:text-emerald-400 transition-colors"
+            >
+              Βάση Φυτών
+            </a>
+
+            <a
+              href="/rotiste"
+              onClick={(e) => { e.preventDefault(); window.history.pushState(null, '', '/rotiste'); window.location.reload(); }}
+              className="text-slate-400 hover:text-emerald-400 transition-colors"
+            >
+              Ρωτήστε τον Γεωπόνο
             </a>
 
             <a href="/about.html" className="text-slate-400 hover:text-emerald-400 transition-colors">

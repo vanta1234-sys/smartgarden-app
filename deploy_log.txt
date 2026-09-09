@@ -1,5 +1,5 @@
 ﻿====================================================
-[LOG] SMARTGARDEN DEPLOYMENT STARTED AT: 2026-09-09 02:13:14
+[LOG] SMARTGARDEN DEPLOYMENT STARTED AT: 2026-09-09 22:09:28
 ====================================================
 [LOG] Running npm run build...
 
@@ -8,21 +8,21 @@
 
 vite v6.4.3 building for production...
 transforming...
-✓ 1961 modules transformed.
+✓ 1965 modules transformed.
 rendering chunks...
 computing gzip size...
 dist/index.html                                 5.52 kB │ gzip:   2.28 kB
-dist/assets/index-B6oS6OyT.css                146.29 kB │ gzip:  18.17 kB
-dist/assets/smartphone-DxgBlBVz.js              0.37 kB │ gzip:   0.29 kB
-dist/assets/SeoMetadataAuditor-Du4FIFVV.js     35.50 kB │ gzip:   9.54 kB
-dist/assets/TikTokStudio-CpDAkK95.js          360.85 kB │ gzip: 108.88 kB
-dist/assets/index-CXUgIXfu.js               1,366.59 kB │ gzip: 259.40 kB
+dist/assets/index-OSzHxUzA.css                148.32 kB │ gzip:  18.39 kB
+dist/assets/smartphone-DnpcyYYi.js              0.37 kB │ gzip:   0.29 kB
+dist/assets/SeoMetadataAuditor-D_asMgUF.js     34.67 kB │ gzip:   9.29 kB
+dist/assets/TikTokStudio-DAEYx2ix.js          360.85 kB │ gzip: 108.88 kB
+dist/assets/index-YmpCqYi8.js               1,445.90 kB │ gzip: 278.35 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 8.53s
+✓ built in 6.82s
 ▲ [WARNING] "import.meta" is not available with the "cjs" output format and will be empty [empty-import-meta]
 
     server.ts:9:33:
@@ -36,7 +36,7 @@ dist/assets/index-CXUgIXfu.js               1,366.59 kB │ gzip: 259.40 kB
   dist\server.cjs      1.8mb
   dist\server.cjs.map  1.9mb
 
-Done in 65ms
+Done in 53ms
 [LOG] Build succeeded.
 [LOG] OK: /.htaccess
 [LOG] OK: /about.html
@@ -50,6 +50,7 @@ Done in 65ms
 [LOG] OK: /facebook-auth-login.php
 [LOG] OK: /facebook-publish.php
 [LOG] OK: /favicon-32.png
+[LOG] OK: /frost_dates.json
 [LOG] OK: /google-service-account.json
 [LOG] OK: /google2cdfa49dadae03df.html
 [LOG] OK: /icon-192.png
@@ -64,7 +65,9 @@ Done in 65ms
 [LOG] OK: /pinterest-boards.php
 [LOG] OK: /pinterest-publish.php
 [LOG] OK: /plant-diagnosis.php
+[LOG] OK: /plants.json
 [LOG] OK: /privacy-policy.html
+[LOG] OK: /qa.php
 [LOG] OK: /robots.txt
 [LOG] OK: /rss.xml
 [LOG] OK: /server.cjs
@@ -87,14 +90,14 @@ Done in 65ms
 [LOG] OK: /youtube-auth-callback.php
 [LOG] OK: /youtube-auth-login.php
 [LOG] OK: /youtube-publish.php
-[LOG] OK: /assets/index-B6oS6OyT.css
-[LOG] OK: /assets/index-CXUgIXfu.js
-[LOG] OK: /assets/SeoMetadataAuditor-Du4FIFVV.js
-[LOG] OK: /assets/smartphone-DxgBlBVz.js
-[LOG] OK: /assets/TikTokStudio-CpDAkK95.js
+[LOG] OK: /assets/index-OSzHxUzA.css
+[LOG] OK: /assets/index-YmpCqYi8.js
+[LOG] OK: /assets/SeoMetadataAuditor-D_asMgUF.js
+[LOG] OK: /assets/smartphone-DnpcyYYi.js
+[LOG] OK: /assets/TikTokStudio-DAEYx2ix.js
 [LOG] OK: /social-images/elia-se-glastra-bonsai-kladema-lipansi-20260904.jpg
 [LOG] OK: /videos/demo-video.mp4
 
 ====================================================
-[LOG] UPLOAD SUMMARY: 56 / 56 files uploaded at 2026-09-09 02:13:41
+[LOG] UPLOAD SUMMARY: 59 / 59 files uploaded at 2026-09-09 22:10:00
 ====================================================

@@ -1,0 +1,515 @@
+[
+ {
+  "slug": "ntomata",
+  "name": "Ντομάτα",
+  "botanical": "Solanum lycopersicum",
+  "category": "lachanika",
+  "minTempC": 5,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-6.8"
+ },
+ {
+  "slug": "piperia",
+  "name": "Πιπεριά",
+  "botanical": "Capsicum annuum",
+  "category": "lachanika",
+  "minTempC": 8,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-6.8"
+ },
+ {
+  "slug": "melitzana",
+  "name": "Μελιτζάνα",
+  "botanical": "Solanum melongena",
+  "category": "lachanika",
+  "minTempC": 10,
+  "sun": "Πλήρης ήλιος",
+  "ph": "5.8-6.8"
+ },
+ {
+  "slug": "aggouri",
+  "name": "Αγγούρι",
+  "botanical": "Cucumis sativus",
+  "category": "lachanika",
+  "minTempC": 10,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "kolokythi",
+  "name": "Κολοκύθι",
+  "botanical": "Cucurbita pepo",
+  "category": "lachanika",
+  "minTempC": 10,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "fasolakia",
+  "name": "Φασολάκια",
+  "botanical": "Phaseolus vulgaris",
+  "category": "lachanika",
+  "minTempC": 8,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "marouli",
+  "name": "Μαρούλι",
+  "botanical": "Lactuca sativa",
+  "category": "lachanika",
+  "minTempC": -6,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "spanaki",
+  "name": "Σπανάκι",
+  "botanical": "Spinacia oleracea",
+  "category": "lachanika",
+  "minTempC": -9,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.5-7.5"
+ },
+ {
+  "slug": "roka",
+  "name": "Ρόκα",
+  "botanical": "Eruca vesicaria",
+  "category": "lachanika",
+  "minTempC": -7,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "rapanaki",
+  "name": "Ραπανάκι",
+  "botanical": "Raphanus sativus",
+  "category": "lachanika",
+  "minTempC": -5,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "karoto",
+  "name": "Καρότο",
+  "botanical": "Daucus carota",
+  "category": "lachanika",
+  "minTempC": -6,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-6.8"
+ },
+ {
+  "slug": "kremmydi",
+  "name": "Κρεμμύδι",
+  "botanical": "Allium cepa",
+  "category": "lachanika",
+  "minTempC": -8,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "skordo",
+  "name": "Σκόρδο",
+  "botanical": "Allium sativum",
+  "category": "lachanika",
+  "minTempC": -10,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "lachano",
+  "name": "Λάχανο",
+  "botanical": "Brassica oleracea var. capitata",
+  "category": "lachanika",
+  "minTempC": -10,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.5-7.5"
+ },
+ {
+  "slug": "brokolo",
+  "name": "Μπρόκολο",
+  "botanical": "Brassica oleracea var. italica",
+  "category": "lachanika",
+  "minTempC": -8,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.5-7.5"
+ },
+ {
+  "slug": "arakas",
+  "name": "Αρακάς",
+  "botanical": "Pisum sativum",
+  "category": "lachanika",
+  "minTempC": -6,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "fraoula",
+  "name": "Φράουλα",
+  "botanical": "Fragaria × ananassa",
+  "category": "lachanika",
+  "minTempC": -12,
+  "sun": "Πλήρης ήλιος",
+  "ph": "5.5-6.5"
+ },
+ {
+  "slug": "patata",
+  "name": "Πατάτα",
+  "botanical": "Solanum tuberosum",
+  "category": "lachanika",
+  "minTempC": 2,
+  "sun": "Πλήρης ήλιος",
+  "ph": "5.0-6.5"
+ },
+ {
+  "slug": "maintanos",
+  "name": "Μαϊντανός",
+  "botanical": "Petroselinum crispum",
+  "category": "lachanika",
+  "minTempC": -10,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "anithos",
+  "name": "Άνηθος",
+  "botanical": "Anethum graveolens",
+  "category": "lachanika",
+  "minTempC": -5,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "vasilikos",
+  "name": "Βασιλικός",
+  "botanical": "Ocimum basilicum",
+  "category": "aromatika",
+  "minTempC": 10,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "rigani",
+  "name": "Ρίγανη",
+  "botanical": "Origanum vulgare",
+  "category": "aromatika",
+  "minTempC": -15,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-8.0"
+ },
+ {
+  "slug": "thymari",
+  "name": "Θυμάρι",
+  "botanical": "Thymus vulgaris",
+  "category": "aromatika",
+  "minTempC": -12,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-8.0"
+ },
+ {
+  "slug": "dendrolivano",
+  "name": "Δεντρολίβανο",
+  "botanical": "Salvia rosmarinus",
+  "category": "aromatika",
+  "minTempC": -10,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "menta",
+  "name": "Μέντα / Δυόσμος",
+  "botanical": "Mentha spicata",
+  "category": "aromatika",
+  "minTempC": -15,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "levanta",
+  "name": "Λεβάντα",
+  "botanical": "Lavandula angustifolia",
+  "category": "aromatika",
+  "minTempC": -15,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.5-8.0"
+ },
+ {
+  "slug": "faskomilo",
+  "name": "Φασκόμηλο",
+  "botanical": "Salvia officinalis",
+  "category": "aromatika",
+  "minTempC": -12,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "melissochorto",
+  "name": "Μελισσόχορτο",
+  "botanical": "Melissa officinalis",
+  "category": "aromatika",
+  "minTempC": -15,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "dafni",
+  "name": "Δάφνη",
+  "botanical": "Laurus nobilis",
+  "category": "aromatika",
+  "minTempC": -8,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "chamomili",
+  "name": "Χαμομήλι",
+  "botanical": "Matricaria chamomilla",
+  "category": "aromatika",
+  "minTempC": -10,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "gerani",
+  "name": "Γεράνι / Πελαργόνιο",
+  "botanical": "Pelargonium spp.",
+  "category": "anthofora",
+  "minTempC": 0,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "petounia",
+  "name": "Πετούνια",
+  "botanical": "Petunia × atkinsiana",
+  "category": "anthofora",
+  "minTempC": 2,
+  "sun": "Πλήρης ήλιος",
+  "ph": "5.5-6.5"
+ },
+ {
+  "slug": "triantafyllia",
+  "name": "Τριανταφυλλιά",
+  "botanical": "Rosa spp.",
+  "category": "anthofora",
+  "minTempC": -15,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-6.8"
+ },
+ {
+  "slug": "ortansia",
+  "name": "Ορτανσία",
+  "botanical": "Hydrangea macrophylla",
+  "category": "anthofora",
+  "minTempC": -12,
+  "sun": "Ημισκιά",
+  "ph": "5.0-6.0 (μπλε) / 6.5-7.0 (ροζ)"
+ },
+ {
+  "slug": "gardenia",
+  "name": "Γαρδένια",
+  "botanical": "Gardenia jasminoides",
+  "category": "anthofora",
+  "minTempC": -3,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "5.0-6.0"
+ },
+ {
+  "slug": "voukamvilia",
+  "name": "Βουκαμβίλια",
+  "botanical": "Bougainvillea glabra",
+  "category": "anthofora",
+  "minTempC": 0,
+  "sun": "Πλήρης ήλιος",
+  "ph": "5.5-7.0"
+ },
+ {
+  "slug": "giasemi",
+  "name": "Γιασεμί",
+  "botanical": "Jasminum officinale",
+  "category": "anthofora",
+  "minTempC": -7,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "chrysanthemo",
+  "name": "Χρυσάνθεμο",
+  "botanical": "Chrysanthemum × morifolium",
+  "category": "anthofora",
+  "minTempC": -8,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "kyklamino",
+  "name": "Κυκλάμινο",
+  "botanical": "Cyclamen persicum",
+  "category": "anthofora",
+  "minTempC": -2,
+  "sun": "Ημισκιά",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "alexandrino",
+  "name": "Αλεξανδρινό",
+  "botanical": "Euphorbia pulcherrima",
+  "category": "anthofora",
+  "minTempC": 10,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "5.5-6.5"
+ },
+ {
+  "slug": "toulipa",
+  "name": "Τουλίπα",
+  "botanical": "Tulipa gesneriana",
+  "category": "anthofora",
+  "minTempC": -15,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "narkissos",
+  "name": "Νάρκισσος",
+  "botanical": "Narcissus spp.",
+  "category": "anthofora",
+  "minTempC": -15,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "lemonia",
+  "name": "Λεμονιά",
+  "botanical": "Citrus limon",
+  "category": "dentra",
+  "minTempC": -3,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "portokalia",
+  "name": "Πορτοκαλιά",
+  "botanical": "Citrus × sinensis",
+  "category": "dentra",
+  "minTempC": -4,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "koumkouat",
+  "name": "Κουμκουάτ",
+  "botanical": "Citrus japonica",
+  "category": "dentra",
+  "minTempC": -6,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "elia",
+  "name": "Ελιά",
+  "botanical": "Olea europaea",
+  "category": "dentra",
+  "minTempC": -10,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.5-8.0"
+ },
+ {
+  "slug": "sykia",
+  "name": "Συκιά",
+  "botanical": "Ficus carica",
+  "category": "dentra",
+  "minTempC": -12,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "rodia",
+  "name": "Ροδιά",
+  "botanical": "Punica granatum",
+  "category": "dentra",
+  "minTempC": -12,
+  "sun": "Πλήρης ήλιος",
+  "ph": "5.5-7.5"
+ },
+ {
+  "slug": "pyxari",
+  "name": "Πυξάρι",
+  "botanical": "Buxus sempervirens",
+  "category": "dentra",
+  "minTempC": -18,
+  "sun": "Ήλιος / ημισκιά",
+  "ph": "6.5-7.5"
+ },
+ {
+  "slug": "monstera",
+  "name": "Μονστέρα",
+  "botanical": "Monstera deliciosa",
+  "category": "esoterikou",
+  "minTempC": 10,
+  "sun": "Σκιά / έμμεσο φως",
+  "ph": "5.5-7.0"
+ },
+ {
+  "slug": "zamioulkas",
+  "name": "Ζαμιοκούλκας",
+  "botanical": "Zamioculcas zamiifolia",
+  "category": "esoterikou",
+  "minTempC": 12,
+  "sun": "Σκιά / έμμεσο φως",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "sansevieria",
+  "name": "Σανσεβιέρια",
+  "botanical": "Dracaena trifasciata",
+  "category": "esoterikou",
+  "minTempC": 10,
+  "sun": "Σκιά / έμμεσο φως",
+  "ph": "5.5-7.5"
+ },
+ {
+  "slug": "pothos",
+  "name": "Πόθος",
+  "botanical": "Epipremnum aureum",
+  "category": "esoterikou",
+  "minTempC": 12,
+  "sun": "Σκιά / έμμεσο φως",
+  "ph": "6.0-7.0"
+ },
+ {
+  "slug": "spathifyllo",
+  "name": "Σπαθίφυλλο",
+  "botanical": "Spathiphyllum wallisii",
+  "category": "esoterikou",
+  "minTempC": 12,
+  "sun": "Σκιά / έμμεσο φως",
+  "ph": "5.5-6.5"
+ },
+ {
+  "slug": "aloe-vera",
+  "name": "Αλόη",
+  "botanical": "Aloe vera",
+  "category": "esoterikou",
+  "minTempC": 5,
+  "sun": "Πλήρης ήλιος",
+  "ph": "6.0-7.5"
+ },
+ {
+  "slug": "orchidea",
+  "name": "Ορχιδέα Φαλαινόψις",
+  "botanical": "Phalaenopsis spp.",
+  "category": "esoterikou",
+  "minTempC": 15,
+  "sun": "Σκιά / έμμεσο φως",
+  "ph": "5.5-6.5"
+ },
+ {
+  "slug": "ficus-lyrata",
+  "name": "Φίκος Λυράτα",
+  "botanical": "Ficus lyrata",
+  "category": "esoterikou",
+  "minTempC": 12,
+  "sun": "Σκιά / έμμεσο φως",
+  "ph": "6.0-7.0"
+ }
+]
