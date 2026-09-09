@@ -58,9 +58,12 @@ export function injectGlobalSiteSchema() {
         },
         'description': 'Επιστημονική Γεωπονία, Αστική Κηπουρική, Τηλεμετρία & Αυτοματισμοί Άρδευσης.',
         'sameAs': [
-          // Real Page ID (2026-09-08) — the site never claimed the "smartgarden.gr"
-          // vanity username, so that placeholder URL didn't point at the real Page.
-          'https://www.facebook.com/profile.php?id=1340919395764582',
+          // Facebook's own canonical URL for the Page, verified by following the redirect.
+          // The Page has two identifiers — 1340919395764582 (classic Page ID, what the
+          // Graph API and FACEBOOK_PAGE_ID use) and 61594241310349 (New Pages Experience
+          // profile ID) — and both redirect here. Linking the canonical form avoids
+          // making search engines resolve a redirect to match the entity.
+          'https://www.facebook.com/people/SmartGardengr/61594241310349/',
           'https://tiktok.com/@smartgarden.gr',
           // Real, publicly live channel with real uploaded content (2026-09-08).
           'https://www.youtube.com/@Smartgarden-h4f',

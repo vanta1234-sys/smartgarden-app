@@ -2828,7 +2828,7 @@ pause
             </a>
 
             <a
-              href="https://www.facebook.com/profile.php?id=1340919395764582"
+              href="https://www.facebook.com/people/SmartGardengr/61594241310349/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-400 hover:text-blue-400 flex items-center gap-1 transition-colors"
