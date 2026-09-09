@@ -207,7 +207,7 @@ export const TikTokComposition: React.FC<TikTokCompositionProps> = ({
   script,
   imageUrl,
   brandName = 'SmartGarden.gr',
-  brandHandle = '@smartgarden',
+  brandHandle = '@smartgarden68',
   primaryColor = '#10b981',
 }) => {
   const frame = useCurrentFrame();

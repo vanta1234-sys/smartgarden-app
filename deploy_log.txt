@@ -1,5 +1,5 @@
 ﻿====================================================
-[LOG] SMARTGARDEN DEPLOYMENT STARTED AT: 2026-09-09 23:01:31
+[LOG] SMARTGARDEN DEPLOYMENT STARTED AT: 2026-09-09 23:06:48
 ====================================================
 [LOG] Running npm run build...
 
@@ -13,16 +13,16 @@ rendering chunks...
 computing gzip size...
 dist/index.html                                 5.52 kB │ gzip:   2.28 kB
 dist/assets/index-DfJFHU5s.css                152.87 kB │ gzip:  18.79 kB
-dist/assets/smartphone-diu8fGmo.js              0.37 kB │ gzip:   0.29 kB
-dist/assets/SeoMetadataAuditor-BPurwS4R.js     34.67 kB │ gzip:   9.29 kB
-dist/assets/TikTokStudio-CCnia1s0.js          360.85 kB │ gzip: 108.88 kB
-dist/assets/index-BtprzGuz.js               1,447.31 kB │ gzip: 278.58 kB
+dist/assets/smartphone-DMJj7A2O.js              0.37 kB │ gzip:   0.29 kB
+dist/assets/SeoMetadataAuditor-B1KMze1H.js     34.67 kB │ gzip:   9.29 kB
+dist/assets/TikTokStudio-a5-MHp_I.js          360.87 kB │ gzip: 108.88 kB
+dist/assets/index-Yjbt6FMB.js               1,447.32 kB │ gzip: 278.59 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 7.87s
+✓ built in 7.31s
 ▲ [WARNING] "import.meta" is not available with the "cjs" output format and will be empty [empty-import-meta]
 
     server.ts:9:33:
@@ -36,7 +36,7 @@ dist/assets/index-BtprzGuz.js               1,447.31 kB │ gzip: 278.58 kB
   dist\server.cjs      1.8mb
   dist\server.cjs.map  1.9mb
 
-Done in 49ms
+Done in 66ms
 [LOG] Build succeeded.
 [LOG] OK: /.htaccess
 [LOG] OK: /about.html
@@ -90,14 +90,14 @@ Done in 49ms
 [LOG] OK: /youtube-auth-callback.php
 [LOG] OK: /youtube-auth-login.php
 [LOG] OK: /youtube-publish.php
-[LOG] OK: /assets/index-BtprzGuz.js
 [LOG] OK: /assets/index-DfJFHU5s.css
-[LOG] OK: /assets/SeoMetadataAuditor-BPurwS4R.js
-[LOG] OK: /assets/smartphone-diu8fGmo.js
-[LOG] OK: /assets/TikTokStudio-CCnia1s0.js
+[LOG] OK: /assets/index-Yjbt6FMB.js
+[LOG] OK: /assets/SeoMetadataAuditor-B1KMze1H.js
+[LOG] OK: /assets/smartphone-DMJj7A2O.js
+[LOG] OK: /assets/TikTokStudio-a5-MHp_I.js
 [LOG] OK: /social-images/elia-se-glastra-bonsai-kladema-lipansi-20260904.jpg
 [LOG] OK: /videos/demo-video.mp4
 
 ====================================================
-[LOG] UPLOAD SUMMARY: 59 / 59 files uploaded at 2026-09-09 23:02:00
+[LOG] UPLOAD SUMMARY: 59 / 59 files uploaded at 2026-09-09 23:07:14
 ====================================================

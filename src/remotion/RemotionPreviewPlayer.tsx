@@ -116,7 +116,7 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
       script,
       imageUrl,
       brandName: 'SmartGarden.gr',
-      brandHandle: '@smartgarden'
+      brandHandle: '@smartgarden68'
     })}'`;
     navigator.clipboard.writeText(code);
     setCopiedCode(true);
@@ -301,7 +301,7 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
         ctx.fillStyle = '#fbbf24';
         ctx.font = 'bold 28px sans-serif';
         ctx.textAlign = 'right';
-        ctx.fillText('@smartgarden', canvas.width - 70, 140);
+        ctx.fillText('@smartgarden68', canvas.width - 70, 140);
 
         // Kinetic Scene Card with Spring bounce
         const springT = Math.min(1, sceneFrame / 10);
@@ -412,7 +412,7 @@ export const RemotionPreviewPlayer: React.FC<RemotionPreviewPlayerProps> = ({
                 script,
                 imageUrl,
                 brandName: 'SmartGarden.gr',
-                brandHandle: '@smartgarden',
+                brandHandle: '@smartgarden68',
                 primaryColor: '#10b981',
               }}
               loop

@@ -64,7 +64,9 @@ export function injectGlobalSiteSchema() {
           // profile ID) — and both redirect here. Linking the canonical form avoids
           // making search engines resolve a redirect to match the entity.
           'https://www.facebook.com/people/SmartGardengr/61594241310349/',
-          'https://tiktok.com/@smartgarden.gr',
+          // Handle confirmed by the owner 2026-09-09. Was @smartgarden.gr here and
+          // @smartgarden everywhere else in the codebase; neither existed.
+          'https://www.tiktok.com/@smartgarden68',
           // Real, publicly live channel with real uploaded content (2026-09-08).
           'https://www.youtube.com/@Smartgarden-h4f',
         ],

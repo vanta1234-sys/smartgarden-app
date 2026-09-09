@@ -298,7 +298,7 @@ ${summary.slice(0, 200)}
     const fullScriptText = `🎬 TIKTOK SCRIPT: ${title}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⏱️ Διάρκεια: 30 δευτερόλεπτα (Viral Retention Rate)
-📱 Account: @smartgarden (smartgarden68@gmail.com)
+📱 Account: @smartgarden68 (smartgarden68@gmail.com)
 
 [0:00-0:03] 🪝 HOOK:
 Visual: Κοντινό πλάνο με δραματικό zoom.
@@ -888,7 +888,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
         ctx.fillStyle = 'rgba(255,255,255,0.85)';
         ctx.font = '700 26px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText('@smartgarden', 60, 110);
+        ctx.fillText('@smartgarden68', 60, 110);
 
         // Helper: bold text with a black outline, no solid background box —
         // matches how real gardening-niche TikToks caption over raw footage.
@@ -1037,7 +1037,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.font = '700 26px sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText('@smartgarden', 60, 110);
+      ctx.fillText('@smartgarden68', 60, 110);
       ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.font = '600 26px sans-serif';
       ctx.textAlign = 'center';
@@ -1118,7 +1118,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
             <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-pink-500 via-rose-600 to-amber-500 text-white font-extrabold text-[11px] shadow-sm uppercase tracking-wider">
               📱 TikTok Automation Hub
             </span>
-            <span className="text-xs text-slate-400 font-medium">SmartGarden • @smartgarden (smartgarden68@gmail.com)</span>
+            <span className="text-xs text-slate-400 font-medium">SmartGarden • @smartgarden68 (smartgarden68@gmail.com)</span>
           </div>
           <h2 className="text-2xl font-black text-white flex items-center gap-2.5">
             <Film className="w-6 h-6 text-pink-400" />
@@ -1262,7 +1262,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                       </span>
                     </div>
                     <div className="text-xs text-slate-400 font-mono">
-                      smartgarden68@gmail.com • @smartgarden
+                      smartgarden68@gmail.com • @smartgarden68
                     </div>
                   </div>
                 </div>
@@ -1325,7 +1325,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                       </div>
                       <div className={`flex items-center gap-2 ${publishStep >= 3 ? 'text-emerald-400 font-bold' : 'text-slate-500'}`}>
                         {publishStep >= 3 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
-                        <span>3. Αποστολή στο TikTok Content API (@smartgarden)</span>
+                        <span>3. Αποστολή στο TikTok Content API (@smartgarden68)</span>
                       </div>
                       <div className={`flex items-center gap-2 ${publishStep >= 4 ? 'text-emerald-400 font-bold' : 'text-slate-500'}`}>
                         {publishStep >= 4 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
@@ -1543,7 +1543,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                 <div className="flex items-center justify-between pt-1">
                   <div className="bg-black/60 backdrop-blur-sm p-2 rounded-xl border border-white/10 max-w-[190px]">
                     <div className="text-xs font-extrabold text-white flex items-center gap-1">
-                      <span>@smartgarden</span>
+                      <span>@smartgarden68</span>
                       <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 fill-current" />
                     </div>
                     <p className="text-[10px] text-slate-200 line-clamp-1 mt-0.5 font-medium">
@@ -1605,7 +1605,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
             <div>
               <h3 className="text-base font-extrabold text-white flex items-center gap-2">
                 <Clock className="w-5 h-5 text-purple-400" />
-                Ιστορικό Αυτόματων Δημοσιεύσεων TikTok (@smartgarden)
+                Ιστορικό Αυτόματων Δημοσιεύσεων TikTok (@smartgarden68)
               </h3>
               <p className="text-xs text-slate-400 mt-1">
                 Όλα τα βίντεο που έχουν σταλεί και δημοσιευτεί αυτόματα στον λογαριασμό σας.
