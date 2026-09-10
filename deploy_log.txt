@@ -1,5 +1,5 @@
 ﻿====================================================
-[LOG] SMARTGARDEN DEPLOYMENT STARTED AT: 2026-09-10 15:52:15
+[LOG] SMARTGARDEN DEPLOYMENT STARTED AT: 2026-09-10 17:53:15
 ====================================================
 [LOG] Running npm run build...
 
@@ -22,7 +22,7 @@ dist/assets/index-BuT9pbsF.js               1,488.60 kB │ gzip: 289.17 kB
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 9.83s
+✓ built in 9.55s
 ▲ [WARNING] "import.meta" is not available with the "cjs" output format and will be empty [empty-import-meta]
 
     server.ts:9:33:
@@ -36,7 +36,7 @@ dist/assets/index-BuT9pbsF.js               1,488.60 kB │ gzip: 289.17 kB
   dist\server.cjs      1.8mb
   dist\server.cjs.map  1.9mb
 
-Done in 130ms
+Done in 74ms
 [LOG] Build succeeded.
 [LOG] OK: /.htaccess
 [LOG] OK: /about.html
@@ -101,5 +101,5 @@ Done in 130ms
 [LOG] OK: /videos/demo-video.mp4
 
 ====================================================
-[LOG] UPLOAD SUMMARY: 61 / 61 files uploaded at 2026-09-10 15:53:08
+[LOG] UPLOAD SUMMARY: 61 / 61 files uploaded at 2026-09-10 17:54:01
 ====================================================

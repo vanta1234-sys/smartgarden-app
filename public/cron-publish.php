@@ -69,7 +69,7 @@ foreach ($possibleWpPaths as $path) {
 $topicPool = array(
     array(
         "slug" => "viologiki-zizanioktonia-ksydi-corn-gluten",
-        "title" => "Οικολογική Ζιζανιοκτονία: Γεωργικό Ξύδι 20%, Corn Gluten Meal & Αιθέρια Έλαια",
+        "title" => "Γιατί το ξύδι δεν σκοτώνει τα ζιζάνια από τη ρίζα (και τι δουλεύει πραγματικά)",
         "category" => "Οικολογική Φροντίδα",
         "category_slug" => "plant_care",
         "readTime" => "12 min",
@@ -154,7 +154,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "bokashi-composting-vermicomposting-balcony",
-        "title" => "Κομποστοποίηση στο Μπαλκόνι με Κάδους Bokashi & Γαιοσκώληκες: Μηδενικές Οσμές & Υγρό Λίπασμα",
+        "title" => "Κομποστοποίηση στο μπαλκόνι χωρίς καμία μυρωδιά: Bokashi και γαιοσκώληκες βήμα-βήμα",
         "category" => "Οικολογική Φροντίδα",
         "category_slug" => "plant_care",
         "readTime" => "11 min",
@@ -239,7 +239,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "elia-se-glastra-bonsai-kladema-lipansi",
-        "title" => "Ελιά σε Γλάστρα & Μπονσάι Ελιάς: Κλάδεμα Διαμόρφωσης, Μεταφύτευση & Λίπανση",
+        "title" => "Το λάθος κλάδεμα σκοτώνει την ελιά σας σε γλάστρα — να πώς κλαδεύεται σωστά",
         "category" => "Μπαλκόνι & Γλάστρες",
         "category_slug" => "balcony",
         "readTime" => "13 min",
@@ -326,7 +326,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi",
-        "title" => "Εσπεριδοειδή σε Γλάστρα (Λεμονιά, Κουμκουάτ, Μανταρινιά): Αντιμετώπιση Χλώρωσης Σιδήρου & Καρπόπτωση",
+        "title" => "Κίτρινα φύλλα στη λεμονιά; Δεν φταίει πάντα το πότισμα — έτσι διαγιγνώσκεται η χλώρωση σιδήρου",
         "category" => "Μπαλκόνι & Γλάστρες",
         "category_slug" => "balcony",
         "readTime" => "12 min",
@@ -409,7 +409,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "kladema-anazwoogonisi-geraniwn-pelargoniwn-kafsonas",
-        "title" => "Κλάδεμα & Αναζωογόνηση Γερανιών και Πελαργονίων μετά τον Καύσωνα",
+        "title" => "Το γεράνι σας δείχνει νεκρό μετά τον καύσωνα; Έτσι αναζωογονείται μέσα σε λίγες εβδομάδες",
         "category" => "Φροντίδα Φυτών",
         "category_slug" => "plant_care",
         "readTime" => "10 min",
@@ -491,7 +491,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "yperypsomena-parteria-hugelkultur-paragwgi",
-        "title" => "Υπερυψωμένα Παρτέρια Hugelkultur: Αυτονομία Νερού & Εκρηκτική Παραγωγή Λαχανικών",
+        "title" => "Η τεχνική Hugelkultur ποτίζεται μόνη της για μήνες — να πώς φτιάχνεται σωστά",
         "category" => "Λαχανόκηπος",
         "category_slug" => "vegetable_garden",
         "readTime" => "14 min",
@@ -569,7 +569,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "ardefsi-taratsas-retyre-anemos-stalaktes-pc",
-        "title" => "Άρδευση σε Ταράτσες & Ρετιρέ: Αντιμετώπιση Ισχυρών Ανέμων & Αυτοεξισορροπούμενοι Σταλάκτες",
+        "title" => "Γιατί οι γλάστρες στη ταράτσα ξεραίνονται μέσα σε ώρες — και πώς το λύνει η σωστή άρδευση",
         "category" => "Αυτόματο Πότισμα & IoT",
         "category_slug" => "irrigation_iot",
         "readTime" => "13 min",
@@ -655,7 +655,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "ntomata-se-glastra-ksiri-koryfi-klawdema",
-        "title" => "Ντομάτα σε Γλάστρα: Πρόληψη Ξηράς Κορυφής (BER), Κλάδεμα Λαίμαργων & Υποστύλωση",
+        "title" => "Η ξηρή κορυφή στην ντομάτα δεν είναι έλλειψη ασβεστίου — είναι πρόβλημα ποτίσματος",
         "category" => "Λαχανόκηπος",
         "category_slug" => "vegetable_garden",
         "readTime" => "12 min",
@@ -736,7 +736,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "robotic-mowers-guide-ellada-2026",
-        "title" => "Ρομποτικά Χλοοκοπτικά 2026: Χωρίς Καλώδιο με RTK-GPS, 3D LiDAR & AI Vision",
+        "title" => "Χλοοκοπτικό ρομπότ χωρίς καλώδιο: Τι πρέπει να ξέρετε πριν αγοράσετε ένα το 2026",
         "category" => "Ρομποτικά Mowers",
         "category_slug" => "robotic_mowers",
         "readTime" => "14 min",
@@ -817,7 +817,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "fthinoporini-fyteysi-volvon-loulou-dion",
-        "title" => "Φθινοπωρινή Φύτευση Βολβών: Τουλίπες, Νάρκισσοι, Κρόκοι & Υάκινθοι",
+        "title" => "Το λάθος που εμποδίζει τις τουλίπες σας να ξανανθίσουν του χρόνου",
         "category" => "Μπαλκόνι & Design",
         "category_slug" => "balcony",
         "readTime" => "10 min",
@@ -885,7 +885,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "chrysanthemo-kyklamino-fthinoporino-mpalkoni",
-        "title" => "Χρυσάνθεμο & Κυκλάμινο: Φροντίδα για Έγχρωμο Φθινοπωρινό Μπαλκόνι",
+        "title" => "Το κυκλάμινο ποτίζεται εντελώς διαφορετικά από τα άλλα φυτά — να γιατί σαπίζει τόσο συχνά",
         "category" => "Μπαλκόνι & Design",
         "category_slug" => "balcony",
         "readTime" => "9 min",
@@ -943,7 +943,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "vasika-ergaleia-kipourikis-arxarion",
-        "title" => "Βασικά Εργαλεία Κηπουρικής για Αρχάριους: Ο Πλήρης Οδηγός",
+        "title" => "5 εργαλεία κηπουρικής που πραγματικά χρειάζεστε (και τι μην αγοράσετε)",
         "category" => "Φροντίδα Φυτών",
         "category_slug" => "plant_care",
         "readTime" => "8 min",
@@ -1085,7 +1085,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "test-edafous-sto-spiti-pi-ipoifi-apostraggisi",
-        "title" => "Τεστ Εδάφους στο Σπίτι: Υφή, pH & Αποστράγγιση Χωρίς Εργαστήριο",
+        "title" => "Τι τύπο χώματος έχει η γλάστρα σας; Το μαθαίνετε σε 10 λεπτά χωρίς εργαστήριο",
         "category" => "Φροντίδα Φυτών",
         "category_slug" => "plant_care",
         "readTime" => "10 min",
@@ -1155,7 +1155,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "xristougenniatika-fyta-alexandrino-kaktos-kalanchoe",
-        "title" => "Χριστουγεννιάτικα Φυτά: Αλεξανδρινό, Κάκτος Χριστουγέννων & Καλανχόη",
+        "title" => "Γιατί το αλεξανδρινό σας δεν ξανακοκκινίζει τα Χριστούγεννα (λύνεται σε 8 εβδομάδες)",
         "category" => "Μπαλκόνι & Design",
         "category_slug" => "balcony",
         "readTime" => "9 min",
@@ -1213,7 +1213,7 @@ $topicPool = array(
     ),
     array(
         "slug" => "pollaplasiasmos-fyton-me-moscheymata",
-        "title" => "Πολλαπλασιασμός Φυτών με Μοσχεύματα: Ο Πλήρης Οδηγός",
+        "title" => "Πολλαπλασιάστε τα φυτά σας δωρεάν: το μυστικό δεν είναι η ορμόνη, είναι ο κόμβος",
         "category" => "Φροντίδα Φυτών",
         "category_slug" => "plant_care",
         "readTime" => "11 min",
@@ -1332,11 +1332,14 @@ if (!$forcePublish) {
 // capping how many times any one topic can be republished fixes this at the root,
 // instead of just deleting the duplicates it produces after the fact.
 $MAX_VERSIONS_PER_TOPIC = 3;
+// Suffixes read as a natural continuation of the (now hook-style) base title rather
+// than a flat format label — "...: Προχωρημένος Οδηγός" read like a filing category,
+// not a reason to click, which defeats the point of rewriting the base titles at all.
 $cycleAngles = array(
-    array('suffix' => 'Προχωρημένος Οδηγός', 'focus' => 'Δώσε έμφαση σε προχωρημένες τεχνικές, ειδικές περιπτώσεις και αντιμετώπιση σπάνιων προβλημάτων που δεν καλύπτονται σε βασικό οδηγό.'),
-    array('suffix' => 'Συχνά Λάθη & Λύσεις', 'focus' => 'Δώσε έμφαση σε διαγνωστικά συμπτώματα, λάθη αρχαρίων και συγκεκριμένες διορθωτικές ενέργειες βήμα-βήμα.'),
-    array('suffix' => 'Εποχιακός Οδηγός', 'focus' => 'Δώσε έμφαση σε εποχιακές διαφοροποιήσεις της φροντίδας ανά μήνα και προσαρμογές ανάλογα με το ελληνικό κλίμα.'),
-    array('suffix' => 'Ερωτήσεις & Απαντήσεις', 'focus' => 'Δόμησε το άρθρο γύρω από τις πιο συχνές ερωτήσεις αναγνωστών με άμεσες, πρακτικές απαντήσεις.'),
+    array('suffix' => 'Τι Αλλάζει στις Δύσκολες Περιπτώσεις', 'focus' => 'Δώσε έμφαση σε προχωρημένες τεχνικές, ειδικές περιπτώσεις και αντιμετώπιση σπάνιων προβλημάτων που δεν καλύπτονται σε βασικό οδηγό.'),
+    array('suffix' => 'Τα Λάθη που Κάνουν Όλοι', 'focus' => 'Δώσε έμφαση σε διαγνωστικά συμπτώματα, λάθη αρχαρίων και συγκεκριμένες διορθωτικές ενέργειες βήμα-βήμα.'),
+    array('suffix' => 'Πώς Αλλάζει Κάθε Μήνα', 'focus' => 'Δώσε έμφαση σε εποχιακές διαφοροποιήσεις της φροντίδας ανά μήνα και προσαρμογές ανάλογα με το ελληνικό κλίμα.'),
+    array('suffix' => 'Οι Πιο Συχνές Ερωτήσεις Αναγνωστών', 'focus' => 'Δόμησε το άρθρο γύρω από τις πιο συχνές ερωτήσεις αναγνωστών με άμεσες, πρακτικές απαντήσεις.'),
 );
 
 $topicVersionCounts = array();
