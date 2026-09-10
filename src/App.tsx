@@ -19,6 +19,7 @@ import { AskAgronomistPage } from './components/AskAgronomistPage';
 import { InstagramStudio } from './components/InstagramStudio';
 import { ArticleToolLinks } from './components/ArticleToolLinks';
 import { LunarCalendarPage, LunarBadge } from './components/LunarCalendarPage';
+import { DailyBrief } from './components/DailyBrief';
 import { SoilCalculator } from './components/SoilCalculator';
 import { SymptomWizard } from './components/SymptomWizard';
 import { CompanionMatrix } from './components/CompanionMatrix';
@@ -1146,6 +1147,11 @@ pause
                 </div>
               </div>
             </div>
+
+            {/* The reason to open the site with your morning coffee: the same telemetry
+                that was already on the page, converted from numbers into today's
+                instruction. Sits above the moon badge because it is the actionable one. */}
+            <DailyBrief weather={currentWeather} />
 
             {/* Moon phase — changes daily on its own, so it is one of the few things on
                 the page that gives a returning visitor something new every morning. */}
