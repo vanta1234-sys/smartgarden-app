@@ -590,7 +590,10 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
   // public/tts-greek.php (Google Translate TTS, less natural but stable for years) if the
   // unofficial Edge endpoint fails. Returns null only if both fail, so the caller can fall
   // back to a transition tick gracefully.
-  const fetchGreekTtsAudioElement = async (text: string): Promise<{ audio: HTMLAudioElement; naturalDuration: number } | null> => {
+  const fetchGreekTtsAudioElement = async (
+    text: string,
+    forceEngine?: 'edge' | 'google'
+  ): Promise<{ audio: HTMLAudioElement; naturalDuration: number; engine: 'edge' | 'google' } | null> => {
     const cleanText = text.replace(/[«»"]/g, '').trim();
     if (!cleanText) return null;
 
@@ -615,13 +618,35 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
     // often a transient blip, not a persistent failure, and this makes it much more likely
     // every scene in a given video ends up on the same, better-sounding engine
     // (2026-09-06 fix, after a user report of exactly this "one scene sounds different").
+    //
+    // That per-scene retry still wasn't a hard guarantee: if one scene hit a persistent
+    // Edge blip that outlasted both retries while every other scene succeeded on Edge,
+    // that one scene alone fell back to Google's visibly different voice — same "one
+    // scene sounds different" symptom, just rarer. Fixed properly (2026-09-12) by having
+    // the caller probe the engine once on the first scene and pass it here as
+    // `forceEngine` for every other scene, so a whole video commits to one engine
+    // instead of each scene negotiating independently.
     const edgeUrl = `/tts-edge.php?text=${encodeURIComponent(cleanText)}`;
-    let blob = await tryFetch(edgeUrl, 7000);
-    if (!blob) {
+    const googleUrl = `/tts-greek.php?text=${encodeURIComponent(cleanText)}`;
+    let blob: Blob | null = null;
+    let engine: 'edge' | 'google';
+
+    if (forceEngine === 'google') {
+      blob = await tryFetch(googleUrl);
+      engine = 'google';
+    } else {
       blob = await tryFetch(edgeUrl, 7000);
-    }
-    if (!blob) {
-      blob = await tryFetch(`/tts-greek.php?text=${encodeURIComponent(cleanText)}`);
+      if (!blob) blob = await tryFetch(edgeUrl, 7000);
+      if (blob) {
+        engine = 'edge';
+      } else if (forceEngine === 'edge') {
+        // Committed to Edge for this video — don't silently swap engines mid-render.
+        // A scene that can't get Edge audio falls back to the transition-tick beep below.
+        return null;
+      } else {
+        blob = await tryFetch(googleUrl);
+        engine = 'google';
+      }
     }
     if (!blob) return null;
 
@@ -635,7 +660,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
         setTimeout(() => { if (!done) { done = true; resolve(audio.duration || 0); } }, 3000);
       });
       if (!naturalDuration) return null;
-      return { audio, naturalDuration };
+      return { audio, naturalDuration, engine };
     } catch (e) {
       console.warn('Greek TTS audio element setup failed:', e);
       return null;
@@ -723,9 +748,14 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
       // preservesPitch (set in playSceneAudio below) keeps the same voice/tone at this
       // speed instead of the "chipmunk" pitch-up a raw resample would cause.
       const narrationRate = 1.1;
-      let sceneAudioEls: ({ audio: HTMLAudioElement; naturalDuration: number } | null)[] = scenes.map(() => null);
+      let sceneAudioEls: ({ audio: HTMLAudioElement; naturalDuration: number; engine: 'edge' | 'google' } | null)[] = scenes.map(() => null);
+      // Probe the engine on scene 0 alone first, then force every other scene onto that
+      // same engine — keeps the whole video on one consistent voice (see the 2026-09-12
+      // note inside fetchGreekTtsAudioElement) instead of each scene racing independently.
+      const firstSceneAudio = scenes.length > 0 ? await fetchGreekTtsAudioElement(scenes[0].voiceover) : null;
+      const lockedEngine = firstSceneAudio?.engine;
       sceneAudioEls = await Promise.all(
-        scenes.map((scene) => fetchGreekTtsAudioElement(scene.voiceover))
+        scenes.map((scene, i) => (i === 0 ? Promise.resolve(firstSceneAudio) : fetchGreekTtsAudioElement(scene.voiceover, lockedEngine)))
       );
       setGenerationProgress(25);
 
