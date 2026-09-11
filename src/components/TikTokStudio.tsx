@@ -440,6 +440,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
     
     setIsAutoPublishing(true);
     setPublishSuccessMessage(null);
+    setUploadMessage(null);
     setPublishStep(1); // 1. Video render & assets synthesis
 
     try {
@@ -491,25 +492,29 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
 
       setIsAutoPublishing(false);
 
-      if (!res.ok || !data.success) {
+      const tiktokFailed = !res.ok || !data.success;
+      if (tiktokFailed) {
         setPublishStep(0);
         if (data.connected === false) {
           setUploadMessage('⚠️ Ο λογαριασμός TikTok δεν είναι συνδεδεμένος. Πάτα εδώ για σύνδεση: /tiktok-auth-login.php');
         } else {
           setUploadMessage('❌ Σφάλμα δημοσίευσης στο TikTok: ' + (data.error || 'Άγνωστο σφάλμα'));
         }
-        return;
+      } else {
+        setPublishStep(4); // 4. Done!
+        // Use the backend's own message rather than a fixed string — it distinguishes
+        // a confirmed terminal status from "TikTok hasn't finished processing yet,
+        // check back" (post.status: 'draft_uploaded_unconfirmed'), which a hardcoded
+        // success string would paper over.
+        setPublishSuccessMessage('✅ ' + (data.message || 'Το βίντεο ανέβηκε ως draft στο TikTok inbox.'));
+        fetchPublishedPosts();
       }
 
-      setPublishStep(4); // 4. Done!
-      setPublishSuccessMessage('✅ Το βίντεο ανέβηκε ως draft στο TikTok inbox — άνοιξε την εφαρμογή TikTok στο κινητό για να το δημοσιεύσεις.');
-
-      fetchPublishedPosts();
-
       // Best-effort: also publish the same rendered video as a YouTube Short.
-      // Deliberately doesn't block or fail the TikTok success path above — YouTube
-      // not being connected (or a transient upload error) shouldn't undo a TikTok
-      // publish that already succeeded.
+      // Genuinely independent of the TikTok result above (2026-09-12: TikTok's own
+      // FILE_UPLOAD validator can reject a video — e.g. frame_rate_check_failed —
+      // that YouTube accepts fine; a TikTok failure must not skip this, and a TikTok
+      // success shouldn't be undone by a YouTube hiccup either).
       if (videoBase64) {
         fetch('/youtube-publish.php', {
           method: 'POST',
@@ -1378,6 +1383,17 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                     >
                       Προβολή Ιστορικού
                     </button>
+                  </div>
+                )}
+
+                {/* Error Message Banner — was set via setUploadMessage but never rendered
+                    anywhere (2026-09-12 fix): a TikTok failure silently vanished from the
+                    UI while a following YouTube success still showed, which reads as full
+                    success even when TikTok genuinely rejected the video. */}
+                {uploadMessage && (
+                  <div className="bg-red-950/80 border border-red-500/40 rounded-2xl p-4 flex items-center gap-2.5 text-red-200 text-xs font-bold shadow-lg whitespace-pre-line">
+                    <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+                    <span>{uploadMessage}</span>
                   </div>
                 )}
               </div>

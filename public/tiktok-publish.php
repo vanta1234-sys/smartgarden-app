@@ -130,6 +130,52 @@ if ($uploadStatus < 200 || $uploadStatus >= 300) {
     fail(500, ['success' => false, 'error' => 'TikTok video upload failed', 'details' => $uploadResp]);
 }
 
+// Accepting the bytes doesn't mean the video survived TikTok's own processing —
+// browser-rendered MediaRecorder output has a variable frame rate, which TikTok's
+// validator rejects with a FAILED / frame_rate_check_failed status that only shows
+// up *after* upload, on a separate status-fetch call (2026-09-12: caught a real
+// case where this endpoint reported success while the video had actually failed
+// server-side and never reached the creator's inbox at all — see tiktok_integration
+// memory). Poll briefly for a terminal status instead of assuming success the
+// moment the upload bytes are accepted.
+$finalStatus = null;
+$failReason = null;
+for ($attempt = 0; $attempt < 5; $attempt++) {
+    usleep(1500000); // 1.5s
+    $ch = curl_init('https://open.tiktokapis.com/v2/post/publish/status/fetch/');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: application/json; charset=UTF-8',
+        ],
+        CURLOPT_POSTFIELDS => json_encode(['publish_id' => $publishId]),
+    ]);
+    $statusResp = json_decode(curl_exec($ch), true);
+    curl_close($ch);
+    $status = $statusResp['data']['status'] ?? null;
+    if ($status === 'FAILED') {
+        $finalStatus = 'FAILED';
+        $failReason = $statusResp['data']['fail_reason'] ?? 'unknown';
+        break;
+    }
+    if ($status === 'SEND_TO_USER_INBOX' || $status === 'PUBLISH_COMPLETE') {
+        $finalStatus = $status;
+        break;
+    }
+    // Anything else (e.g. PROCESSING_UPLOAD/PROCESSING_DOWNLOAD) — keep polling.
+}
+
+if ($finalStatus === 'FAILED') {
+    fail(500, [
+        'success' => false,
+        'error' => 'Το TikTok απέρριψε το βίντεο μετά το upload: ' . $failReason . '. Δεν έφτασε ποτέ στο inbox.',
+        'fail_reason' => $failReason,
+        'publish_id' => $publishId,
+    ]);
+}
+
 // Log locally so TikTok Studio's history view has something real to show
 $logPath = __DIR__ . '/tiktok_posts.json';
 $posts = file_exists($logPath) ? (json_decode(file_get_contents($logPath), true) ?: []) : [];
@@ -138,7 +184,7 @@ $newPost = [
     'articleId' => $articleId,
     'title' => $title,
     'caption' => $caption,
-    'status' => 'draft_uploaded',
+    'status' => $finalStatus ?: 'draft_uploaded_unconfirmed',
     'platform' => 'TikTok',
     'publishedAt' => date('c'),
 ];
@@ -148,5 +194,7 @@ file_put_contents($logPath, json_encode($posts, JSON_PRETTY_PRINT | JSON_UNESCAP
 echo json_encode([
     'success' => true,
     'post' => $newPost,
-    'message' => 'Το βίντεο ανέβηκε ως draft στο TikTok inbox — άνοιξε την εφαρμογή TikTok για να το δημοσιεύσεις.',
+    'message' => $finalStatus
+        ? 'Το βίντεο ανέβηκε ως draft στο TikTok inbox — άνοιξε την εφαρμογή TikTok για να το δημοσιεύσεις.'
+        : 'Το βίντεο ανέβηκε αλλά το TikTok δεν έχει επιβεβαιώσει ακόμα την επεξεργασία του (θα φανεί στο Ιστορικό όταν ολοκληρωθεί) — ελέγξτε ξανά σε λίγο.',
 ], JSON_UNESCAPED_UNICODE);
