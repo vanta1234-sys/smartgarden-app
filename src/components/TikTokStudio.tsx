@@ -196,7 +196,14 @@ export const TikTokStudio: React.FC<TikTokStudioProps> = ({
     // so the same article always renders the same way, but different articles vary.
     // Deliberately only touches the HOOK/PROBLEM scenes' tag/voiceover/onScreenText —
     // scene count, timing, and the per-step/caption sync logic below are untouched.
-    const hookAngles = [
+    //
+    // These 4 all presuppose the article is about a problem/mistake/mystery to solve —
+    // wrong for a straightforward "Πλήρης Οδηγός" (complete guide) or "Ερωτήσεις &
+    // Απαντήσεις" (Q&A) article, which isn't framed around avoiding a mistake at all
+    // (2026-09-12: caught live — the hook said "never make this mistake" over a plant
+    // *propagation* how-to guide). Kept as the default/fallback pool below, used only
+    // when the title doesn't match one of the more specific pools.
+    const problemHookAngles = [
       {
         hookTag: '🪝 THE HOOK',
         hookVoiceover: 'Μην κάνεις ποτέ αυτό το λάθος με τα φυτά σου στο μπαλκόνι',
@@ -226,6 +233,38 @@ export const TikTokStudio: React.FC<TikTokStudioProps> = ({
         problemText: 'Η επιστήμη λέει κάτι διαφορετικό',
       },
     ];
+    // Positive, skill-focused framing for "complete guide" / how-to articles — nothing
+    // here implies a mistake or a problem being diagnosed.
+    const guideHookAngles = [
+      {
+        hookTag: '📋 QUICK GUIDE',
+        hookVoiceover: 'Κράτα αυτό το βίντεο, θα σου χρειαστεί',
+        hookText: 'Ο Οδηγός που Έψαχνες 📋',
+        problemTag: 'ΤΙ ΘΑ ΜΑΘΕΙΣ',
+        problemText: 'Όλα τα βήματα, απλά και κατανοητά',
+      },
+      {
+        hookTag: '🎯 STEP BY STEP',
+        hookVoiceover: 'Ο πιο εύκολος τρόπος να το πετύχεις σωστά από την πρώτη φορά',
+        hookText: 'Βήμα προς Βήμα 🎯',
+        problemTag: 'Ο ΟΔΗΓΟΣ',
+        problemText: 'Ακολούθησε τα βήματα με τη σειρά',
+      },
+    ];
+    // Q&A articles answer specific reader questions — not a "mistake to avoid" either.
+    const qaHookAngles = [
+      {
+        hookTag: '💬 Q&A',
+        hookVoiceover: 'Απαντάμε στις πιο συχνές ερωτήσεις σας για αυτό',
+        hookText: 'Οι Ερωτήσεις σου, Απαντημένες 💬',
+        problemTag: 'Η ΕΡΩΤΗΣΗ',
+        problemText: 'Αυτό ρωτάνε οι περισσότεροι',
+      },
+    ];
+    const titleForClassification = cleanTitle.toLowerCase();
+    const isQaTitle = /ερωτ[ήη]σει|απαντ[ήη]σει/.test(titleForClassification);
+    const isGuideTitle = /οδηγ[όο]ς|βήμα.{0,3}βήμα|πλήρης οδηγ/.test(titleForClassification);
+    const hookAngles = isQaTitle ? qaHookAngles : isGuideTitle ? guideHookAngles : problemHookAngles;
     const angleIndex = currentArticle.id
       ? Array.from(currentArticle.id).reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % hookAngles.length
       : 0;
@@ -528,7 +567,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
           .then((r) => r.json())
           .then((ytData) => {
             if (ytData.success) {
-              setPublishSuccessMessage((prev) => (prev || '') + `\n✅ Ανέβηκε και στο YouTube Shorts: ${ytData.url}`);
+              setPublishSuccessMessage((prev) => (prev || '') + `\n✅ Ανέβηκε στο YouTube Shorts ως ΙΔΙΩΤΙΚΟ (δες το πρώτα, μετά κάν' το Public από το Studio): ${ytData.url}`);
             } else {
               console.warn('YouTube upload failed:', ytData.error);
             }

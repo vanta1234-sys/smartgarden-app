@@ -95,7 +95,13 @@ $metadata = json_encode([
         'categoryId' => '26', // Howto & Style
     ],
     'status' => [
-        'privacyStatus' => 'public',
+        // Uploads default to private until a human reviews and promotes them (2026-09-12,
+        // after a broken 9-minute render with dead air went public and was seen before
+        // anyone caught it — see tiktok_integration memory). Flip to 'public' in YouTube
+        // Studio once you've actually watched it. The stored OAuth token only has upload
+        // scope (no videos.update/delete), so this can't be changed back to public from
+        // here either — that's also a manual Studio step, same as this was.
+        'privacyStatus' => 'private',
         'selfDeclaredMadeForKids' => false,
     ],
 ], JSON_UNESCAPED_UNICODE);
