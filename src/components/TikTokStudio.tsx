@@ -658,13 +658,38 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
     try {
       const objectUrl = URL.createObjectURL(blob);
       const audio = new Audio(objectUrl);
-      const naturalDuration = await new Promise<number>((resolve) => {
-        let done = false;
-        audio.onloadedmetadata = () => { if (!done) { done = true; resolve(audio.duration || 0); } };
-        audio.onerror = () => { if (!done) { done = true; resolve(0); } };
-        setTimeout(() => { if (!done) { done = true; resolve(audio.duration || 0); } }, 3000);
-      });
-      if (!naturalDuration) return null;
+      let naturalDuration: number;
+      if (engine === 'edge') {
+        // tts-edge.php relays Microsoft's audio live over a WebSocket as it's
+        // synthesized, so its MP3's LAME/VBR header (which normally records the
+        // real frame/byte count) never gets patched with real values afterward —
+        // it ships with the encoder's placeholder bytes still in it, since there's
+        // no finished file to seek back into. Chrome's <audio>.duration reads that
+        // placeholder header as if it were real and reports a wildly wrong number
+        // (confirmed live 2026-09-12: a 2.7s clip's blob reported ~9 minutes,
+        // which is exactly why a 6-scene render ballooned to a 9-minute video that
+        // got published and was publicly visible before anyone caught it). Fixed by
+        // computing duration from the blob's own byte size against Edge's fixed,
+        // known bitrate (audio-24khz-48kbitrate-mono-mp3 in tts-edge.php) instead
+        // of trusting the corrupted header at all.
+        naturalDuration = (blob.size * 8) / 48000;
+      } else {
+        naturalDuration = await new Promise<number>((resolve) => {
+          let done = false;
+          audio.onloadedmetadata = () => { if (!done) { done = true; resolve(audio.duration || 0); } };
+          audio.onerror = () => { if (!done) { done = true; resolve(0); } };
+          setTimeout(() => { if (!done) { done = true; resolve(audio.duration || 0); } }, 3000);
+        });
+      }
+      // Defensive backstop regardless of engine/source: no single TikTok-scene
+      // narration line is ever legitimately longer than a few seconds, so treat
+      // anything beyond this as a bad duration reading rather than trust it and
+      // silently produce a multi-minute video again.
+      const MAX_SANE_SCENE_SECONDS = 20;
+      if (!naturalDuration || !isFinite(naturalDuration) || naturalDuration > MAX_SANE_SCENE_SECONDS) {
+        console.warn(`TTS duration out of sane range (${naturalDuration}s) for engine ${engine}, clamping.`);
+        naturalDuration = Math.min(naturalDuration || MAX_SANE_SCENE_SECONDS, MAX_SANE_SCENE_SECONDS);
+      }
       return { audio, naturalDuration, engine };
     } catch (e) {
       console.warn('Greek TTS audio element setup failed:', e);
