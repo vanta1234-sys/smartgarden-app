@@ -2,6 +2,37 @@ import { Client } from "basic-ftp";
 import path from "path";
 import fs from "fs";
 
+/**
+ * Files the LIVE SERVER writes and owns: articles the cron publishes, the sitemap
+ * and feed it regenerates from them, publish logs, OAuth tokens, rate-limit counters,
+ * and reader-submitted questions. The local copies of these are snapshots that go
+ * stale the moment the cron next runs, so uploading them silently destroys whatever
+ * the server has written since.
+ *
+ * This is not hypothetical: on 2026-09-14 a series of ordinary deploys reverted
+ * latest_articles.json to a Sept-9 snapshot, wiping five days of cron-published
+ * articles (and the sitemap/rss entries pointing at them) — nobody noticed until a
+ * routine article count came back lower than it had been half an hour earlier.
+ *
+ * To pull the live versions down into the repo instead, fetch them over HTTP
+ * (curl https://smartgarden.gr/<file> -o public/<file>) — never let deploy push them up.
+ */
+const SERVER_OWNED_FILES = new Set([
+  "latest_articles.json",
+  "sitemap.xml",
+  "rss.xml",
+  "tiktok_posts.json",
+  "qa_questions.json",
+  "tiktok_tokens.json",
+  "tiktok_tokens_sandbox.json",
+  "youtube_tokens.json",
+  "facebook_tokens.json",
+  "pinterest_tokens.json",
+  "plant_diagnosis_usage.json",
+  "newsletter_signup_usage.json",
+  "qa_usage.json",
+]);
+
 async function deploy() {
   console.log("🚀 Starting SmartGarden deploy to smartgarden.gr...");
   
@@ -57,20 +88,32 @@ async function deploy() {
   }
 
   try {
-    // 1. Upload latest_articles.json & cron.php directly if available in public
+    // 1. Upload public/ (skipping anything the live server owns — see SERVER_OWNED_FILES)
     const publicDir = path.join(process.cwd(), "public");
     if (fs.existsSync(publicDir)) {
       const publicFiles = fs.readdirSync(publicDir);
       for (const file of publicFiles) {
         const filePath = path.join(publicDir, file);
-        if (fs.statSync(filePath).isFile()) {
-          console.log(`📤 Uploading public/${file} to ${FTP_REMOTE_DIR}/${file}...`);
-          await client.uploadFrom(filePath, `${FTP_REMOTE_DIR}/${file}`);
+        if (!fs.statSync(filePath).isFile()) continue;
+        if (SERVER_OWNED_FILES.has(file)) {
+          console.log(`⏭️  Skipping public/${file} (server-owned — deploying it would overwrite live data)`);
+          continue;
         }
+        console.log(`📤 Uploading public/${file} to ${FTP_REMOTE_DIR}/${file}...`);
+        await client.uploadFrom(filePath, `${FTP_REMOTE_DIR}/${file}`);
       }
     }
 
-    // 2. Upload dist folder
+    // 2. Upload dist folder. `vite build` copies everything in public/ into dist/,
+    // so the server-owned files have to be removed from the build output too —
+    // otherwise this second pass re-uploads the very files pass 1 just skipped.
+    for (const file of SERVER_OWNED_FILES) {
+      const staleCopy = path.join(distDir, file);
+      if (fs.existsSync(staleCopy)) {
+        fs.unlinkSync(staleCopy);
+        console.log(`⏭️  Removed ${file} from build output (server-owned)`);
+      }
+    }
     console.log(`📤 Uploading build assets (${distDir}) to ${FTP_REMOTE_DIR}...`);
     await client.ensureDir(FTP_REMOTE_DIR);
     await client.uploadFromDir(distDir, FTP_REMOTE_DIR);
