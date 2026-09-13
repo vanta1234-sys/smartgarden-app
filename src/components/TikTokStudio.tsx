@@ -1397,7 +1397,17 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
                 </button>
 
                 <button
-                  onClick={handleGenerateStaticImageAndPublish}
+                  onClick={() => {
+                    // This fallback (built 2026-09-04 to route around a TikTok photo-post
+                    // API verification issue) sits directly under the main publish button
+                    // and looks similar enough at a glance to click by mistake — that's
+                    // exactly what produced the silent, motionless TikTok posts a user
+                    // found live in production on 2026-09-12. A confirm click doesn't
+                    // stop a deliberate use, just an accidental one.
+                    if (window.confirm('Αυτό δημοσιεύει ΜΟΝΟ μια στατική φωτογραφία, χωρίς κίνηση και χωρίς ήχο — όχι το κανονικό βίντεο. Σίγουρα αυτό θες;')) {
+                      handleGenerateStaticImageAndPublish();
+                    }
+                  }}
                   disabled={isGeneratingVideo}
                   className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-100 font-bold text-sm py-3.5 px-6 rounded-2xl border border-slate-700 flex items-center justify-center gap-2.5 cursor-pointer transition-all"
                 >
