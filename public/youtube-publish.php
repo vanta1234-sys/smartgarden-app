@@ -49,7 +49,11 @@ $refreshData = json_decode($refreshResponse, true);
 $accessToken = $refreshData['access_token'] ?? null;
 
 if (!$accessToken) {
-    http_response_code(502);
+    // 200-with-success:false on purpose, not a 5xx: Cloudflare replaces any origin 5xx
+    // body with its own error page, so the real Google error was hidden behind a bare
+    // "error code: 502" and an ordinary expired refresh token looked like a gateway
+    // fault. The caller already treats success:false as a failure.
+    http_response_code(200);
     echo json_encode(['success' => false, 'error' => 'Failed to refresh YouTube access token', 'detail' => $refreshResponse]);
     exit;
 }
@@ -140,6 +144,8 @@ if ($httpCode >= 200 && $httpCode < 300 && !empty($result['id'])) {
         'url' => 'https://youtube.com/shorts/' . $result['id'],
     ]);
 } else {
-    http_response_code(502);
+    // Same reason as above — a 5xx here gets swallowed by Cloudflare and the actual
+    // YouTube API error never reaches the caller.
+    http_response_code(200);
     echo json_encode(['success' => false, 'error' => 'YouTube upload failed', 'httpCode' => $httpCode, 'detail' => $uploadResponse]);
 }
