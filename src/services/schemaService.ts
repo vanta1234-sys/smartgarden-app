@@ -140,7 +140,16 @@ export function injectArticleSchema(article: ArticleItem) {
   const title = article.title?.el || (typeof article.title === 'string' ? article.title : 'Οδηγός SmartGarden');
   const summary = article.summary?.el || (typeof article.summary === 'string' ? article.summary : '');
   const url = `https://smartgarden.gr/article/${article.slug}`;
-  const imgUrl = article.imageUrl || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200';
+  // Articles carry their photo as `image` (that's the field name in latest_articles.json
+  // and everywhere else); `imageUrl` is an alternate name the interface also allows but
+  // nothing actually populates. Reading only `imageUrl` meant this was ALWAYS undefined,
+  // so every article fell through to the generic fallback below — and since the og:image
+  // update further down writes this same value into the tag, the client was overwriting
+  // the correct per-article image that article.php had already rendered server-side.
+  // Social crawlers never saw the damage (they read raw HTML), but Google renders JS, so
+  // every article's structured data and og:image showed one generic stock photo (found
+  // 2026-09-14 by reading the live rendered JSON-LD on two unrelated articles).
+  const imgUrl = article.imageUrl || article.image || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200';
   const pubDate = article.date || '2026-08-25';
   const howToSteps = getHowToStepsForArticle(article);
 
