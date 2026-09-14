@@ -2142,6 +2142,63 @@ if (FB_AUTO_POST_ENABLED && $fbPageId && $fbPageToken) {
 }
 
 // ==========================================
+// 7a2. AUTO-PIN THE ARTICLE TO PINTEREST
+// ==========================================
+// Pins the freshly published article to the board matching its category. The image is
+// generated on the fly by pinterest-pin-image.php (1000x1500 branded vertical, the
+// static-image format Pinterest uses since Idea Pins were retired in 2024) — Pinterest
+// fetches that URL itself, so nothing needs pre-rendering or storing.
+//
+// Board IDs come from pinterest_boards.json, written by pinterest-create-boards.php.
+//
+// NOTE (2026-09-14): this will keep failing with API error code 29 ("Apps with Trial
+// access may not create Pins in production") until the Pinterest app is upgraded from
+// Trial to Standard access — the OAuth connection, the 7 boards and the image generator
+// are all already live and working. It's deliberately best-effort and silent about it,
+// exactly like the Facebook block above: the moment Standard access is granted this
+// starts pinning with no further code change.
+$pinterestTokensPath = __DIR__ . '/pinterest_tokens.json';
+$pinterestBoardsPath = __DIR__ . '/pinterest_boards.json';
+if (file_exists($pinterestTokensPath) && file_exists($pinterestBoardsPath)) {
+    $pinTokens = json_decode(@file_get_contents($pinterestTokensPath), true);
+    $pinBoards = json_decode(@file_get_contents($pinterestBoardsPath), true);
+    $pinToken = isset($pinTokens['access_token']) ? $pinTokens['access_token'] : '';
+    $pinCategory = isset($newArticleObj['category']) ? $newArticleObj['category'] : '';
+    $pinBoardId = ($pinCategory && isset($pinBoards[$pinCategory])) ? $pinBoards[$pinCategory] : '';
+
+    if ($pinToken && $pinBoardId) {
+        $pinTitle = isset($newArticleObj['title']['el']) ? $newArticleObj['title']['el'] : '';
+        $pinSummary = isset($newArticleObj['summary']['el']) ? $newArticleObj['summary']['el'] : '';
+        // Pinterest 2026 guidance: keywords in the description text outrank hashtags,
+        // so this is a plain keyword-rich sentence set, not a hashtag block.
+        $pinDescription = trim($pinSummary) . ' Πλήρης οδηγός βήμα-βήμα για το ελληνικό κλίμα στο SmartGarden.gr.';
+
+        $pinCh = curl_init('https://api.pinterest.com/v5/pins');
+        curl_setopt_array($pinCh, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_TIMEOUT => 25,
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer ' . $pinToken,
+                'Content-Type: application/json',
+            ),
+            CURLOPT_POSTFIELDS => json_encode(array(
+                'board_id' => $pinBoardId,
+                'title' => mb_substr($pinTitle, 0, 100),
+                'description' => mb_substr($pinDescription, 0, 500),
+                'link' => 'https://smartgarden.gr/article/' . rawurlencode($newArticleObj['slug']),
+                'media_source' => array(
+                    'source_type' => 'image_url',
+                    'url' => 'https://smartgarden.gr/pinterest-pin-image.php?articleId=' . rawurlencode($newArticleObj['id']),
+                ),
+            ), JSON_UNESCAPED_UNICODE),
+        ));
+        curl_exec($pinCh); // best-effort — a Pinterest failure must never fail article publishing
+        curl_close($pinCh);
+    }
+}
+
+// ==========================================
 // 7b. AUTO-UPDATE SITEMAP.XML WITH ALL ARTICLES
 // ==========================================
 $sitemapPath = __DIR__ . '/sitemap.xml';

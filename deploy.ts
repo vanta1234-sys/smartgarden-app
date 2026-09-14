@@ -28,6 +28,7 @@ const SERVER_OWNED_FILES = new Set([
   "youtube_tokens.json",
   "facebook_tokens.json",
   "pinterest_tokens.json",
+  "pinterest_boards.json",
   "plant_diagnosis_usage.json",
   "newsletter_signup_usage.json",
   "qa_usage.json",
