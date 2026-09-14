@@ -237,6 +237,51 @@ export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
     keywords: ["παγετος", "παγωνια", "χειμωνας", "frost", "ψυχος", "προστασια απο κρυο", "διαχειμαση", "υαλοβαμβακας", "θερμοκηπιο χειμωνα"],
     category: "plant_care",
     alt: "Frost crystals covering green leaves"
+  },
+
+  // ──────────────────────────────────────────
+  // 🪴 THE EVERYDAY ACTIONS (ΚΑΘΗΜΕΡΙΝΕΣ ΕΝΕΡΓΕΙΕΣ)
+  // ──────────────────────────────────────────
+  // Almost every article's three takeaways are some combination of pot, water, prune and
+  // feed, so without these the per-scene matcher kept scoring zero on the step scenes and
+  // falling through to the neutral pool. Two pot photos on purpose: a scene never reuses a
+  // photo, so a single one left the second container scene with nothing to match.
+  // All six visually checked before being added, not trusted on an HTTP 200.
+  {
+    url: "https://images.unsplash.com/photo-1620293106076-ad27d651efe3?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["γλαστρα", "γλαστρες", "δοχειο", "δοχεια", "pot", "pots", "container", "terracotta", "πηλινη", "πηλινες", "ζαρντινιερα"],
+    category: "balcony",
+    alt: "Terracotta pots planted with pansies"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1528789386055-75c4b717bad1?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["χωρητικοτητα", "ογκος", "λιτρα", "βαθος", "μεγεθος γλαστρας", "αποστραγγιση", "τρυπες", "drainage", "repotting", "αλλαγη γλαστρας"],
+    category: "balcony",
+    alt: "Stacked empty terracotta pots"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1747339385292-d58fdff13938?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ποτισμα", "ποτιζω", "ποτιστηρι", "νερο", "υγρασια", "αρδευση", "watering", "irrigation", "συχνοτητα ποτισματος", "υπερβολικο ποτισμα"],
+    category: "irrigation_iot",
+    alt: "Watering can watering young plants in a container"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1680124744811-f779e4ad6985?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["κλαδεμα", "κοπη", "ψαλιδι", "βλαστος", "βλαστους", "κορυφολογημα", "pruning", "prune", "shears", "μασχαλες", "αφαιρεση"],
+    category: "plant_care",
+    alt: "Pruning shears cutting a rose stem"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1708223578831-5c737a3074ab?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["μπαλκονι", "βεραντα", "balcony", "terrace", "διαμερισμα", "αστικη καλλιεργεια", "γλαστρακια", "παραθυρο", "ρηχο δοχειο"],
+    category: "balcony",
+    alt: "Potted plants lined up on a balcony ledge"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1693307299092-21e61023160c?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["λιπασμα", "λιπανση", "θρεψη", "fertilizer", "granules", "κοκκωδες", "αζωτο", "καλιο", "φωσφορο", "θρεπτικα", "οργανικο λιπασμα"],
+    category: "plant_care",
+    alt: "A handful of granular fertilizer held over soil"
   }
 ];
 
