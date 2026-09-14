@@ -14,3 +14,6 @@ public/newsletter_signup_usage.json
 public/youtube_tokens.json
 public/facebook_tokens.json
 public/.htaccess
+
+# Local recording, not part of the site
+pinterest-standard-access-demo.mp4

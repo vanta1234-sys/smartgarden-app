@@ -334,7 +334,7 @@ export function getSmartArticleImage(topicTitle: string, category: string = "", 
  * Falling back to a random in-category photo instead produced exactly the failure the
  * user reported — lemons on a weed-control video, kiwis next to a spray-dosage step.
  */
-const NEUTRAL_SCENE_PHOTOS = [
+export const NEUTRAL_SCENE_PHOTOS = [
   "https://images.unsplash.com/photo-1758372120921-29d4569f609a?w=1200&auto=format&fit=crop&q=80", // vertical green wall
   "https://images.unsplash.com/photo-1589135716303-d04b9f3ab4b6?w=1200&auto=format&fit=crop&q=80", // rich potting soil
   "https://images.unsplash.com/photo-1621272155982-eb405db62303?w=1200&auto=format&fit=crop&q=80", // seedling trays
