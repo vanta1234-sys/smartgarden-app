@@ -91,6 +91,14 @@ function sg_run_job($dir) {
     sg_status($dir, 'running', 3, 'Ξεκινά η δημιουργία βίντεο');
     sg_log($dir, 'job start: ' . ($job['article']['slug'] ?? '?') . ' (' . $n . ' scenes)');
 
+    // Each finished job leaves ~15MB behind. Uploads happen minutes after the render, so
+    // anything three days old is long since published and only costing disk.
+    foreach ((array) glob(dirname($dir) . '/*', GLOB_ONLYDIR) as $old) {
+        if ($old === $dir || filemtime($old) > time() - 259200) continue;
+        foreach ((array) glob($old . '/*') as $f) @unlink($f);
+        @rmdir($old);
+    }
+
     $sceneFiles = array();
 
     foreach ($scenes as $i => $scene) {
@@ -226,9 +234,13 @@ function sg_run_job($dir) {
             $lines = array();
             @exec($thisCmd, $lines, $exitCode);
             $res = trim(implode("\n", $lines));
+            // Exit code plus measured duration, and deliberately NOT a scan of stderr for
+            // the word "error": Edge TTS occasionally returns an mp3 with one malformed
+            // frame, and ffmpeg logs "Error while decoding" while skipping it and producing
+            // a perfectly good full-length scene. A genuinely failed encode always shows up
+            // as a non-zero exit or a short file.
             $outDur = file_exists($out) ? sg_duration($ffprobe, $out) : 0.0;
-            $complained = $res !== '' && preg_match('/error|failed|invalid/i', $res);
-            $ok = ($exitCode === 0 && !$complained && $outDur >= $sceneDur - 0.35);
+            $ok = ($exitCode === 0 && $outDur >= $sceneDur - 0.35);
             if (!$ok) {
                 sg_log($dir, 'scene ' . $i . ' attempt ' . ($attempt + 1) . ' failed: exit=' . $exitCode
                     . ' dur=' . round($outDur, 2) . '/' . round($sceneDur, 2)
@@ -276,10 +288,74 @@ function sg_run_job($dir) {
     $duration = sg_duration($ffprobe, $final);
     sg_log($dir, 'done: ' . filesize($final) . ' bytes, ' . round($duration, 2) . 's');
 
+    $publish = !empty($job['autoPublish']) ? sg_publish($job, $dir, basename($dir)) : null;
+
     sg_status($dir, 'done', 100, 'Το βίντεο είναι έτοιμο', array(
         'video' => $final,
         'bytes' => filesize($final),
         'duration' => round($duration, 2),
         'scenes' => $n,
+        'publish' => $publish,
     ));
+}
+
+/** POST a JSON body to one of our own endpoints and decode the reply. */
+function sg_post_json($url, $payload, $timeout = 180) {
+    $ch = curl_init($url);
+    curl_setopt_array($ch, array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_TIMEOUT => $timeout,
+        CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
+        CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE),
+    ));
+    $body = curl_exec($ch);
+    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err = curl_error($ch);
+    curl_close($ch);
+    return array('http' => $status, 'body' => json_decode((string) $body, true) ?: (string) $body, 'curl_error' => $err);
+}
+
+/**
+ * Hand the finished video to YouTube and TikTok.
+ *
+ * Runs here rather than back in cron-publish.php because the render takes a couple of
+ * minutes and the cron request is long gone by then. Both are best-effort: a failed upload
+ * is recorded in the job status and never throws away a video that rendered fine.
+ *
+ * YouTube gets the job id and reads the file off disk (a 15MB mp4 as base64 JSON would
+ * exceed post_max_size); TikTok is handed the job's own file URL, which it fetches itself.
+ */
+function sg_publish($job, $dir, $jobId) {
+    $key = $job['key'];
+    $script = $job['script'];
+    $article = $job['article'];
+    $result = array();
+
+    $yt = sg_post_json('https://smartgarden.gr/youtube-publish.php', array(
+        'job' => $jobId,
+        'key' => $key,
+        'title' => $script['youtubeTitle'],
+        'description' => $script['youtubeDescription'],
+    ));
+    $result['youtube'] = array(
+        'ok' => !empty($yt['body']['success']),
+        'videoId' => isset($yt['body']['videoId']) ? $yt['body']['videoId'] : null,
+        'error' => isset($yt['body']['error']) ? $yt['body']['error'] : null,
+    );
+    sg_log($dir, 'youtube: ' . json_encode($result['youtube'], JSON_UNESCAPED_UNICODE));
+
+    $tt = sg_post_json('https://smartgarden.gr/tiktok-publish.php', array(
+        'videoUrl' => 'https://smartgarden.gr/video-render.php?action=file&job=' . $jobId . '&key=' . rawurlencode($key),
+        'caption' => $script['tiktokCaption'],
+        'title' => $script['youtubeTitle'],
+        'articleId' => $article['id'],
+    ));
+    $result['tiktok'] = array(
+        'ok' => !empty($tt['body']['success']),
+        'error' => isset($tt['body']['error']) ? $tt['body']['error'] : null,
+    );
+    sg_log($dir, 'tiktok: ' . json_encode($result['tiktok'], JSON_UNESCAPED_UNICODE));
+
+    return $result;
 }

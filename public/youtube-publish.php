@@ -59,27 +59,51 @@ if (!$accessToken) {
 }
 
 $body = json_decode(file_get_contents('php://input'), true);
-$videoDataUri = $body['videoBase64'] ?? '';
 $title = trim($body['title'] ?? 'SmartGarden.gr Guide');
 $description = trim($body['description'] ?? '');
 
-if (!$videoDataUri || strpos($videoDataUri, 'base64,') === false) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Missing or invalid videoBase64']);
-    exit;
-}
-
-// Videos coming straight from TikTokStudio.tsx's MediaRecorder output are raw
-// video/webm, not mp4 — detect the real mime type from the data URI instead of
-// assuming mp4, so the multipart Content-Type below actually matches the bytes.
+$videoBinary = null;
 $videoMimeType = 'video/mp4';
-if (preg_match('/^data:(video\/[a-zA-Z0-9.+-]+);base64,/', $videoDataUri, $mimeMatch)) {
-    $videoMimeType = $mimeMatch[1];
+
+// Two ways in. The browser posts the recording inline as base64; the server-side
+// renderer just names the render job it produced, because base64-ing a 15MB mp4 into a
+// JSON body would sail past this host's post_max_size. Only a job id is accepted, never
+// a path — it is basename()d and resolved under the jobs root, so it can't address
+// anything but a rendered video.
+$jobId = isset($body['job']) ? basename((string) $body['job']) : '';
+if ($jobId !== '') {
+    $cronKeys = ['smartgarden_cron_x7K9pQ2026', 'smartgarden_cron_secret_2026'];
+    if (!in_array($body['key'] ?? '', $cronKeys, true)) {
+        http_response_code(200);
+        echo json_encode(['success' => false, 'error' => 'Unauthorized job upload']);
+        exit;
+    }
+    $jobsRoot = is_dir(dirname(__DIR__) . '/video-jobs') ? dirname(__DIR__) . '/video-jobs' : __DIR__ . '/video-jobs';
+    $videoPath = $jobsRoot . '/' . $jobId . '/video.mp4';
+    if (!is_file($videoPath)) {
+        http_response_code(200);
+        echo json_encode(['success' => false, 'error' => 'No rendered video for job ' . $jobId]);
+        exit;
+    }
+    $videoBinary = file_get_contents($videoPath);
+} else {
+    $videoDataUri = $body['videoBase64'] ?? '';
+    if (!$videoDataUri || strpos($videoDataUri, 'base64,') === false) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Missing or invalid videoBase64']);
+        exit;
+    }
+    // Videos coming straight from TikTokStudio.tsx's MediaRecorder output are raw
+    // video/webm, not mp4 — detect the real mime type from the data URI instead of
+    // assuming mp4, so the multipart Content-Type below actually matches the bytes.
+    if (preg_match('/^data:(video\/[a-zA-Z0-9.+-]+);base64,/', $videoDataUri, $mimeMatch)) {
+        $videoMimeType = $mimeMatch[1];
+    }
+    list(, $base64Data) = explode('base64,', $videoDataUri, 2);
+    $videoBinary = base64_decode($base64Data);
 }
 
-list(, $base64Data) = explode('base64,', $videoDataUri, 2);
-$videoBinary = base64_decode($base64Data);
-if ($videoBinary === false || strlen($videoBinary) < 1000) {
+if ($videoBinary === false || strlen((string) $videoBinary) < 1000) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Decoded video data looks invalid/too small']);
     exit;

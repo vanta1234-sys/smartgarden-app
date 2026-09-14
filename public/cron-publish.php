@@ -2199,6 +2199,36 @@ if (file_exists($pinterestTokensPath) && file_exists($pinterestBoardsPath)) {
 }
 
 // ==========================================
+// 7a3. QUEUE THE VERTICAL VIDEO (YouTube Short + TikTok)
+// ==========================================
+// Until now a person had to open TikTok Studio in a browser and sit through a real-time
+// canvas recording to get a video out of an article. video-render.php builds the same
+// thing server-side: it returns as soon as the job is spawned, and a detached worker does
+// the render (~1-2 min) and then uploads to YouTube and TikTok on its own.
+//
+// &publish=1 is what authorises those uploads. YouTube uploads stay private until someone
+// watches them, and TikTok lands in the creator inbox as a draft — neither posts publicly
+// without a human, which is the same safety rule as before.
+//
+// Best-effort and deliberately silent, like the Pinterest and Facebook steps: a video
+// problem must never fail article publishing.
+$videoJobId = null;
+if (!empty($newArticleObj['id'])) {
+    // Falls back to the first valid key because $providedKey is empty on a CLI run.
+    $videoKey = $providedKey !== '' ? $providedKey : $VALID_KEYS[0];
+    $videoCh = curl_init('https://smartgarden.gr/video-render.php?action=start&publish=1'
+        . '&articleId=' . rawurlencode($newArticleObj['id'])
+        . '&key=' . rawurlencode($videoKey));
+    curl_setopt_array($videoCh, array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 45,
+    ));
+    $videoResp = json_decode((string) curl_exec($videoCh), true);
+    curl_close($videoCh);
+    if (!empty($videoResp['job'])) $videoJobId = $videoResp['job'];
+}
+
+// ==========================================
 // 7b. AUTO-UPDATE SITEMAP.XML WITH ALL ARTICLES
 // ==========================================
 $sitemapPath = __DIR__ . '/sitemap.xml';
@@ -2388,5 +2418,6 @@ echo json_encode(array(
     'wordpress_post_id' => $wpPostId,
     'google_indexed' => $googleIndexed,
     'published_url' => $newPublishedUrl,
+    'video_job' => $videoJobId,
     'total_stored_articles' => count($existingArticles)
 ), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

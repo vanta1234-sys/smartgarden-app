@@ -282,6 +282,10 @@ file_put_contents($dir . '/job.json', json_encode(array(
     'sceneImages' => $sceneImages,
     'ffmpeg' => $FFMPEG,
     'ffprobe' => $FFPROBE,
+    // With &publish=1 the worker uploads to YouTube and TikTok once the render finishes.
+    // The cron that queues the job is long gone by then, so it can't do this itself.
+    'autoPublish' => isset($_GET['publish']),
+    'key' => $_GET['key'],
     'created' => date('c'),
 ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
