@@ -22,18 +22,32 @@ if (!in_array($providedKey, $VALID_KEYS)) {
     exit;
 }
 
-$tokensPath = __DIR__ . '/pinterest_tokens.json';
-if (!file_exists($tokensPath)) {
-    http_response_code(401);
-    echo json_encode(array('success' => false, 'connected' => false, 'error' => 'Pinterest not connected. Visit /pinterest-auth-login.php'), JSON_UNESCAPED_UNICODE);
-    exit;
-}
-$tokens = json_decode(file_get_contents($tokensPath), true);
-$accessToken = isset($tokens['access_token']) ? $tokens['access_token'] : '';
-if (!$accessToken) {
-    http_response_code(401);
-    echo json_encode(array('success' => false, 'error' => 'No access token stored'), JSON_UNESCAPED_UNICODE);
-    exit;
+// ?sandbox=1 targets Pinterest's separate sandbox environment (own token, own data) —
+// needed because Trial-access apps can't create pins in production.
+$isSandbox = isset($_GET['sandbox']) && $_GET['sandbox'] === '1';
+$apiBase = $isSandbox ? 'https://api-sandbox.pinterest.com' : 'https://api.pinterest.com';
+
+if ($isSandbox) {
+    $accessToken = getenv('PINTEREST_SANDBOX_TOKEN') ?: '';
+    if (!$accessToken) {
+        http_response_code(401);
+        echo json_encode(array('success' => false, 'error' => 'PINTEREST_SANDBOX_TOKEN is not configured.'), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+} else {
+    $tokensPath = __DIR__ . '/pinterest_tokens.json';
+    if (!file_exists($tokensPath)) {
+        http_response_code(401);
+        echo json_encode(array('success' => false, 'connected' => false, 'error' => 'Pinterest not connected. Visit /pinterest-auth-login.php'), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    $tokens = json_decode(file_get_contents($tokensPath), true);
+    $accessToken = isset($tokens['access_token']) ? $tokens['access_token'] : '';
+    if (!$accessToken) {
+        http_response_code(401);
+        echo json_encode(array('success' => false, 'error' => 'No access token stored'), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 }
 
 $boards = array(
@@ -75,7 +89,7 @@ $boards = array(
 );
 
 // Existing boards first, so re-running doesn't create duplicates.
-$ch = curl_init('https://api.pinterest.com/v5/boards?page_size=100');
+$ch = curl_init($apiBase . '/v5/boards?page_size=100');
 curl_setopt_array($ch, array(
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_HTTPHEADER => array('Authorization: Bearer ' . $accessToken),
@@ -102,7 +116,7 @@ foreach ($boards as $board) {
         continue;
     }
 
-    $ch = curl_init('https://api.pinterest.com/v5/boards');
+    $ch = curl_init($apiBase . '/v5/boards');
     curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
@@ -130,7 +144,10 @@ foreach ($boards as $board) {
 }
 
 // Persist the map so cron-publish.php can pin without re-listing boards on every run.
-if ($map) {
+// Sandbox board IDs are NOT written here on purpose: sandbox is a separate environment
+// with its own IDs, and overwriting the production map with them would silently point
+// the cron's auto-pinning at boards that don't exist in production.
+if ($map && !$isSandbox) {
     file_put_contents(__DIR__ . '/pinterest_boards.json', json_encode($map, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 }
 

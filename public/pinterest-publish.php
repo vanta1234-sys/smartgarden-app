@@ -13,15 +13,28 @@ function fail($code, $payload) {
     exit;
 }
 
-$tokensPath = __DIR__ . '/pinterest_tokens.json';
-if (!file_exists($tokensPath)) {
-    fail(401, ['success' => false, 'connected' => false, 'error' => 'Pinterest account not connected yet.', 'loginUrl' => '/pinterest-auth-login.php']);
-}
+// Pinterest keeps Trial-access apps out of production pin creation entirely (API error
+// code 29) and points them at the sandbox instead, so ?sandbox=1 targets that separate
+// environment with its own token and its own data — same split the TikTok integration uses.
+$isSandbox = isset($_GET['sandbox']) && $_GET['sandbox'] === '1';
+$apiBase = $isSandbox ? 'https://api-sandbox.pinterest.com' : 'https://api.pinterest.com';
 
-$tokens = json_decode(file_get_contents($tokensPath), true);
-$accessToken = $tokens['access_token'] ?? null;
-if (!$accessToken) {
-    fail(401, ['success' => false, 'error' => 'No Pinterest access token stored.']);
+if ($isSandbox) {
+    $accessToken = getenv('PINTEREST_SANDBOX_TOKEN') ?: '';
+    if (!$accessToken) {
+        fail(401, ['success' => false, 'error' => 'PINTEREST_SANDBOX_TOKEN is not configured.']);
+    }
+} else {
+    $tokensPath = __DIR__ . '/pinterest_tokens.json';
+    if (!file_exists($tokensPath)) {
+        fail(401, ['success' => false, 'connected' => false, 'error' => 'Pinterest account not connected yet.', 'loginUrl' => '/pinterest-auth-login.php']);
+    }
+
+    $tokens = json_decode(file_get_contents($tokensPath), true);
+    $accessToken = $tokens['access_token'] ?? null;
+    if (!$accessToken) {
+        fail(401, ['success' => false, 'error' => 'No Pinterest access token stored.']);
+    }
 }
 
 $input = json_decode(file_get_contents('php://input'), true) ?: [];
@@ -35,7 +48,7 @@ if (!$boardId || !$imageUrl) {
     fail(400, ['success' => false, 'error' => 'Missing boardId or imageUrl. Call /pinterest-boards.php first to list your board IDs.']);
 }
 
-$ch = curl_init('https://api.pinterest.com/v5/pins');
+$ch = curl_init($apiBase . '/v5/pins');
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST => true,
