@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { RemotionPreviewPlayer } from '../remotion/RemotionPreviewPlayer';
 import { TikTokScriptData } from '../remotion/TikTokComposition';
+import { getSceneImages } from '../services/imageService';
 import {
   Film,
   Sparkles,
@@ -763,28 +764,24 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
         console.warn('AudioContext setup skipped:', e);
       }
 
-      // A different background photo per scene (not one photo reused for the whole video —
-      // the earlier version always showed just the article's single main image throughout).
-      // The article's own photo is always first; the rest come from the site's curated
-      // gardening photo pool so every render still gets real variety even for articles that
-      // only have one image on file.
-      const backgroundPhotoPool = [
+      // One background photo per scene, chosen from what that scene actually says.
+      //
+      // This used to be a fixed 7-photo list cycled by scene index, which meant every
+      // video on the channel showed the same tomatoes/greenhouse/bonsai no matter the
+      // subject — a scene about pruning or root rot got whatever the index landed on.
+      // User put it plainly (2026-09-15): "όλα δείχνουν τις ίδιες 4-5 φώτο... ενώ θα
+      // έπρεπε να δείχνουν αυτό που περιγράφει κάθε στιγμή". getSceneImages scores each
+      // scene's own wording against the curated keyword library and avoids reusing a
+      // photo within the same video; the article's own photo stays on scene 0, which is
+      // the frame YouTube tends to lift for the thumbnail.
+      const sceneImageUrls = getSceneImages(
+        tikTokScript.scenes.map((s: any) =>
+          [s.onScreenText, s.voiceover, s.tag, s.visual].filter(Boolean).join(' ')
+        ),
         currentArticle.image,
-        // This pool was found 2026-09-08 to still contain 3 of the ~25 IDs confirmed
-        // wrong-content during the site-wide visual audit the same day (Unsplash IDs can
-        // get reassigned by photographers to unrelated content — a status-code check never
-        // catches this, only actually viewing the image does). Caught live on a real
-        // published YouTube Short: a Hugelkultur/composting video showed a citrus-fruit-slice
-        // photo as its background. All entries below are now from the audit's confirmed-good
-        // 9-photo pool (see src/data/verifiedImages.ts) — do not add an ID here without
-        // visually confirming its actual content first.
-        "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80", // ripe tomatoes on vine
-        "https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1200&auto=format&fit=crop&q=80", // bonsai tree in pot
-        "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // tomato greenhouse interior
-        "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", // lush vertical garden
-        "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1200&auto=format&fit=crop&q=80", // seedling tray with sprouts
-        "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80", // monstera indoor plant
-      ].filter((url): url is string => !!url);
+        typeof currentArticle.title === 'string' ? currentArticle.title : (currentArticle.title?.el || ''),
+        currentArticle.category || ''
+      );
 
       const preloadImage = (src: string): Promise<HTMLImageElement> => {
         const el = new Image();
@@ -798,9 +795,7 @@ Text: 📲 SmartGarden.gr (Δωρεάν Οδηγός)`;
         });
       };
 
-      const sceneImages = await Promise.all(
-        tikTokScript.scenes.map((_, i) => preloadImage(backgroundPhotoPool[i % backgroundPhotoPool.length]))
-      );
+      const sceneImages = await Promise.all(sceneImageUrls.map((url) => preloadImage(url)));
 
       setGenerationProgress(15);
 

@@ -201,6 +201,42 @@ export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
     keywords: ["κομποστ", "κομποστοποιηση", "compost", "bokashi", "γαιοσκωληκες", "οργανικα", "λιπασμα", "ανακυκλωση"],
     category: "vegetable_garden",
     alt: "Kitchen compost caddy with vegetable scraps"
+  },
+  // ──────────────────────────────────────────
+  // 🪴 TECHNIQUES & CONDITIONS — added 2026-09-15 because video scenes talk about
+  // actions (watering, repotting, sowing, frost) far more often than they name a
+  // specific plant, and without these every scene fell through to the generic pool.
+  // All five visually verified before being added, per the standing rule.
+  // ──────────────────────────────────────────
+  {
+    url: "https://images.unsplash.com/photo-1589135716303-d04b9f3ab4b6?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["χωμα", "υποστρωμα", "εδαφος", "τυρφη", "περλιτης", "αποστραγγιση", "soil", "substrate", "ph εδαφους", "δομη εδαφους", "ζιζανια"],
+    category: "plant_care",
+    alt: "Dark rich potting soil texture close-up"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1560808193-0d6ef54659ad?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ριζες", "ριζικο συστημα", "μεταφυτευση", "γλαστρα", "repot", "roots", "root-bound", "σηψιρριζια", "κλαδεμα ριζων", "αλλαγη γλαστρας"],
+    category: "plant_care",
+    alt: "Dense root ball of a pot-bound plant"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1621272155982-eb405db62303?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["σπορα", "σπορος", "σποροι", "σπορεια", "δισκακια", "φυτωριο", "seedling", "seedlings", "βλαστηση", "φυτρωμα", "νεαρα φυτα"],
+    category: "vegetables",
+    alt: "Seedling trays in a plant nursery"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1506543730435-e2c1d4553a84?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["μοσχευμα", "μοσχευματα", "πολλαπλασιασμος", "cutting", "cuttings", "propagation", "ριζοβολια", "ορμονη", "καταβολαδα"],
+    category: "plant_care",
+    alt: "Plant cutting rooting in a glass of water"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1483309830935-35efd1b07946?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["παγετος", "παγωνια", "χειμωνας", "frost", "ψυχος", "προστασια απο κρυο", "διαχειμαση", "υαλοβαμβακας", "θερμοκηπιο χειμωνα"],
+    category: "plant_care",
+    alt: "Frost crystals covering green leaves"
   }
 ];
 
@@ -277,4 +313,129 @@ export function getSmartArticleImage(topicTitle: string, category: string = "", 
   }
   const fallbackIndex = Math.abs(hash + indexSeed) % FALLBACK_BOTANICAL_PHOTOS.length;
   return FALLBACK_BOTANICAL_PHOTOS[fallbackIndex];
+}
+
+/**
+ * Picks one background photo per video scene, matched to what that scene is actually
+ * saying rather than to the article as a whole.
+ *
+ * Before this existed, TikTokStudio cycled a fixed 7-photo pool by scene index, so every
+ * video on the channel showed the same tomatoes and greenhouse regardless of topic — a
+ * pruning step and a watering step got whatever the index landed on. Scoring each scene's
+ * own text against the curated keyword library fixes that; photos already used earlier in
+ * the same video are penalised so a video doesn't repeat one shot throughout.
+ *
+ * The article's own photo is reserved for the opening scene, which is the one frame
+ * YouTube is most likely to lift as a thumbnail.
+ */
+/**
+ * Generic garden imagery that is never *wrong* for a gardening video, used when a scene's
+ * wording matches nothing specific (hooks and call-to-action scenes usually don't).
+ * Falling back to a random in-category photo instead produced exactly the failure the
+ * user reported — lemons on a weed-control video, kiwis next to a spray-dosage step.
+ */
+const NEUTRAL_SCENE_PHOTOS = [
+  "https://images.unsplash.com/photo-1758372120921-29d4569f609a?w=1200&auto=format&fit=crop&q=80", // vertical green wall
+  "https://images.unsplash.com/photo-1589135716303-d04b9f3ab4b6?w=1200&auto=format&fit=crop&q=80", // rich potting soil
+  "https://images.unsplash.com/photo-1621272155982-eb405db62303?w=1200&auto=format&fit=crop&q=80", // seedling trays
+  "https://images.unsplash.com/photo-1738598665806-7ecc32c3594c?w=1200&auto=format&fit=crop&q=80", // drip irrigation
+];
+
+/**
+ * Picks one background photo per video scene, matched to what that scene actually says.
+ *
+ * This replaced a fixed 7-photo list cycled by scene index, which meant every video on the
+ * channel showed the same tomatoes/greenhouse/bonsai whatever the subject was — the user's
+ * words (2026-09-15): "όλα δείχνουν τις ίδιες 4-5 φώτο... ενώ θα έπρεπε να δείχνουν αυτό
+ * που περιγράφει κάθε στιγμή".
+ *
+ * Two details matter for Greek. Keywords are matched on a stem as well as in full, because
+ * scene text is inflected ("σπόρους" never contains "σποροι") and exact substring matching
+ * silently missed most of them. And when nothing matches, the fallback is deliberately
+ * neutral greenery rather than another in-category photo, since the category lottery is
+ * what put citrus on a composting video in the first place.
+ */
+export function getSceneImages(
+  sceneTexts: string[],
+  articleImage?: string,
+  articleTitle: string = "",
+  category: string = ""
+): string[] {
+  const used = new Set<string>();
+  const result: string[] = [];
+
+  const matchScore = (text: string, photo: CuratedPhoto): number => {
+    const haystack = stripAccents(text);
+    let score = 0;
+    for (const kw of photo.keywords) {
+      const normKw = stripAccents(kw);
+      if (normKw.length < 4) continue;
+      if (haystack.includes(normKw)) {
+        score += normKw.length;
+        continue;
+      }
+      // Greek inflection: "σπόρους"/"σπόρων" won't contain "σποροι", but they share a stem.
+      // Only for reasonably long keywords, so short ones can't match loosely by accident.
+      if (normKw.length >= 6) {
+        const stem = normKw.slice(0, normKw.length - 2);
+        if (haystack.includes(stem)) score += stem.length;
+      }
+    }
+    return score;
+  };
+
+  const pickUnused = (candidates: string[]): string | null => {
+    for (const url of candidates) {
+      if (!used.has(url)) return url;
+    }
+    return null;
+  };
+
+  sceneTexts.forEach((text, index) => {
+    // Scene 0 keeps the article's own photo — it's the most on-topic image available and
+    // the frame YouTube is most likely to lift as the thumbnail.
+    if (index === 0 && articleImage) {
+      used.add(articleImage);
+      result.push(articleImage);
+      return;
+    }
+
+    let best: CuratedPhoto | null = null;
+    let bestScore = 0;
+    for (const photo of CURATED_GARDENING_PHOTOS) {
+      let score = matchScore(text, photo);
+      if (score > 0 && used.has(photo.url)) score -= 100; // prefer variety within one video
+      if (score > bestScore) {
+        bestScore = score;
+        best = photo;
+      }
+    }
+    if (best && bestScore > 0) {
+      used.add(best.url);
+      result.push(best.url);
+      return;
+    }
+
+    // No match in this scene's own wording. Try the article's overall subject once, then
+    // fall back to neutral greenery rather than a random in-category photo.
+    let titleMatch: string | null = null;
+    let titleScore = 0;
+    for (const photo of CURATED_GARDENING_PHOTOS) {
+      const score = matchScore(articleTitle + " " + category, photo);
+      if (score > titleScore && !used.has(photo.url)) {
+        titleScore = score;
+        titleMatch = photo.url;
+      }
+    }
+    const chosen =
+      titleMatch ||
+      pickUnused(NEUTRAL_SCENE_PHOTOS) ||
+      pickUnused(FALLBACK_BOTANICAL_PHOTOS) ||
+      NEUTRAL_SCENE_PHOTOS[index % NEUTRAL_SCENE_PHOTOS.length];
+
+    used.add(chosen);
+    result.push(chosen);
+  });
+
+  return result;
 }
