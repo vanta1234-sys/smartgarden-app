@@ -270,7 +270,7 @@ $jobId = date('Ymd-His') . '-' . substr(preg_replace('/[^a-z0-9]/', '', strtolow
 $dir = $JOBS_ROOT . '/' . $jobId;
 if (!is_dir($dir) && !@mkdir($dir, 0755, true)) sg_err('Could not create job dir: ' . $dir);
 
-file_put_contents($dir . '/job.json', json_encode(array(
+$jobJson = json_encode(array(
     'article' => array(
         'id' => $article['id'] ?? '',
         'slug' => $article['slug'] ?? '',
@@ -287,7 +287,12 @@ file_put_contents($dir . '/job.json', json_encode(array(
     'autoPublish' => isset($_GET['publish']),
     'key' => $_GET['key'],
     'created' => date('c'),
-), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+// json_encode returns false on malformed UTF-8 rather than throwing, and file_put_contents
+// would then happily write an empty file the worker can only report as unreadable.
+if ($jobJson === false) sg_err('Could not encode the job: ' . json_last_error_msg());
+file_put_contents($dir . '/job.json', $jobJson);
 
 file_put_contents($dir . '/status.json', json_encode(array(
     'state' => 'queued', 'progress' => 0, 'message' => 'Σε αναμονή', 'updated' => date('c'),

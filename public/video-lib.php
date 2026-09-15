@@ -74,7 +74,69 @@ function sg_shorten($text, $max) {
     $cut = mb_substr($text, 0, $max, 'UTF-8');
     $sp = mb_strrpos($cut, ' ', 0, 'UTF-8');
     if ($sp !== false && $sp > $max * 0.6) $cut = mb_substr($cut, 0, $sp, 'UTF-8');
-    return rtrim($cut, " ,·;:-") . '…';
+    // preg with /u, not rtrim: rtrim strips BYTES, and "·" is 0xC2 0xB7 in UTF-8 while "η"
+    // is 0xCE 0xB7. Trimming a Greek word ending in "η" tore the character in half, left the
+    // string invalid UTF-8, and made json_encode return false further up — which surfaced as
+    // an empty job.json and "job.json unreadable" from the worker.
+    return preg_replace('/[\s,·;:\-]+$/u', '', $cut) . '…';
+}
+
+/**
+ * Lay spoken words out into centred lines and hand back a box for each one.
+ *
+ * Positions come from the same FreeType metrics GD draws with, so a word measured here
+ * lands where ffmpeg's drawtext puts it. Returned y values are the TOP of each line,
+ * which is what drawtext expects — GD's own text calls use a baseline instead.
+ */
+function sg_layout_words($words, $size, $maxWidth, $centerX, $topY, $lineHeight) {
+    // Measuring a lone " " with imagettfbbox gives a bounding box, not an advance, and comes
+    // back far too wide. The difference between two strings that differ only by one space is
+    // the real advance.
+    $spaceW = max(1, sg_text_width('ΑΑ ΑΑ', $size) - sg_text_width('ΑΑΑΑ', $size));
+    $lines = array();
+    $cur = array();
+    $curW = 0;
+
+    foreach ($words as $w) {
+        $t = trim((string) ($w['text'] ?? ''));
+        if ($t === '') continue;
+        $wid = sg_text_width($t, $size);
+        $need = (count($cur) ? $spaceW : 0) + $wid;
+        if (count($cur) && $curW + $need > $maxWidth) {
+            $lines[] = array($cur, $curW);
+            $cur = array();
+            $curW = 0;
+            $need = $wid;
+        }
+        $cur[] = array('text' => $t, 'width' => $wid, 'start' => $w['start'], 'end' => $w['end']);
+        $curW += $need;
+    }
+    if (count($cur)) $lines[] = array($cur, $curW);
+
+    $out = array();
+    foreach ($lines as $li => $ln) {
+        list($items, $lineW) = $ln;
+        $x = $centerX - $lineW / 2;
+        $y = $topY + $li * $lineHeight;
+        foreach ($items as $it) {
+            $out[] = array(
+                'text' => $it['text'],
+                'start' => $it['start'],
+                'end' => $it['end'],
+                'x' => (int) round($x),
+                'y' => (int) round($y),
+            );
+            $x += $it['width'] + $spaceW;
+        }
+    }
+    return $out;
+}
+
+/** How many lines sg_layout_words will produce, so the block can be centred vertically. */
+function sg_count_word_lines($layout) {
+    $ys = array();
+    foreach ($layout as $w) $ys[$w['y']] = true;
+    return max(1, count($ys));
 }
 
 // ============================================================================
@@ -146,7 +208,10 @@ function sg_build_script($article) {
         ),
         array(
             'tag' => $angle['problemTag'],
-            'voiceover' => sg_shorten($summary, 130),
+            // Greek TTS runs at roughly 17 characters a second, so these caps are really
+            // duration caps. The whole video targets ~20s: past that, watch-through on a
+            // Short falls off a cliff and the payoff never gets seen.
+            'voiceover' => sg_shorten($summary, 58),
             'onScreenText' => $angle['problemText'],
             'step' => 0,
         ),
@@ -157,10 +222,12 @@ function sg_build_script($article) {
         $bullet = isset($bullets[$i]) && trim($bullets[$i]) !== '' ? $bullets[$i] : $stepFallbacks[$i];
         $scenes[] = array(
             'tag' => 'ΒΗΜΑ ' . ($i + 1),
-            'voiceover' => $stepOrdinals[$i] . ': ' . sg_shorten($bullet, 165),
+            // No spoken "Πρώτον/Δεύτερον" any more: the numbered badge on screen already
+            // says which step this is, and the word cost most of a second each time.
+            'voiceover' => sg_shorten($bullet, 58),
             // Generous, because the renderer wraps to four lines and shrinks the type to fit.
             // Cutting at 95 chars put an ellipsis in the middle of most takeaways.
-            'onScreenText' => sg_shorten($bullet, 150),
+            'onScreenText' => sg_shorten($bullet, 95),
             'step' => $i + 1,
         );
     }
@@ -169,9 +236,9 @@ function sg_build_script($article) {
         'tag' => 'CALL TO ACTION',
         // Spoken text differs from the caption on purpose: Greek TTS mangles "SmartGarden.gr",
         // so the audio gets a phonetic spelling while the screen shows the real one.
-        'voiceover' => 'Αποθήκευσε το για αργότερα και δες τον πλήρη οδηγό στο Σμαρτ Γκάρντεν τελεία τζι-αρ',
+        'voiceover' => 'Όλος ο οδηγός στο Σμαρτ Γκάρντεν τελεία τζι-αρ',
         'onScreenText' => 'Αποθήκευσέ το για αργότερα',
-        'captionDisplay' => 'Αποθήκευσε το για αργότερα και δες τον πλήρη οδηγό στο SmartGarden.gr',
+        'captionDisplay' => 'Όλος ο οδηγός στο SmartGarden.gr',
         'step' => 0,
     );
 
@@ -443,6 +510,11 @@ function sg_render_overlay($scene, $dest) {
     $hookText = sg_strip_emoji($scene['onScreenText']);
     $step = isset($scene['step']) ? (int) $scene['step'] : 0;
 
+    // In word mode the spoken line is drawn by ffmpeg, word by word, in time with the
+    // narration. Everything static still comes from here — gradients, badge, watermark,
+    // footer — but the headline and caption are left out so the two don't overlap.
+    $wordMode = !empty($scene['wordMode']);
+
     // Start big and only shrink if the line count demands it. Shorts are watched on a phone
     // at arm's length, so undersized captions are the single most damaging thing here.
     $hookSize = 58;
@@ -470,9 +542,11 @@ function sg_render_overlay($scene, $dest) {
         imagettftext($img, 48, 0, (int) ($badgeX - $numW / 2), $badgeY + 18, $white, SG_FONT, $num);
     }
 
-    foreach ($hookLines as $line) {
-        sg_outlined_text($img, $line, SG_W / 2, $hookY, $hookSize, $white, $black);
-        $hookY += $lineHeight;
+    if (!$wordMode) {
+        foreach ($hookLines as $line) {
+            sg_outlined_text($img, $line, SG_W / 2, $hookY, $hookSize, $white, $black);
+            $hookY += $lineHeight;
+        }
     }
 
     // Subtitle strip. captionDisplay wins when a scene sets one, so the CTA scene's
@@ -480,7 +554,7 @@ function sg_render_overlay($scene, $dest) {
     // Skipped on step scenes: there the narration is just "Πρώτον: <the bullet>" and the
     // bullet is already the headline, so the strip only reprinted the same sentence in
     // smaller type under itself.
-    if ($step === 0) {
+    if ($step === 0 && !$wordMode) {
         $captionSource = !empty($scene['captionDisplay']) ? $scene['captionDisplay'] : $scene['voiceover'];
         $captionSource = sg_strip_emoji(str_replace(array('«', '»'), '', $captionSource));
         $capLines = array_slice(sg_wrap_lines($captionSource, 33, SG_W - 180), 0, 2);

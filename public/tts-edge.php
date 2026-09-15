@@ -14,6 +14,8 @@
 $text = isset($_GET['text']) ? trim($_GET['text']) : '';
 $voice = isset($_GET['voice']) ? trim($_GET['voice']) : 'el-GR-AthinaNeural';
 $rate = isset($_GET['rate']) ? trim($_GET['rate']) : '+0%';
+// ?meta=1 returns JSON with per-word timings alongside the audio, for caption tracks.
+$wantMeta = isset($_GET['meta']);
 
 if ($text === '') {
     http_response_code(400);
@@ -203,7 +205,7 @@ try {
             'context' => array(
                 'synthesis' => array(
                     'audio' => array(
-                        'metadataoptions' => array('sentenceBoundaryEnabled' => 'false', 'wordBoundaryEnabled' => 'false'),
+                        'metadataoptions' => array('sentenceBoundaryEnabled' => 'false', 'wordBoundaryEnabled' => $wantMeta ? 'true' : 'false'),
                         'outputFormat' => 'audio-24khz-48kbitrate-mono-mp3',
                     ),
                 ),
@@ -220,6 +222,7 @@ try {
     wsSendText($sock, $ssmlMsg);
 
     $audio = '';
+    $words = array();
     $turnEnded = false;
     $deadline = microtime(true) + 12;
 
@@ -235,6 +238,25 @@ try {
         } elseif ($frame['opcode'] === 0x1) { // text = status message
             if (strpos($frame['payload'], 'Path:turn.end') !== false) {
                 $turnEnded = true;
+            } elseif ($wantMeta && strpos($frame['payload'], 'Path:audio.metadata') !== false) {
+                // Edge reports when each word is spoken, in 100-nanosecond ticks from the
+                // start of the audio. That is what makes word-by-word captions possible
+                // without guessing at timings from character counts.
+                $split = explode("
+
+", $frame['payload'], 2);
+                $meta = isset($split[1]) ? json_decode($split[1], true) : null;
+                if (isset($meta['Metadata']) && is_array($meta['Metadata'])) {
+                    foreach ($meta['Metadata'] as $entry) {
+                        if (($entry['Type'] ?? '') !== 'WordBoundary') continue;
+                        $d = $entry['Data'] ?? array();
+                        $words[] = array(
+                            'text' => $d['text']['Text'] ?? '',
+                            'start' => round(($d['Offset'] ?? 0) / 10000000, 3),
+                            'end' => round((($d['Offset'] ?? 0) + ($d['Duration'] ?? 0)) / 10000000, 3),
+                        );
+                    }
+                }
             }
         }
     }
@@ -243,6 +265,18 @@ try {
 
     if (empty($audio)) {
         edgeTtsFail('No audio received from Edge TTS');
+    }
+
+    if ($wantMeta) {
+        // Audio and timings have to travel together: the caller needs both to build a
+        // caption track, and a second synthesis pass would return different timings.
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(array(
+            'success' => true,
+            'words' => $words,
+            'audioBase64' => base64_encode($audio),
+        ));
+        exit;
     }
 
     header('Content-Type: audio/mpeg');

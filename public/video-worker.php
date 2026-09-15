@@ -59,8 +59,28 @@ function sg_duration($ffprobe, $file) {
  * Both are called over HTTP against our own endpoints rather than being included, because
  * both scripts write audio straight to the output buffer and exit.
  */
-function sg_fetch_tts($text, $dest, $dir) {
+function sg_fetch_tts($text, $dest, $dir, &$words = null) {
+    $words = array();
     $clean = trim(str_replace(array('«', '»'), '', $text));
+
+    // meta=1 returns the audio together with the time each word is spoken. Both have to
+    // come from the same synthesis: asking twice would give timings for different audio.
+    $edgeMeta = 'https://smartgarden.gr/tts-edge.php?meta=1&voice=el-GR-AthinaNeural&text=' . rawurlencode($clean);
+    $metaFile = $dest . '.json';
+    if (sg_fetch_to_file($edgeMeta, $metaFile, 60)) {
+        $decoded = json_decode((string) @file_get_contents($metaFile), true);
+        @unlink($metaFile);
+        if (!empty($decoded['audioBase64'])) {
+            $bytes = base64_decode($decoded['audioBase64']);
+            if ($bytes !== false && strlen($bytes) > 4000 && @file_put_contents($dest, $bytes)) {
+                $words = isset($decoded['words']) ? $decoded['words'] : array();
+                return 'edge';
+            }
+        }
+    }
+    @unlink($metaFile);
+
+    // Plain audio, no timings — captions fall back to the static headline for this scene.
     $edge = 'https://smartgarden.gr/tts-edge.php?voice=el-GR-AthinaNeural&text=' . rawurlencode($clean);
     if (sg_fetch_to_file($edge, $dest, 60) && filesize($dest) > 4000) {
         // A 502 JSON error body would also be "a file"; real MP3 starts with ID3 or a frame sync.
@@ -125,16 +145,24 @@ function sg_run_job($dir) {
             imagedestroy($canvas);
         }
 
+        // --- narration --------------------------------------------------------
+        // Fetched before the overlay is drawn, because whether we got word timings decides
+        // whether the overlay should leave room for them.
+        $audio = $base . '.mp3';
+        $sceneWords = array();
+        $engine = sg_fetch_tts($scene['voiceover'], $audio, $dir, $sceneWords);
+
+        // The CTA keeps its static caption: its narration says "Σμαρτ Γκάρντεν" phonetically
+        // so the voice gets the brand right, and those words must never reach the screen.
+        $useWords = count($sceneWords) > 0 && empty($scene['captionDisplay']);
+        $scene['wordMode'] = $useWords;
+
         // --- text overlay -----------------------------------------------------
         $ov = $base . '_ov.png';
         if (!sg_render_overlay($scene, $ov)) {
             sg_status($dir, 'error', $pct, 'Αποτυχία στη δημιουργία των γραφικών (σκηνή ' . ($i + 1) . ')');
             return;
         }
-
-        // --- narration --------------------------------------------------------
-        $audio = $base . '.mp3';
-        $engine = sg_fetch_tts($scene['voiceover'], $audio, $dir);
         $audioDur = ($engine && file_exists($audio)) ? sg_duration($ffprobe, $audio) : 0.0;
         if ($audioDur <= 0.3) {
             // No usable narration: keep the scene on screen for a readable beat instead of
@@ -144,7 +172,9 @@ function sg_run_job($dir) {
             $audio = null;
             $sceneDur = 3.0;
         } else {
-            $sceneDur = min(15.0, max(2.0, $audioDur + 0.4));
+            // Tail padding trimmed from 0.4s to 0.22s and the ceiling from 15s to 6s: six
+            // scenes at 0.4s of dead air each was nearly 2.5s of the budget doing nothing.
+            $sceneDur = min(6.0, max(1.6, $audioDur + 0.22));
         }
         sg_log($dir, 'scene ' . $i . ': engine=' . ($engine ?: 'none') . ' audio=' . round($audioDur, 2) . 's dur=' . round($sceneDur, 2) . 's');
 
@@ -163,7 +193,39 @@ function sg_run_job($dir) {
         // consecutive scenes don't drift the same way.
         $out = $base . '.mp4';
         $panDirection = $i % 4;
-        $buildCmd = function ($moving, $preset) use ($ffmpeg, $sceneDur, $bg, $ov, $audio, $out, $panDirection) {
+
+        // --- word-by-word caption track ---------------------------------------
+        // Each spoken word is its own drawtext, switched on at the moment Edge says it is
+        // spoken and left up for the rest of the scene, with the word currently being said
+        // picked out in green. Text goes through textfile= rather than text=: Greek copy is
+        // full of characters drawtext treats as syntax, and one stray colon would break the
+        // whole filter graph.
+        $wordChain = 'null';
+        if ($useWords) {
+            $size = 52;
+            $lineHeight = 68;
+            $layout = sg_layout_words($sceneWords, $size, SG_W - 150, SG_W / 2, 0, $lineHeight);
+            if (count($layout)) {
+                $lines = sg_count_word_lines($layout);
+                // Centre the block on the same band the static headline used.
+                $offsetY = 900 - (int) (($lines - 1) * $lineHeight / 2) - $size;
+                $parts = array();
+                foreach ($layout as $k => $wd) {
+                    $txtFile = $base . '_w' . $k . '.txt';
+                    file_put_contents($txtFile, $wd['text']);
+                    $common = 'fontfile=' . SG_FONT . ':textfile=' . $txtFile
+                            . ':x=' . $wd['x'] . ':y=' . ($wd['y'] + $offsetY)
+                            . ':fontsize=' . $size . ':borderw=6:bordercolor=black@0.85';
+                    $start = sprintf('%.3f', max(0, $wd['start']));
+                    $end = sprintf('%.3f', max(0.05, $wd['end']));
+                    $parts[] = 'drawtext=' . $common . ":fontcolor=white:enable='gte(t\," . $start . ")'";
+                    $parts[] = 'drawtext=' . $common . ":fontcolor=0x6EE7A8:enable='between(t\," . $start . '\,' . $end . ")'";
+                }
+                $wordChain = implode(',', $parts);
+            }
+        }
+
+        $buildCmd = function ($moving, $preset) use ($ffmpeg, $sceneDur, $bg, $ov, $audio, $out, $panDirection, $wordChain) {
             // Eased 0..1 progress through the scene, so the drift starts and ends gently.
             $p = '(0.5-0.5*cos(PI*min(t/' . sprintf('%.3f', max(0.1, $sceneDur)) . '\,1)))';
             $mx = '(iw-ow)';
@@ -200,7 +262,7 @@ function sg_run_job($dir) {
             $txt = '[1:v]format=rgba,fade=t=in:st=0.10:d=' . sprintf('%.2f', $fadeT) . ':alpha=1'
                  . ',fade=t=out:st=' . sprintf('%.2f', $outT) . ':d=0.24:alpha=1[ov]';
 
-            $vf = $pic . ';' . $txt . ';[kb][ov]overlay=0:' . $rise . '[v]';
+            $vf = $pic . ';' . $txt . ';[kb][ov]overlay=0:' . $rise . '[base];[base]' . $wordChain . '[v]';
 
             $cmd = escapeshellarg($ffmpeg) . ' -y -hide_banner -loglevel error'
                  . ' -framerate 30 -loop 1 -t ' . sprintf('%.3f', $sceneDur) . ' -i ' . escapeshellarg($bg)
