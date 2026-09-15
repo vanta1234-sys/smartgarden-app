@@ -12,6 +12,7 @@
  */
 
 require_once __DIR__ . '/video-lib.php';
+require_once __DIR__ . '/notify.php';
 
 if (!defined('SG_JOB_DIR')) {
     if (PHP_SAPI !== 'cli' || !isset($argv[1])) {
@@ -336,6 +337,17 @@ function sg_run_job($dir) {
         if (!$ok) {
             sg_status($dir, 'error', $pct, 'Αποτυχία κωδικοποίησης στη σκηνή ' . ($i + 1),
                 array('detail' => 'exit=' . $exitCode . ' ' . $res));
+            sg_notify_failure('SmartGarden: το βίντεο δεν βγήκε', array(
+                'Το άρθρο δημοσιεύτηκε αλλά το βίντεο απέτυχε.',
+                '',
+                'Άρθρο: ' . ($job['article']['slug'] ?? '?'),
+                'Σκηνή:  ' . ($i + 1) . ' από ' . $n,
+                'Exit:   ' . $exitCode,
+                'ffmpeg: ' . ($res === '' ? '(καμία έξοδος — πιθανό OOM kill)' : $res),
+                '',
+                'Κατάσταση όλων των render:',
+                'https://smartgarden.gr/video-render.php?action=jobs&key=smartgarden_cron_x7K9pQ2026',
+            ));
             return;
         }
         if ($res !== '') sg_log($dir, 'scene ' . $i . ' ffmpeg: ' . $res);
@@ -360,6 +372,12 @@ function sg_run_job($dir) {
     if (!file_exists($final) || filesize($final) < 20000) {
         sg_log($dir, 'concat FAILED: ' . trim((string) $res));
         sg_status($dir, 'error', 85, 'Αποτυχία ένωσης των σκηνών', array('detail' => trim((string) $res)));
+        sg_notify_failure('SmartGarden: το βίντεο δεν βγήκε', array(
+            'Οι σκηνές βγήκαν αλλά η ένωσή τους απέτυχε.',
+            '',
+            'Άρθρο: ' . ($job['article']['slug'] ?? '?'),
+            'ffmpeg: ' . trim((string) $res),
+        ));
         return;
     }
 
@@ -482,6 +500,20 @@ function sg_publish($job, $dir, $jobId) {
         'error' => isset($tt['body']['error']) ? $tt['body']['error'] : null,
     );
     sg_log($dir, 'tiktok: ' . json_encode($result['tiktok'], JSON_UNESCAPED_UNICODE));
+
+    // Only YouTube is alerted on. TikTok has been failing on purpose since its production
+    // app is still in review, and an alert that fires every single day is one nobody reads.
+    if (!$result['youtube']['ok']) {
+        sg_notify_failure('SmartGarden: το βίντεο δεν ανέβηκε στο YouTube', array(
+            'Το βίντεο δημιουργήθηκε κανονικά αλλά το ανέβασμα απέτυχε.',
+            '',
+            'Άρθρο: ' . ($article['slug'] ?? '?'),
+            'Σφάλμα: ' . ($result['youtube']['error'] ?? '(άγνωστο)'),
+            '',
+            'Συνήθης αιτία: έληξε το refresh token του Google.',
+            'Επανασύνδεση: https://smartgarden.gr/youtube-auth-login.php',
+        ));
+    }
 
     return $result;
 }

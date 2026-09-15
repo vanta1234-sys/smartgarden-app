@@ -2406,6 +2406,56 @@ if (file_exists($serviceAccountPath)) {
 }
 
 // ==========================================
+// 7d. DID YESTERDAY'S RUN ACTUALLY FINISH?
+// ==========================================
+// The video render is detached, so this request is long gone before it succeeds or fails.
+// Checking the PREVIOUS day's article closes that gap: by now its render has either
+// produced an mp4 or it never will. On 2026-09-16 an article went out, the render died,
+// and nobody knew for hours — this is what would have caught it.
+//
+// Silent when everything worked. Best-effort, and never allowed to affect publishing.
+if (function_exists('curl_init')) {
+    require_once __DIR__ . '/notify.php';
+    $yesterday = date('Y-m-d', strtotime('-1 day'));
+    $prev = null;
+    foreach ($existingArticles as $a) {
+        if (($a['date'] ?? '') === $yesterday) { $prev = $a; break; }
+    }
+
+    if ($prev) {
+        $jobsRoot = is_dir(dirname(__DIR__) . '/video-jobs') ? dirname(__DIR__) . '/video-jobs' : __DIR__ . '/video-jobs';
+        $slugKey = preg_replace('/[^a-z0-9]/', '', strtolower($prev['slug'] ?? ''));
+        $found = null;
+        foreach ((array) glob($jobsRoot . '/*', GLOB_ONLYDIR) as $d) {
+            if ($slugKey !== '' && strpos(basename($d), substr($slugKey, 0, 24)) !== false) {
+                $st = json_decode((string) @file_get_contents($d . '/status.json'), true);
+                // Keep looking: a failed early attempt should not mask a later success.
+                if (!$found || ($st['state'] ?? '') === 'done') $found = $st;
+            }
+        }
+
+        if (!$found) {
+            sg_notify_failure('SmartGarden: χθεσινό άρθρο χωρίς βίντεο', array(
+                'Το χθεσινό άρθρο δημοσιεύτηκε αλλά δεν βρέθηκε καμία εργασία βίντεο γι’ αυτό.',
+                '',
+                'Άρθρο: ' . ($prev['slug'] ?? '?'),
+                'Πιθανή αιτία: το video-render.php δεν κλήθηκε ή δεν ξεκίνησε.',
+                '',
+                'https://smartgarden.gr/video-render.php?action=jobs&key=' . rawurlencode($videoKey),
+            ));
+        } elseif (($found['state'] ?? '') !== 'done') {
+            sg_notify_failure('SmartGarden: χθεσινό βίντεο απέτυχε', array(
+                'Το χθεσινό άρθρο δημοσιεύτηκε αλλά το βίντεο δεν ολοκληρώθηκε.',
+                '',
+                'Άρθρο:     ' . ($prev['slug'] ?? '?'),
+                'Κατάσταση: ' . ($found['state'] ?? '?'),
+                'Μήνυμα:    ' . ($found['message'] ?? '-'),
+            ));
+        }
+    }
+}
+
+// ==========================================
 // 8. OUTPUT JSON RESPONSE
 // ==========================================
 echo json_encode(array(

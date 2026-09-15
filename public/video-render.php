@@ -188,6 +188,24 @@ if ($action === 'probe') {
 }
 
 // ============================================================================
+// testalert - proves the failure alerts actually reach a person
+// ============================================================================
+// Monitoring that has never delivered a message is indistinguishable from no monitoring.
+if ($action === 'testalert') {
+    require_once __DIR__ . '/notify.php';
+    $sent = sg_notify_failure('SmartGarden: δοκιμή ειδοποίησης', array(
+        'Αυτό είναι δοκιμαστικό μήνυμα, δεν έχει χαλάσει τίποτα.',
+        'Επιβεβαιώνει ότι οι ειδοποιήσεις αποτυχίας φτάνουν σε άνθρωπο.',
+    ));
+    sg_out(array(
+        'success' => $sent,
+        'note' => $sent
+            ? 'Στάλθηκε. Το ίδιο θέμα δεν ξαναστέλνεται για 12 ώρες.'
+            : 'Δεν στάλθηκε: λείπει το BREVO_API_KEY, ή έχει ήδη σταλεί το ίδιο θέμα τις τελευταίες 12 ώρες.',
+    ));
+}
+
+// ============================================================================
 // jobs - recent renders and how they ended
 // ============================================================================
 // Failures were invisible: the admin page only lists jobs that produced an mp4, so a render
