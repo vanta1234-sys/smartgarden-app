@@ -90,11 +90,32 @@ export const LiveTelemetryCard: React.FC<LiveTelemetryCardProps> = ({
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         setIsLocating(false);
+        const { latitude, longitude, accuracy } = pos.coords;
+
+        // A desktop has no GPS chip, so the browser guesses from Wi-Fi and IP — and that
+        // guess regularly lands in another country entirely. Once it reported 33°C and a
+        // heatwave warning at one in the morning in September, because the coordinates
+        // resolved somewhere it was midday. Greek weather for a Greek site: if the fix is
+        // outside the country, say so and keep the city the reader already chose.
+        const inGreece =
+          latitude >= 34.5 && latitude <= 41.9 && longitude >= 19.2 && longitude <= 29.8;
+
+        if (!inGreece) {
+          setErrorMsg(
+            'Ο φυλλομετρητής έδωσε τοποθεσία εκτός Ελλάδας — σε υπολογιστή χωρίς GPS η εκτίμηση είναι συχνά λάθος. Επιλέξτε πόλη από τη λίστα.'
+          );
+          setTimeout(() => setErrorMsg(null), 7000);
+          return;
+        }
+
         const custom = {
           name: 'Η Τοποθεσία μου',
-          region: 'GPS Συντεταγμένες',
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
+          region:
+            typeof accuracy === 'number' && accuracy > 0
+              ? `GPS · ακρίβεια ±${Math.round(accuracy / 1000)} km`
+              : 'GPS Συντεταγμένες',
+          lat: latitude,
+          lon: longitude,
         };
         setCustomCity(custom);
         await loadWeather(custom);
