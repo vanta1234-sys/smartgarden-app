@@ -67,3 +67,63 @@ function sg_notify_failure($subject, array $lines) {
 
     return $status >= 200 && $status < 300;
 }
+
+/**
+ * Did yesterday's article actually get a video?
+ *
+ * The render is detached and long outlives the request that queued it, so the only honest
+ * time to ask is the following day, by which point it has either produced an mp4 or never
+ * will. Returns a small report and sends an alert when something is wrong.
+ *
+ * Lives here rather than inline in the cron so it can also be run on demand — a check that
+ * can only run during a publish cannot be tested without publishing.
+ */
+function sg_check_previous_day(array $articles, $jobsRoot, $cronKey, $notify = true) {
+    $yesterday = date('Y-m-d', strtotime('-1 day'));
+    $prev = null;
+    foreach ($articles as $a) {
+        if (($a['date'] ?? '') === $yesterday) { $prev = $a; break; }
+    }
+    if (!$prev) {
+        return array('checked' => $yesterday, 'result' => 'no-article', 'note' => 'Δεν βρέθηκε χθεσινό άρθρο.');
+    }
+
+    $slugKey = preg_replace('/[^a-z0-9]/', '', strtolower($prev['slug'] ?? ''));
+    $found = null;
+    foreach ((array) glob($jobsRoot . '/*', GLOB_ONLYDIR) as $d) {
+        if ($slugKey !== '' && strpos(basename($d), substr($slugKey, 0, 24)) !== false) {
+            $st = json_decode((string) @file_get_contents($d . '/status.json'), true);
+            // Keep looking: an early failed attempt must not mask a later success.
+            if (!$found || ($st['state'] ?? '') === 'done') $found = $st;
+        }
+    }
+
+    if (!$found) {
+        if ($notify) {
+            sg_notify_failure('SmartGarden: χθεσινό άρθρο χωρίς βίντεο', array(
+                'Το χθεσινό άρθρο δημοσιεύτηκε αλλά δεν βρέθηκε καμία εργασία βίντεο γι’ αυτό.',
+                '', 'Άρθρο: ' . ($prev['slug'] ?? '?'),
+                'Πιθανή αιτία: το video-render.php δεν κλήθηκε ή δεν ξεκίνησε.',
+                '', 'https://smartgarden.gr/video-render.php?action=jobs&key=' . rawurlencode($cronKey),
+            ));
+        }
+        return array('checked' => $yesterday, 'slug' => $prev['slug'], 'result' => 'no-video-job', 'alerted' => $notify);
+    }
+
+    if (($found['state'] ?? '') !== 'done') {
+        if ($notify) {
+            sg_notify_failure('SmartGarden: χθεσινό βίντεο απέτυχε', array(
+                'Το χθεσινό άρθρο δημοσιεύτηκε αλλά το βίντεο δεν ολοκληρώθηκε.',
+                '', 'Άρθρο:     ' . ($prev['slug'] ?? '?'),
+                'Κατάσταση: ' . ($found['state'] ?? '?'),
+                'Μήνυμα:    ' . ($found['message'] ?? '-'),
+            ));
+        }
+        return array('checked' => $yesterday, 'slug' => $prev['slug'], 'result' => 'video-failed',
+                     'state' => $found['state'] ?? '?', 'alerted' => $notify);
+    }
+
+    return array('checked' => $yesterday, 'slug' => $prev['slug'], 'result' => 'ok',
+                 'duration' => $found['duration'] ?? null,
+                 'youtube' => $found['publish']['youtube']['ok'] ?? null);
+}

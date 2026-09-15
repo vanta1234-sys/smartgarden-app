@@ -50,6 +50,12 @@ $perArticle = $articles ? round($totalCost / $articles, 4) : 0;
 echo json_encode(array(
     'success' => true,
     'articlesRecorded' => $articles,
+    // Recording is best-effort and silent by design, so the one thing that could make it
+    // never work — an unwritable path — is reported here rather than discovered by noticing
+    // the ledger stayed empty for a month.
+    'ledgerWritable' => file_exists(sg_usage_path())
+        ? is_writable(sg_usage_path())
+        : is_writable(dirname(sg_usage_path())),
     'note' => $articles === 0
         ? 'Δεν έχει καταγραφεί ακόμη χρήση. Η καταγραφή ξεκινά με το επόμενο άρθρο που θα βγάλει ο cron.'
         : null,

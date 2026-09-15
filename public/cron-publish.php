@@ -31,6 +31,24 @@ if (!$isCLI && !in_array($providedKey, $VALID_KEYS)) {
     exit;
 }
 
+// ?healthcheck=1 runs only the previous-day check and stops. A check that can only run
+// during a publish cannot be verified without publishing, which is how untested monitoring
+// code ends up in the one path that must not break.
+if (isset($_GET['healthcheck'])) {
+    require_once __DIR__ . '/notify.php';
+    header('Content-Type: application/json; charset=utf-8');
+    $arts = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true) ?: array();
+    $root = is_dir(dirname(__DIR__) . '/video-jobs') ? dirname(__DIR__) . '/video-jobs' : __DIR__ . '/video-jobs';
+    // notify=0 to look without mailing anyone.
+    $notify = !isset($_GET['notify']) || $_GET['notify'] !== '0';
+    echo json_encode(array(
+        'success' => true,
+        'articles' => count($arts),
+        'previousDay' => sg_check_previous_day($arts, $root, $providedKey !== '' ? $providedKey : $VALID_KEYS[0], $notify),
+    ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 $currentTimestamp = time();
 $greekMonths = array(
     1 => 'Ιανουαρίου', 2 => 'Φεβρουαρίου', 3 => 'Μαρτίου', 4 => 'Απριλίου',
@@ -2422,46 +2440,9 @@ if (file_exists($serviceAccountPath)) {
 // and nobody knew for hours — this is what would have caught it.
 //
 // Silent when everything worked. Best-effort, and never allowed to affect publishing.
-if (function_exists('curl_init')) {
-    require_once __DIR__ . '/notify.php';
-    $yesterday = date('Y-m-d', strtotime('-1 day'));
-    $prev = null;
-    foreach ($existingArticles as $a) {
-        if (($a['date'] ?? '') === $yesterday) { $prev = $a; break; }
-    }
-
-    if ($prev) {
-        $jobsRoot = is_dir(dirname(__DIR__) . '/video-jobs') ? dirname(__DIR__) . '/video-jobs' : __DIR__ . '/video-jobs';
-        $slugKey = preg_replace('/[^a-z0-9]/', '', strtolower($prev['slug'] ?? ''));
-        $found = null;
-        foreach ((array) glob($jobsRoot . '/*', GLOB_ONLYDIR) as $d) {
-            if ($slugKey !== '' && strpos(basename($d), substr($slugKey, 0, 24)) !== false) {
-                $st = json_decode((string) @file_get_contents($d . '/status.json'), true);
-                // Keep looking: a failed early attempt should not mask a later success.
-                if (!$found || ($st['state'] ?? '') === 'done') $found = $st;
-            }
-        }
-
-        if (!$found) {
-            sg_notify_failure('SmartGarden: χθεσινό άρθρο χωρίς βίντεο', array(
-                'Το χθεσινό άρθρο δημοσιεύτηκε αλλά δεν βρέθηκε καμία εργασία βίντεο γι’ αυτό.',
-                '',
-                'Άρθρο: ' . ($prev['slug'] ?? '?'),
-                'Πιθανή αιτία: το video-render.php δεν κλήθηκε ή δεν ξεκίνησε.',
-                '',
-                'https://smartgarden.gr/video-render.php?action=jobs&key=' . rawurlencode($videoKey),
-            ));
-        } elseif (($found['state'] ?? '') !== 'done') {
-            sg_notify_failure('SmartGarden: χθεσινό βίντεο απέτυχε', array(
-                'Το χθεσινό άρθρο δημοσιεύτηκε αλλά το βίντεο δεν ολοκληρώθηκε.',
-                '',
-                'Άρθρο:     ' . ($prev['slug'] ?? '?'),
-                'Κατάσταση: ' . ($found['state'] ?? '?'),
-                'Μήνυμα:    ' . ($found['message'] ?? '-'),
-            ));
-        }
-    }
-}
+require_once __DIR__ . '/notify.php';
+$jobsRootForCheck = is_dir(dirname(__DIR__) . '/video-jobs') ? dirname(__DIR__) . '/video-jobs' : __DIR__ . '/video-jobs';
+$previousDay = sg_check_previous_day($existingArticles, $jobsRootForCheck, $videoKey);
 
 // ==========================================
 // 8. OUTPUT JSON RESPONSE
