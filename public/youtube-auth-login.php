@@ -31,6 +31,10 @@ $params = http_build_query([
         'https://www.googleapis.com/auth/youtube.upload',
         'https://www.googleapis.com/auth/yt-analytics.readonly',
         'https://www.googleapis.com/auth/youtube.readonly',
+        // Search Console rides along on the same Google account and the same consent
+        // screen, so one approval covers both. Asking twice means a second chance to
+        // never get round to it.
+        'https://www.googleapis.com/auth/webmasters.readonly',
     )),
     'state' => $state,
     // offline + consent (not just "select_account") is required to actually get a
