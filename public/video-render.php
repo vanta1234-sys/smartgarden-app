@@ -188,6 +188,40 @@ if ($action === 'probe') {
 }
 
 // ============================================================================
+// jobs - recent renders and how they ended
+// ============================================================================
+// Failures were invisible: the admin page only lists jobs that produced an mp4, so a render
+// that died left the article with no video and nothing anywhere said so. This lists every
+// recent job with its state, newest first.
+if ($action === 'jobs') {
+    $rows = array();
+    foreach ((array) glob($JOBS_ROOT . '/*', GLOB_ONLYDIR) as $d) {
+        $status = json_decode((string) @file_get_contents($d . '/status.json'), true);
+        $job = json_decode((string) @file_get_contents($d . '/job.json'), true);
+        $video = $d . '/video.mp4';
+        $rows[] = array(
+            'job' => basename($d),
+            'article' => isset($job['article']['slug']) ? $job['article']['slug'] : null,
+            'state' => isset($status['state']) ? $status['state'] : 'unknown',
+            'message' => isset($status['message']) ? $status['message'] : null,
+            'duration' => isset($status['duration']) ? $status['duration'] : null,
+            'video' => is_file($video) ? filesize($video) : 0,
+            'published' => isset($status['publish']) ? $status['publish'] : null,
+            'when' => date('c', filemtime($d)),
+        );
+    }
+    usort($rows, function ($a, $b) { return strcmp($b['job'], $a['job']); });
+    $failed = 0;
+    foreach ($rows as $r) if ($r['state'] !== 'done') $failed++;
+    sg_out(array(
+        'success' => true,
+        'total' => count($rows),
+        'not_done' => $failed,
+        'jobs' => array_slice($rows, 0, isset($_GET['limit']) ? (int) $_GET['limit'] : 15),
+    ));
+}
+
+// ============================================================================
 // cleanup
 // ============================================================================
 if ($action === 'cleanup') {

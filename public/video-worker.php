@@ -366,6 +366,51 @@ function sg_run_job($dir) {
     foreach ($sceneFiles as $f) @unlink($f);
     @unlink($listFile);
 
+    // --- music bed ------------------------------------------------------------
+    // Optional: any mp3 dropped into public/audio/ becomes a backing track. Tracks are
+    // picked per article rather than at random, so re-rendering the same article gives the
+    // same video, and consecutive articles don't land on the same track.
+    //
+    // Mixed in as a separate pass over the finished file with -c:v copy, so adding music
+    // costs one audio encode rather than redoing every scene. normalize=0 on amix matters:
+    // without it amix halves both inputs and the narration drops with the music.
+    $musicDir = __DIR__ . '/audio';
+    $tracks = array_values(array_filter((array) glob($musicDir . '/*.mp3'), 'is_file'));
+    if (count($tracks)) {
+        sort($tracks);
+        $seed = 0;
+        $slug = (string) ($job['article']['slug'] ?? '');
+        for ($k = 0; $k < strlen($slug); $k++) $seed += ord($slug[$k]);
+        $track = $tracks[$seed % count($tracks)];
+
+        $withMusic = $dir . '/video_music.mp4';
+        $total = sg_duration($ffprobe, $final);
+        $musicOut = max(0.5, $total - 1.6);
+        $bed = '[1:a]volume=0.11'
+             . ',afade=t=in:st=0:d=1.2'
+             . ',afade=t=out:st=' . sprintf('%.2f', $musicOut) . ':d=1.6[bed]';
+        $mix = '[0:a][bed]amix=inputs=2:duration=first:normalize=0[a]';
+
+        $mcmd = escapeshellarg($ffmpeg) . ' -y -hide_banner -loglevel error'
+              . ' -i ' . escapeshellarg($final)
+              . ' -stream_loop -1 -i ' . escapeshellarg($track)
+              . ' -filter_complex ' . escapeshellarg($bed . ';' . $mix)
+              . ' -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 128k -ar 44100 -ac 2'
+              . ' -shortest -movflags +faststart ' . escapeshellarg($withMusic) . ' 2>&1';
+
+        $mres = trim((string) @shell_exec($mcmd));
+        $mdur = file_exists($withMusic) ? sg_duration($ffprobe, $withMusic) : 0.0;
+        if ($mdur >= $total - 0.5) {
+            @unlink($final);
+            @rename($withMusic, $final);
+            sg_log($dir, 'music: ' . basename($track) . ' mixed in');
+        } else {
+            // Best-effort: a video with no music beats no video at all.
+            @unlink($withMusic);
+            sg_log($dir, 'music FAILED (' . basename($track) . '), keeping narration only: ' . $mres);
+        }
+    }
+
     $duration = sg_duration($ffprobe, $final);
     sg_log($dir, 'done: ' . filesize($final) . ' bytes, ' . round($duration, 2) . 's');
 
