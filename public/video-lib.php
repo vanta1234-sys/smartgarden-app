@@ -143,6 +143,20 @@ function sg_count_word_lines($layout) {
 // Script building - mirrors the `tikTokScript` memo in TikTokStudio.tsx
 // ============================================================================
 
+/**
+ * Which hook pool an article title falls into: qa, guide or problem.
+ *
+ * Pulled out of sg_build_script so the analytics side can group videos by the same
+ * classification the renderer used — otherwise "which hook style holds attention" is
+ * answered against a different definition than the one that produced the videos.
+ */
+function sg_hook_pool_name($title) {
+    $lower = mb_strtolower(trim(preg_replace('/[\(\):]/u', '', (string) $title)), 'UTF-8');
+    if (preg_match('/ερωτ[ήη]σει|απαντ[ήη]σει/u', $lower)) return 'qa';
+    if (preg_match('/οδηγ[όο]ς|βήμα.{0,3}βήμα|πλήρης οδηγ/u', $lower)) return 'guide';
+    return 'problem';
+}
+
 function sg_build_script($article) {
     $title = isset($article['title']['el']) ? $article['title']['el'] : (string) ($article['title'] ?? '');
     $summary = isset($article['summary']['el']) ? $article['summary']['el'] : (string) ($article['summary'] ?? '');
@@ -184,14 +198,8 @@ function sg_build_script($article) {
               'problemText' => 'Αυτό ρωτάνε οι περισσότεροι'),
     );
 
-    $lower = mb_strtolower($cleanTitle, 'UTF-8');
-    if (preg_match('/ερωτ[ήη]σει|απαντ[ήη]σει/u', $lower)) {
-        $pool = $qaHookAngles;
-    } elseif (preg_match('/οδηγ[όο]ς|βήμα.{0,3}βήμα|πλήρης οδηγ/u', $lower)) {
-        $pool = $guideHookAngles;
-    } else {
-        $pool = $problemHookAngles;
-    }
+    $poolName = sg_hook_pool_name($cleanTitle);
+    $pool = $poolName === 'qa' ? $qaHookAngles : ($poolName === 'guide' ? $guideHookAngles : $problemHookAngles);
 
     // Deterministic per article, so re-running a job produces the identical video.
     $id = (string) ($article['id'] ?? '');

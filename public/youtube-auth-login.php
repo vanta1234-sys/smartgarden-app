@@ -23,7 +23,15 @@ $params = http_build_query([
     'client_id' => $clientId,
     'redirect_uri' => $redirectUri,
     'response_type' => 'code',
-    'scope' => 'https://www.googleapis.com/auth/youtube.upload',
+    // upload alone is enough to publish, but says nothing about what happened next.
+    // yt-analytics.readonly gives retention (average view percentage — the number that
+    // showed videos were being abandoned at 17s) and youtube.readonly is what lets us
+    // list our own uploads while they are still private.
+    'scope' => implode(' ', array(
+        'https://www.googleapis.com/auth/youtube.upload',
+        'https://www.googleapis.com/auth/yt-analytics.readonly',
+        'https://www.googleapis.com/auth/youtube.readonly',
+    )),
     'state' => $state,
     // offline + consent (not just "select_account") is required to actually get a
     // refresh_token back — Google only issues one on the first real consent grant,
