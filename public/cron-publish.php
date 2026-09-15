@@ -1912,6 +1912,13 @@ function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
             $rawB = curl_multi_getcontent($chB);
             $codeA = curl_getinfo($chA, CURLINFO_HTTP_CODE);
             $codeB = curl_getinfo($chB, CURLINFO_HTTP_CODE);
+
+            // Gemini reports its token usage on every response and it was being thrown away,
+            // so the marginal cost of an article was unknowable without opening Google's
+            // billing console. Both halves are counted: an article comes from two parallel
+            // calls and totalling one would halve the answer. Best-effort by design.
+            require_once __DIR__ . '/usage-ledger.php';
+            @sg_record_usage(array($rawA, $rawB), $model, $selectedTopic['slug'] ?? '');
             $textA = extractGeminiText($rawA, $codeA);
             $textB = extractGeminiText($rawB, $codeB);
 
@@ -2212,9 +2219,10 @@ if (file_exists($pinterestTokensPath) && file_exists($pinterestBoardsPath)) {
 // Best-effort and deliberately silent, like the Pinterest and Facebook steps: a video
 // problem must never fail article publishing.
 $videoJobId = null;
+// Defined outside the branch: the previous-day check further down builds a link with it and
+// would otherwise depend on this block having run.
+$videoKey = $providedKey !== '' ? $providedKey : $VALID_KEYS[0];
 if (!empty($newArticleObj['id'])) {
-    // Falls back to the first valid key because $providedKey is empty on a CLI run.
-    $videoKey = $providedKey !== '' ? $providedKey : $VALID_KEYS[0];
     $videoCh = curl_init('https://smartgarden.gr/video-render.php?action=start&publish=1'
         . '&articleId=' . rawurlencode($newArticleObj['id'])
         . '&key=' . rawurlencode($videoKey));

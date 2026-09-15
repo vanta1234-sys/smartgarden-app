@@ -32,6 +32,8 @@ const SERVER_OWNED_FILES = new Set([
   "plant_diagnosis_usage.json",
   "newsletter_signup_usage.json",
   "qa_usage.json",
+  // Written by the live cron every time it publishes; a local copy would erase history.
+  "gemini_usage.json",
 ]);
 
 async function deploy() {
