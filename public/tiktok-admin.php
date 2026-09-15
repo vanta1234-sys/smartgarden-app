@@ -171,6 +171,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['job']) && $accessToke
   .env { display: inline-block; background: #eef3ec; border: 1px solid #cfe0d2; padding: 4px 10px; border-radius: 99px; font-size: 12px; }
   .creator { display: flex; align-items: center; gap: 12px; }
   .creator img { width: 48px; height: 48px; border-radius: 50%; }
+  .relink { display: inline-block; margin-top: 14px; padding: 10px 16px; border-radius: 9px;
+           background: #14301C; color: #fff; text-decoration: none; font-weight: 700; font-size: 14px; }
   .step { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #5b6b5f; margin-top: 18px; }
 </style>
 </head>
@@ -193,6 +195,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['job']) && $accessToke
             <?= htmlspecialchars(isset($creator['display_name']) ? $creator['display_name'] : '') ?>
           </span>
         </span>
+        <?php // An already-connected account otherwise has no visible OAuth step to show. ?>
+        <a class="relink" href="/tiktok-auth-login.php?<?= $isSandbox ? 'sandbox=1&amp;' : '' ?>consent=1">
+          Σύνδεση ξανά με TikTok (νέα έγκριση δικαιωμάτων)
+        </a>
       <?php else: ?>
         <span class="bad">✗ Μη συνδεδεμένο</span> —
         <a href="/tiktok-auth-login.php<?= $isSandbox ? '?sandbox=1' : '' ?>">σύνδεση μέσω OAuth</a>
