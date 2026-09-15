@@ -160,13 +160,15 @@ export const Footer: React.FC<FooterProps> = ({
         <div className="pt-8 border-t border-neutral-850 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <p>© 2026 SmartGarden.gr — Όλα τα δικαιώματα διατηρούνται.</p>
           <div className="flex items-center gap-4">
-            <a href="#privacy" onClick={(e) => e.preventDefault()} className="hover:text-neutral-400">
+            {/* These three were href="#privacy" with preventDefault() — they looked like
+                links and went nowhere. All three targets are real pages now. */}
+            <a href="/privacy" className="hover:text-neutral-400">
               {lang === 'el' ? 'Πολιτική Απορρήτου' : 'Privacy Policy'}
             </a>
-            <a href="#terms" onClick={(e) => e.preventDefault()} className="hover:text-neutral-400">
+            <a href="/terms" className="hover:text-neutral-400">
               {lang === 'el' ? 'Όροι Χρήσης' : 'Terms'}
             </a>
-            <a href="#editorial" onClick={(e) => e.preventDefault()} className="hover:text-neutral-400">
+            <a href="/syntaktis" className="hover:text-neutral-400">
               {lang === 'el' ? 'Συντακτική Ομάδα' : 'Editorial Team'}
             </a>
           </div>

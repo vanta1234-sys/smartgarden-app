@@ -21,6 +21,7 @@ import { ArticleToolLinks } from './components/ArticleToolLinks';
 import { LunarCalendarPage, LunarBadge } from './components/LunarCalendarPage';
 import { DailyBrief } from './components/DailyBrief';
 import { SoilCalculatorPage } from './components/SoilCalculatorPage';
+import { LegalPage } from './components/LegalPage';
 import { SoilCalculator } from './components/SoilCalculator';
 import { SymptomWizard } from './components/SymptomWizard';
 import { CompanionMatrix } from './components/CompanionMatrix';
@@ -222,7 +223,7 @@ export default function App() {
   // without adding it here silently breaks that page's <title>/meta tags, since this
   // effect still runs and overwrites them regardless of what JSX actually renders.
   const isStaticPageRoute = typeof window !== 'undefined'
-    && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy|pagetos|fyta|rotiste|selini|xoma|instagram-studio)/.test(window.location.pathname);
+    && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy|pagetos|fyta|rotiste|selini|xoma|instagram-studio|privacy|terms)/.test(window.location.pathname);
 
   // Auto-fetch live articles from latest_articles.json on mount & inject SEO Schema
   useEffect(() => {
@@ -935,6 +936,12 @@ pause
   }
   if (pathname.match(/^\/rotiste\/?/)) {
     return <AskAgronomistPage onBack={handleBackToHome} />;
+  }
+  if (pathname.match(/^\/privacy\/?$/)) {
+    return <LegalPage variant="privacy" onBack={handleBackToHome} />;
+  }
+  if (pathname.match(/^\/terms\/?$/)) {
+    return <LegalPage variant="terms" onBack={handleBackToHome} />;
   }
   // Internal content tool — reachable by URL but deliberately kept out of the sitemap,
   // the footer and llms.txt, since it is for producing posts, not for readers.
