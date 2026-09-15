@@ -88,6 +88,32 @@ foreach ((array) glob($jobsRoot . '/*', GLOB_ONLYDIR) as $dir) {
 }
 usort($jobs, function ($a, $b) { return $b['mtime'] - $a['mtime']; });
 
+// ?check=1 runs only the init call and reports the raw result as JSON. Used to confirm the
+// creator's pending-draft queue is clear before recording a demo: TikTok rejects init with
+// spam_risk_too_many_pending_share once too many uploaded drafts sit unpublished, and that
+// failure is invisible until it lands in the middle of a take.
+if (isset($_GET['check'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    if (!$accessToken) {
+        echo json_encode(array('ok' => false, 'reason' => 'not connected'));
+        exit;
+    }
+    $probe = ttCall('POST', 'https://open.tiktokapis.com/v2/post/publish/inbox/video/init/', $accessToken, array(
+        'source_info' => array('source' => 'FILE_UPLOAD', 'video_size' => 5000000, 'chunk_size' => 5000000, 'total_chunk_count' => 1),
+    ));
+    $decoded = json_decode($probe['body'], true);
+    $code = isset($decoded['error']['code']) ? $decoded['error']['code'] : '';
+    echo json_encode(array(
+        'ok' => $probe['status'] === 200 && $code === 'ok',
+        'http' => $probe['status'],
+        'error_code' => $code,
+        'note' => $code === 'ok'
+            ? 'init accepted - the pending queue is clear'
+            : 'init refused - ' . $code,
+    ), JSON_PRETTY_PRINT);
+    exit;
+}
+
 $action = null;
 
 // ---- Upload a rendered video to the creator's TikTok inbox -------------------
