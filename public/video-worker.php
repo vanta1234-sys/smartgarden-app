@@ -174,18 +174,37 @@ function sg_run_job($dir) {
                 case 2:  $x = $mx . '*(1-' . $p . ')'; $y = $my . '/2'; break;
                 default: $x = $mx . '/2';              $y = $my . '*(1-' . $p . ')'; break;
             }
-            // eof_action=repeat lets the overlay be a SINGLE decoded frame reused for the
-            // whole scene. Looping it as a second timed input (and at 25fps, since -framerate
-            // only applied to the first input) made overlay buffer the faster stream while it
-            // waited on the slower one — that mismatch, not the filtering, is what the OOM
-            // killer kept reacting to.
-            $vf = $moving
-                ? "[0:v]crop=1080:1920:x='" . $x . "':y='" . $y . "',fps=30[kb];[kb][1:v]overlay=0:0:eof_action=repeat[v]"
-                : '[0:v]crop=1080:1920,fps=30[kb];[kb][1:v]overlay=0:0:eof_action=repeat[v]';
+            // Scenes used to butt straight up against each other. A short dip through black
+            // at each edge reads as a deliberate beat instead of a jump cut, and because it
+            // happens inside the scene's own encode it costs nothing extra and still lets the
+            // final stitch run with -c copy.
+            $fadeV = 0.18;
+            $outV = max(0.0, $sceneDur - $fadeV);
+
+            // The caption fades up and settles from 18px low, rather than appearing all at
+            // once fully formed. Slightly after the picture, so the eye lands on the photo
+            // first. Needs the overlay as a real 30fps stream: a single repeated frame has
+            // nothing for a time-based fade to act on. Matching -framerate on BOTH inputs is
+            // what matters — the earlier OOM kills came from looping this at 25fps against a
+            // 30fps picture, which made overlay buffer one stream while waiting on the other.
+            $fadeT = 0.42;
+            $outT = max(0.0, $sceneDur - 0.24);
+            $rise = "'18-18*min(t/" . sprintf('%.2f', $fadeT) . "\,1)'";
+
+            $pic = $moving
+                ? "[0:v]crop=1080:1920:x='" . $x . "':y='" . $y . "',fps=30"
+                : '[0:v]crop=1080:1920,fps=30';
+            $pic .= ',fade=t=in:st=0:d=' . sprintf('%.2f', $fadeV)
+                  . ',fade=t=out:st=' . sprintf('%.2f', $outV) . ':d=' . sprintf('%.2f', $fadeV) . '[kb]';
+
+            $txt = '[1:v]format=rgba,fade=t=in:st=0.10:d=' . sprintf('%.2f', $fadeT) . ':alpha=1'
+                 . ',fade=t=out:st=' . sprintf('%.2f', $outT) . ':d=0.24:alpha=1[ov]';
+
+            $vf = $pic . ';' . $txt . ';[kb][ov]overlay=0:' . $rise . '[v]';
 
             $cmd = escapeshellarg($ffmpeg) . ' -y -hide_banner -loglevel error'
                  . ' -framerate 30 -loop 1 -t ' . sprintf('%.3f', $sceneDur) . ' -i ' . escapeshellarg($bg)
-                 . ' -i ' . escapeshellarg($ov);
+                 . ' -framerate 30 -loop 1 -t ' . sprintf('%.3f', $sceneDur) . ' -i ' . escapeshellarg($ov);
 
             if ($audio) {
                 $cmd .= ' -i ' . escapeshellarg($audio)
