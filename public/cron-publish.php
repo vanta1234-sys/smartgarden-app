@@ -2151,12 +2151,11 @@ if (FB_AUTO_POST_ENABLED && $fbPageId && $fbPageToken) {
 //
 // Board IDs come from pinterest_boards.json, written by pinterest-create-boards.php.
 //
-// NOTE (2026-09-14): this will keep failing with API error code 29 ("Apps with Trial
-// access may not create Pins in production") until the Pinterest app is upgraded from
-// Trial to Standard access — the OAuth connection, the 7 boards and the image generator
-// are all already live and working. It's deliberately best-effort and silent about it,
-// exactly like the Facebook block above: the moment Standard access is granted this
-// starts pinning with no further code change.
+// Standard access was granted on 2026-09-15, so this now pins for real; before that it
+// failed every run with API error code 29 ("Apps with Trial access may not create Pins in
+// production"). Verified with a live pin the same day: HTTP 201, is_standard true.
+// Still deliberately best-effort and silent — a Pinterest outage must never fail an
+// article publish.
 $pinterestTokensPath = __DIR__ . '/pinterest_tokens.json';
 $pinterestBoardsPath = __DIR__ . '/pinterest_boards.json';
 if (file_exists($pinterestTokensPath) && file_exists($pinterestBoardsPath)) {
