@@ -386,7 +386,7 @@ function sg_run_job($dir) {
         $withMusic = $dir . '/video_music.mp4';
         $total = sg_duration($ffprobe, $final);
         $musicOut = max(0.5, $total - 1.6);
-        $bed = '[1:a]volume=0.11'
+        $bed = '[1:a]volume=0.20'
              . ',afade=t=in:st=0:d=1.2'
              . ',afade=t=out:st=' . sprintf('%.2f', $musicOut) . ':d=1.6[bed]';
         $mix = '[0:a][bed]amix=inputs=2:duration=first:normalize=0[a]';

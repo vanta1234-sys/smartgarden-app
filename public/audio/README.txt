@@ -21,6 +21,6 @@ claims on the channel, which "free" music from elsewhere frequently does.
 
 How it is mixed
 ---------------
-Volume 0.11 under the narration, 1.2s fade in, 1.6s fade out before the end, looped
+Volume 0.20 under the narration, 1.2s fade in, 1.6s fade out before the end, looped
 to the length of the video. Mixed with amix normalize=0 so the narration keeps its
 level. Applied as a separate pass with -c:v copy, so it never re-encodes the picture.
