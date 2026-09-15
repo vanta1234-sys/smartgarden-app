@@ -55,11 +55,20 @@ function prettyJson($raw) {
 }
 
 // Proves the user.info.basic scope works, and shows which creator is connected.
+//
+// A stored token is not the same as a live one: when the creator revokes this app from
+// their TikTok settings the file stays on disk but every call 401s. Treat that as simply
+// disconnected and offer the OAuth link again, rather than reporting a half-state nobody
+// can act on.
 $creator = null;
 if ($accessToken) {
     $info = ttCall('GET', 'https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,avatar_url', $accessToken);
     $decoded = json_decode($info['body'], true);
-    if (isset($decoded['data']['user'])) $creator = $decoded['data']['user'];
+    if (isset($decoded['data']['user'])) {
+        $creator = $decoded['data']['user'];
+    } else {
+        $accessToken = '';
+    }
 }
 
 // Rendered videos waiting on disk, newest first — these come out of video-render.php.
@@ -184,8 +193,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['job']) && $accessToke
             <?= htmlspecialchars(isset($creator['display_name']) ? $creator['display_name'] : '') ?>
           </span>
         </span>
-      <?php elseif ($accessToken): ?>
-        <span class="bad">✗ Το token υπάρχει αλλά το /v2/user/info/ δεν απάντησε</span>
       <?php else: ?>
         <span class="bad">✗ Μη συνδεδεμένο</span> —
         <a href="/tiktok-auth-login.php<?= $isSandbox ? '?sandbox=1' : '' ?>">σύνδεση μέσω OAuth</a>
