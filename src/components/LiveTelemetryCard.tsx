@@ -101,10 +101,14 @@ export const LiveTelemetryCard: React.FC<LiveTelemetryCardProps> = ({
           latitude >= 34.5 && latitude <= 41.9 && longitude >= 19.2 && longitude <= 29.8;
 
         if (!inGreece) {
+          // Showing the actual coordinates matters: "wrong location" on its own is
+          // unfalsifiable, and the usual causes — a VPN, or an ISP whose addresses
+          // geolocate abroad — are only obvious once you can see where it landed.
           setErrorMsg(
-            'Ο φυλλομετρητής έδωσε τοποθεσία εκτός Ελλάδας — σε υπολογιστή χωρίς GPS η εκτίμηση είναι συχνά λάθος. Επιλέξτε πόλη από τη λίστα.'
+            `Ο φυλλομετρητής τοποθετεί τη συσκευή στο ${latitude.toFixed(2)}°, ${longitude.toFixed(2)}° — εκτός Ελλάδας. ` +
+              'Συνήθως φταίει VPN ή ο πάροχος. Επιλέξτε πόλη από τη λίστα.'
           );
-          setTimeout(() => setErrorMsg(null), 7000);
+          setTimeout(() => setErrorMsg(null), 12000);
           return;
         }
 
