@@ -2348,7 +2348,11 @@ $rssXml .= "</channel>\n</rss>\n";
 // ==========================================
 // 7c. AUTO-NOTIFY GOOGLE INDEXING API (INSTANT CRAWL)
 // ==========================================
-$newPublishedUrl = "https://smartgarden.gr/article/" . $articleSlug;
+// $articleSlug was never assigned anywhere in this file, so this URL had been coming out
+// as the bare .../article/ with no slug. It isn't only cosmetic: this same variable is
+// what gets submitted to the Google Indexing API below, so every daily run was asking
+// Google to re-crawl the listing URL instead of the article just published.
+$newPublishedUrl = 'https://smartgarden.gr/article/' . rawurlencode($newArticleObj['slug']);
 $googleIndexed = false;
 $serviceAccountPath = __DIR__ . '/service-account.json';
 if (file_exists($serviceAccountPath)) {
