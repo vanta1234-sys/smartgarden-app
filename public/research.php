@@ -144,8 +144,25 @@ if ($clientId && $clientSecret && file_exists($tokensPath)) {
                 CURLOPT_HTTPHEADER => array('Authorization: Bearer ' . $token),
             ));
             $sitesRaw = curl_exec($ch);
+            $sitesStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
             $sites = json_decode((string) $sitesRaw, true);
+
+            // Reading siteEntry straight off a failed response turns "the call broke" into
+            // "you own no sites" — two completely different problems wearing the same face.
+            if ($sitesStatus !== 200) {
+                $searchConsole = array(
+                    'available' => false,
+                    'reason' => 'Η λίστα ιδιοκτησιών Search Console απάντησε HTTP ' . $sitesStatus . '.',
+                    'detail' => $sites['error']['message'] ?? substr((string) $sitesRaw, 0, 400),
+                );
+                rs_out(array(
+                    'success' => true,
+                    'readerQuestions' => array('total' => count($questions), 'topTerms' => array_slice($askedTopics, 0, 20), 'uncoveredGaps' => $gaps),
+                    'searchConsole' => $searchConsole,
+                    'articlesPublished' => count($articles),
+                ));
+            }
 
             $entries = $sites['siteEntry'] ?? array();
             $siteUrl = null;

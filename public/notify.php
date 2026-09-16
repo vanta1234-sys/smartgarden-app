@@ -20,8 +20,17 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
     exit;
 }
 
+// Alerts go to the owner's personal inbox, not the site's. smartgarden68@gmail.com is the
+// address the site itself uses for newsletters and platform correspondence, so a monitoring
+// email lands there among dozens of others and gets skimmed past — which defeats the point.
+// Override with SetEnv SG_NOTIFY_TO in .htaccess to change it without touching code.
 if (!defined('SG_NOTIFY_TO')) {
-    define('SG_NOTIFY_TO', 'smartgarden68@gmail.com');
+    define('SG_NOTIFY_TO', getenv('SG_NOTIFY_TO') ?: 'vanta1234@gmail.com');
+}
+// The From address stays the site's: Brevo is configured to send as that domain, and a
+// personal address in the sender is more likely to be filtered.
+if (!defined('SG_NOTIFY_FROM')) {
+    define('SG_NOTIFY_FROM', 'smartgarden68@gmail.com');
 }
 
 /**
@@ -47,7 +56,7 @@ function sg_notify_failure($subject, array $lines) {
           . "\n\n---\nsmartgarden.gr · αυτόματη ειδοποίηση · " . date('Y-m-d H:i');
 
     $payload = json_encode(array(
-        'sender' => array('name' => 'SmartGarden Monitor', 'email' => SG_NOTIFY_TO),
+        'sender' => array('name' => 'SmartGarden Monitor', 'email' => SG_NOTIFY_FROM),
         'to' => array(array('email' => SG_NOTIFY_TO)),
         'subject' => $subject,
         'textContent' => $body,

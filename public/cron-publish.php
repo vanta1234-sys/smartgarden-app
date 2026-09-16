@@ -2379,7 +2379,14 @@ $rssXml .= "</channel>\n</rss>\n";
 // Google to re-crawl the listing URL instead of the article just published.
 $newPublishedUrl = 'https://smartgarden.gr/article/' . rawurlencode($newArticleObj['slug']);
 $googleIndexed = false;
-$serviceAccountPath = __DIR__ . '/service-account.json';
+// The key on the server is named google-service-account.json — which is also the name
+// .htaccess denies and .gitignore excludes. This looked for service-account.json, a file
+// that has never existed there, so the Indexing API silently never ran: the service account
+// was added as a Search Console owner on 2026-08-30 and sat unused ever since.
+// Both names are accepted so neither spelling can break it again.
+$serviceAccountPath = file_exists(__DIR__ . '/google-service-account.json')
+    ? __DIR__ . '/google-service-account.json'
+    : __DIR__ . '/service-account.json';
 if (file_exists($serviceAccountPath)) {
     try {
         $sa = json_decode(file_get_contents($serviceAccountPath), true);
