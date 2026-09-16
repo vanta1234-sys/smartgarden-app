@@ -138,6 +138,30 @@ if ($article) {
     $ssr .= $mdToHtml($bodyMd);
     $ssr .= '</article>';
 
+    // Related reading. Two jobs at once: it gives a crawler eight internal links out of
+    // every article — which is how the other seventy get discovered and how link equity
+    // moves around a flat site — and it gives a reader somewhere to go next, which is the
+    // only thing that turns one pageview into several.
+    require_once __DIR__ . '/ssr-lib.php';
+    $all = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true) ?: array();
+    $cat = $article['category'] ?? '';
+    $sameCat = array();
+    $others = array();
+    foreach ($all as $a) {
+        if (($a['slug'] ?? '') === $slug) continue;
+        if ($cat !== '' && ($a['category'] ?? '') === $cat) $sameCat[] = $a;
+        else $others[] = $a;
+    }
+    // Same category first, then the newest of anything else, so a thin category still
+    // produces a full block rather than one lonely link.
+    $related = array_slice(array_merge($sameCat, $others), 0, 8);
+    if (count($related)) {
+        $ssr .= '<nav>' . sg_article_list($related, 8, 'Σχετικά άρθρα') . '</nav>';
+    }
+    $ssr .= '<p><a href="/">Όλοι οι οδηγοί του SmartGarden.gr</a>'
+          . ($cat !== '' ? ' · <a href="/kategoria/' . sg_e(rawurlencode($cat)) . '">Περισσότερα στην ίδια κατηγορία</a>' : '')
+          . '</p>';
+
     // Structured data, which also only ever existed client-side.
     $ld = json_encode(array(
         '@context' => 'https://schema.org',

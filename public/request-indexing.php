@@ -97,6 +97,40 @@ if ($clientId && $clientSecret && file_exists($tokensPath)) {
 
 $urls = array();
 $why = array();
+
+// &source=pages submits the non-article URLs instead. They only became worth crawling on
+// 2026-09-17, when static-meta.php started rendering a body for them — before that every
+// one of them served the same empty shell, which is what Google filed as duplicates.
+// Kept separate from the article run because the daily Indexing API quota is 200 and
+// submitting all 146 in one day on top of the articles would overrun it.
+if (($_GET['source'] ?? '') === 'pages') {
+    $sitemap = @file_get_contents(__DIR__ . '/sitemap.xml');
+    if (!$sitemap) ri_out(array('success' => false, 'error' => 'Δεν διαβάστηκε το sitemap.xml'));
+    preg_match_all('#<loc>([^<]+)</loc>#', $sitemap, $m);
+    // &offset skips the ones a previous run already sent — $limit is capped at 50 per call
+    // and there are more pages than that.
+    $skip = isset($_GET['offset']) ? max(0, (int) $_GET['offset']) : 0;
+    $seen = 0;
+    foreach ($m[1] as $loc) {
+        if (strpos($loc, '/article/') !== false) continue;
+        if ($seen++ < $skip) continue;
+        if (count($urls) >= $limit) break;
+        $urls[] = $loc;
+        $why[$loc] = 'σελίδα με νέο περιεχόμενο';
+    }
+    if ($dryRun) {
+        ri_out(array('success' => true, 'dryRun' => true, 'rankedBy' => 'sitemap-pages',
+            'wouldSubmit' => array_map(function ($u) { return array('url' => $u); }, $urls)));
+    }
+    list($token, $err) = sg_indexing_token();
+    if (!$token) ri_out(array('success' => false, 'error' => $err));
+    $results = array();
+    foreach ($urls as $u) { $results[] = sg_submit_url($token, $u); usleep(200000); }
+    $ok = count(array_filter($results, function ($r) { return $r['ok']; }));
+    ri_out(array('success' => true, 'rankedBy' => 'sitemap-pages', 'submitted' => count($results),
+        'accepted' => $ok, 'failed' => count($results) - $ok,
+        'failures' => array_values(array_filter($results, function ($r) { return !$r['ok']; }))));
+}
 foreach (array_keys($ranked) as $page) {
     if (count($urls) >= $limit) break;
     $urls[] = $page;
