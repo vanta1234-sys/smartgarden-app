@@ -10,7 +10,7 @@
  */
 
 $slug = $_GET['slug'] ?? '';
-$slug = preg_replace('/[^a-zA-Z0-9\-_]/', '', $slug);
+$slug = preg_replace('/[^\p{L}\p{N}\-_]/u', '', (string) $slug);
 
 $indexPath = __DIR__ . '/index.html';
 $html = file_exists($indexPath) ? file_get_contents($indexPath) : false;
@@ -39,7 +39,7 @@ if ($article) {
     $title = ($article['title']['el'] ?? $article['title'] ?? 'Άρθρο') . ' | SmartGarden.gr';
     $description = mb_substr($article['summary']['el'] ?? $article['summary'] ?? '', 0, 200);
     $image = $article['image'] ?? $article['imageUrl'] ?? 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80';
-    $url = 'https://smartgarden.gr/article/' . $slug;
+    $url = 'https://smartgarden.gr/article/' . rawurlencode($slug);
 
     $replacements = [
         '/<title>.*?<\/title>/s' => '<title>' . htmlspecialchars($title, ENT_QUOTES) . '</title>',
@@ -162,8 +162,24 @@ if ($article) {
           . ($cat !== '' ? ' · <a href="/kategoria/' . sg_e(rawurlencode($cat)) . '">Περισσότερα στην ίδια κατηγορία</a>' : '')
           . '</p>';
 
+    // The questions this category answers, rendered as text before they are marked up:
+    // Google requires FAQ markup to match content the reader can actually see.
+    $faqs = array();
+    $faqData = json_decode((string) @file_get_contents(__DIR__ . '/category-faqs.json'), true);
+    if (is_array($faqData)) {
+        $faqs = $faqData['byCategory'][$cat] ?? ($faqData['default'] ?? array());
+    }
+    if (count($faqs)) {
+        $ssr .= '<section><h2>Συχνές ερωτήσεις</h2><dl>';
+        foreach ($faqs as $f) {
+            $ssr .= '<dt>' . sg_e($f['question'] ?? '') . '</dt><dd>' . sg_e($f['answer'] ?? '') . '</dd>';
+        }
+        $ssr .= '</dl></section>';
+    }
+
     // Structured data, which also only ever existed client-side.
-    $ld = json_encode(array(
+    $graph = array();
+    $graph[] = array(
         '@context' => 'https://schema.org',
         '@type' => 'Article',
         'headline' => mb_substr($h1, 0, 110),
@@ -175,13 +191,55 @@ if ($article) {
         'publisher' => array('@type' => 'Organization', 'name' => 'SmartGarden.gr'),
         'mainEntityOfPage' => array('@type' => 'WebPage', '@id' => $url),
         'inLanguage' => 'el',
-    ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    );
+
+    $catLabel = $article['categoryLabel']['el'] ?? (is_string($article['categoryLabel'] ?? null) ? $article['categoryLabel'] : '');
+    $trail = array('Αρχική' => 'https://smartgarden.gr/');
+    if ($cat !== '' && $catLabel !== '') {
+        $trail[$catLabel] = 'https://smartgarden.gr/kategoria/' . rawurlencode($cat);
+    }
+    $trail[$h1] = $url;
+    $graph[] = sg_breadcrumbs($trail);
+
+    if (count($faqs)) {
+        $graph[] = array(
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            '@id' => $url . '#faq',
+            'mainEntity' => array_map(function ($f) {
+                return array('@type' => 'Question', 'name' => $f['question'] ?? '',
+                    'acceptedAnswer' => array('@type' => 'Answer', 'text' => $f['answer'] ?? ''));
+            }, $faqs),
+        );
+    }
+
+    // HowTo only when the body genuinely contains a numbered sequence. The generator's
+    // prompt produces "**Βήμα N: title**" headings; an article without them gets no HowTo,
+    // because markup that describes steps the page does not show is a manual action.
+    if (preg_match_all(
+        '/(?:\\*\\*|^#{2,3}\\s*)Βήμα\\s*\\d+[:.]?\\s*([^*\\n]+?)(?:\\*\\*)?\\s*\\n+(.*?)(?=\\n(?:\\*\\*|#{2,3}\\s*)Βήμα\\s*\\d+|\\n#{2,3}\\s|\\n\\*\\*Εργαλεία|$)/ums',
+        $bodyMd, $stepM, PREG_SET_ORDER
+    ) && count($stepM) >= 2) {
+        $steps = array();
+        foreach (array_slice($stepM, 0, 12) as $sm) {
+            $text = trim(preg_replace('/\s+/u', ' ', preg_replace('/[*_#]/u', '', $sm[2])));
+            if ($text === '') continue;
+            $steps[] = array('@type' => 'HowToStep', 'name' => trim($sm[1]),
+                'text' => mb_substr($text, 0, 500, 'UTF-8'));
+        }
+        if (count($steps) >= 2) {
+            $graph[] = array('@context' => 'https://schema.org', '@type' => 'HowTo',
+                '@id' => $url . '#howto', 'name' => mb_substr($h1, 0, 110, 'UTF-8'), 'step' => $steps);
+        }
+    }
+
+    $ld = json_encode($graph, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
     $html = preg_replace(
         '/<div id="root">\s*<\/div>/',
         '<div id="root">' . $ssr . '</div>' . "
 "
-            . '<script type="application/ld+json">' . $ld . '</script>',
+            . '<script type="application/ld+json" id="smartgarden-article-schema">' . $ld . '</script>',
         $html,
         1
     );

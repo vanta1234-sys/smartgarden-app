@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "tsx scripts/export-plants.ts && tsx scripts/build-seed-articles.ts && vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
-    "deploy": "tsx scripts/export-photo-catalogue.ts && tsx scripts/export-plants.ts && tsx scripts/build-seed-articles.ts && vite build && tsx deploy.ts",
+    "build": "tsx scripts/export-category-faqs.ts && tsx scripts/export-plants.ts && tsx scripts/build-seed-articles.ts && vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "deploy": "tsx scripts/export-photo-catalogue.ts && tsx scripts/export-category-faqs.ts && tsx scripts/export-plants.ts && tsx scripts/build-seed-articles.ts && vite build && tsx deploy.ts",
     "start": "node dist/server.cjs",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
