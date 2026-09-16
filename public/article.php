@@ -9,6 +9,8 @@
  * to the SPA's own catch-all. The React app still boots normally afterwards.
  */
 
+require_once __DIR__ . '/ssr-lib.php';
+
 $slug = $_GET['slug'] ?? '';
 $slug = preg_replace('/[^\p{L}\p{N}\-_]/u', '', (string) $slug);
 
@@ -36,13 +38,16 @@ if ($slug && file_exists($articlesPath)) {
 }
 
 if ($article) {
-    $title = ($article['title']['el'] ?? $article['title'] ?? 'Άρθρο') . ' | SmartGarden.gr';
-    $description = mb_substr($article['summary']['el'] ?? $article['summary'] ?? '', 0, 200);
+    $rawTitle = $article['title']['el'] ?? $article['title'] ?? 'Άρθρο';
+    // Social cards have room for the whole headline; a search result does not.
+    $title = $rawTitle . ' | SmartGarden.gr';
+    $seoTitle = sg_seo_title_unique($rawTitle, is_array($articles ?? null) ? $articles : array(), $slug);
+    $description = sg_unique_description($article, is_array($articles ?? null) ? $articles : array());
     $image = $article['image'] ?? $article['imageUrl'] ?? 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80';
     $url = 'https://smartgarden.gr/article/' . rawurlencode($slug);
 
     $replacements = [
-        '/<title>.*?<\/title>/s' => '<title>' . htmlspecialchars($title, ENT_QUOTES) . '</title>',
+        '/<title>.*?<\/title>/s' => '<title>' . htmlspecialchars($seoTitle, ENT_QUOTES) . '</title>',
         '/<meta name="description" content=".*?"/s' => '<meta name="description" content="' . htmlspecialchars($description, ENT_QUOTES) . '"',
         '/<link rel="canonical" href=".*?"/s' => '<link rel="canonical" href="' . htmlspecialchars($url, ENT_QUOTES) . '"',
         '/<meta property="og:url" content=".*?"/s' => '<meta property="og:url" content="' . htmlspecialchars($url, ENT_QUOTES) . '"',
@@ -142,7 +147,6 @@ if ($article) {
     // every article — which is how the other seventy get discovered and how link equity
     // moves around a flat site — and it gives a reader somewhere to go next, which is the
     // only thing that turns one pageview into several.
-    require_once __DIR__ . '/ssr-lib.php';
     $all = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true) ?: array();
     $cat = $article['category'] ?? '';
     $sameCat = array();
