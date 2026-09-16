@@ -34,6 +34,8 @@ const SERVER_OWNED_FILES = new Set([
   "qa_usage.json",
   // Written by the live cron every time it publishes; a local copy would erase history.
   "gemini_usage.json",
+  // Rebuilt on the server whenever latest_articles.json changes.
+  "articles-index.cache.json",
 ]);
 
 async function deploy() {

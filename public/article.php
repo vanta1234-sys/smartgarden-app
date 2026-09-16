@@ -243,7 +243,13 @@ if ($article) {
         '/<div id="root">\s*<\/div>/',
         '<div id="root">' . $ssr . '</div>' . "
 "
-            . '<script type="application/ld+json" id="smartgarden-article-schema">' . $ld . '</script>',
+            . '<script type="application/ld+json" id="smartgarden-article-schema">' . $ld . '</script>'
+            // The reader's own copy, so the page it landed on needs no second request for
+            // its body. HEX_TAG/HEX_AMP keep any '</script>' inside the article text from
+            // ending this one.
+            . '<script>window.__SG_ARTICLE__=' . json_encode($article,
+                  JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP
+                  | JSON_HEX_APOS | JSON_HEX_QUOT) . ';</script>',
         $html,
         1
     );

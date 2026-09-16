@@ -270,7 +270,9 @@ export default function App() {
   // Auto-fetch live articles from latest_articles.json on mount & inject SEO Schema
   useEffect(() => {
     injectGlobalSiteSchema();
-    fetch(`/latest_articles.json?t=${Date.now()}`)
+    // The index carries every field except the article bodies. Fetching all 71 bodies
+    // (2.4MB of JSON) so that someone could read one was the heaviest thing on the page.
+    fetch(`/articles-index.php?t=${Date.now()}`)
       .then((res) => {
         if (res.ok) return res.json();
         throw new Error('Local fetch failed');
@@ -315,6 +317,37 @@ export default function App() {
       injectArticleSchema(selectedArticle);
     }
   }, [selectedArticle]);
+
+  // Whichever article ends up selected fetches its own body, since the list arrives
+  // without them. One effect rather than a fetch at each of the seventeen places that can
+  // select an article. The article the reader landed on is already inlined by article.php,
+  // so that one costs no request at all.
+  useEffect(() => {
+    const current = selectedArticle;
+    const slug = current?.slug;
+    if (!slug) return;
+    const body = current.content?.el || (typeof current.content === 'string' ? current.content : '');
+    if (body) return;
+
+    // article.php inlines the article the reader actually landed on.
+    const inlined = (window as any).__SG_ARTICLE__;
+    if (inlined && inlined.slug === slug && (inlined.content?.el || '')) {
+      setArticles((prev) => prev.map((a) => (a.slug === slug ? { ...a, ...inlined } : a)));
+      setSelectedArticle((prev) => (prev && prev.slug === slug ? { ...prev, ...inlined } : prev));
+      return;
+    }
+
+    let cancelled = false;
+    fetch(`/article-json.php?slug=${encodeURIComponent(slug)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((full: ArticleItem | null) => {
+        if (cancelled || !full || !full.slug) return;
+        setArticles((prev) => prev.map((a) => (a.slug === full.slug ? { ...a, ...full } : a)));
+        setSelectedArticle((prev) => (prev && prev.slug === full.slug ? { ...prev, ...full } : prev));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [selectedArticle?.slug]);
 
   // Edit Form State
   const [editTitle, setEditTitle] = useState(selectedArticle.title.el);
