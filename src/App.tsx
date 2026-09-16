@@ -222,6 +222,15 @@ export default function App() {
   // (search "Lightweight client-side routing") — adding a new static page there
   // without adding it here silently breaks that page's <title>/meta tags, since this
   // effect still runs and overwrites them regardless of what JSX actually renders.
+  // Article metadata belongs on article URLs and nowhere else. isStaticPageRoute below
+  // lists the named client-only pages, but it never covered "/" — so on the homepage the
+  // newest article's title, description AND canonical were injected over the real ones,
+  // leaving the most important URL on the site declaring itself a duplicate of an article.
+  // Search Console was reporting 158 pages as "Duplicate: Google chose a different
+  // canonical"; this was telling it to.
+  const isArticleRoute = () =>
+    typeof window !== 'undefined' && /^\/article\//.test(window.location.pathname);
+
   const isStaticPageRoute = typeof window !== 'undefined'
     && /^\/(kategoria\/|syntaktis|imerologio-sporas|klima-kipoy|pagetos|fyta|rotiste|selini|xoma|instagram-studio|privacy|terms)/.test(window.location.pathname);
 
@@ -245,21 +254,21 @@ export default function App() {
           if (linkedArticle) {
             setSelectedArticle(linkedArticle);
             setIsReadingModalOpen(true);
-            if (!isStaticPageRoute) injectArticleSchema(linkedArticle);
+            if (isArticleRoute()) injectArticleSchema(linkedArticle);
           } else {
             setSelectedArticle(data[0]);
-            if (!isStaticPageRoute) injectArticleSchema(data[0]);
+            if (isArticleRoute()) injectArticleSchema(data[0]);
           }
         }
       })
       .catch(() => {
         // Use default initial articles if offline
-        if (!isStaticPageRoute) injectArticleSchema(INITIAL_ARTICLES[0]);
+        if (isArticleRoute()) injectArticleSchema(INITIAL_ARTICLES[0]);
       });
   }, []);
 
   useEffect(() => {
-    if (selectedArticle && !isStaticPageRoute) {
+    if (selectedArticle && isArticleRoute()) {
       injectArticleSchema(selectedArticle);
     }
   }, [selectedArticle]);
