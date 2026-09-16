@@ -2383,77 +2383,18 @@ $rssXml .= "</channel>\n</rss>\n";
 // Google to re-crawl the listing URL instead of the article just published.
 $newPublishedUrl = 'https://smartgarden.gr/article/' . rawurlencode($newArticleObj['slug']);
 $googleIndexed = false;
-// The key on the server is named google-service-account.json — which is also the name
-// .htaccess denies and .gitignore excludes. This looked for service-account.json, a file
-// that has never existed there, so the Indexing API silently never ran: the service account
-// was added as a Search Console owner on 2026-08-30 and sat unused ever since.
-// Both names are accepted so neither spelling can break it again.
-$serviceAccountPath = file_exists(__DIR__ . '/google-service-account.json')
-    ? __DIR__ . '/google-service-account.json'
-    : __DIR__ . '/service-account.json';
-if (file_exists($serviceAccountPath)) {
-    try {
-        $sa = json_decode(file_get_contents($serviceAccountPath), true);
-        if ($sa && !empty($sa['private_key']) && !empty($sa['client_email'])) {
-            $header = base64_encode(json_encode(array('alg' => 'RS256', 'typ' => 'JWT')));
-            $now = time();
-            $claim = base64_encode(json_encode(array(
-                'iss' => $sa['client_email'],
-                'scope' => 'https://www.googleapis.com/auth/indexing',
-                'aud' => 'https://oauth2.googleapis.com/token',
-                'exp' => $now + 3600,
-                'iat' => $now
-            )));
-            $signature = '';
-            openssl_sign($header . '.' . $claim, $signature, $sa['private_key'], 'SHA256');
-            $jwt = $header . '.' . $claim . '.' . base64_encode($signature);
 
-            // Get access token
-            $tokenCh = curl_init('https://oauth2.googleapis.com/token');
-            curl_setopt($tokenCh, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($tokenCh, CURLOPT_POST, true);
-            curl_setopt($tokenCh, CURLOPT_POSTFIELDS, http_build_query(array(
-                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion' => $jwt
-            )));
-            $tokenRes = curl_exec($tokenCh);
-            curl_close($tokenCh);
-            $tokenData = json_decode($tokenRes, true);
-
-            if (!empty($tokenData['access_token'])) {
-                $indexCh = curl_init('https://indexing.googleapis.com/v3/urlNotifications:publish');
-                curl_setopt($indexCh, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($indexCh, CURLOPT_POST, true);
-                curl_setopt($indexCh, CURLOPT_HTTPHEADER, array(
-                    'Authorization: Bearer ' . $tokenData['access_token'],
-                    'Content-Type: application/json'
-                ));
-                curl_setopt($indexCh, CURLOPT_POSTFIELDS, json_encode(array(
-                    'url' => $newPublishedUrl,
-                    'type' => 'URL_UPDATED'
-                )));
-                $indexRes = curl_exec($indexCh);
-                curl_close($indexCh);
-                $googleIndexed = true;
-            }
-        }
-    } catch (Exception $e) {
-        // silent fail to not block article creation
-    }
+// Was hand-rolled here and carried two faults that made it a no-op for its entire life:
+// it looked for a filename the server has never had, and built the JWT with base64_encode
+// where the spec requires base64url — so even with the key found, Google would have
+// rejected every signature. Both live in indexing-lib.php now, used by this and by
+// request-indexing.php, so there is one implementation to be wrong instead of two.
+require_once __DIR__ . '/indexing-lib.php';
+list($idxToken, $idxErr) = sg_indexing_token();
+if ($idxToken) {
+    $idxResult = sg_submit_url($idxToken, $newPublishedUrl);
+    $googleIndexed = $idxResult['ok'];
 }
-
-// ==========================================
-// 7d. DID YESTERDAY'S RUN ACTUALLY FINISH?
-// ==========================================
-// The video render is detached, so this request is long gone before it succeeds or fails.
-// Checking the PREVIOUS day's article closes that gap: by now its render has either
-// produced an mp4 or it never will. On 2026-09-16 an article went out, the render died,
-// and nobody knew for hours — this is what would have caught it.
-//
-// Silent when everything worked. Best-effort, and never allowed to affect publishing.
-require_once __DIR__ . '/notify.php';
-$jobsRootForCheck = is_dir(dirname(__DIR__) . '/video-jobs') ? dirname(__DIR__) . '/video-jobs' : __DIR__ . '/video-jobs';
-$previousDay = sg_check_previous_day($existingArticles, $jobsRootForCheck, $videoKey);
 
 // ==========================================
 // 8. OUTPUT JSON RESPONSE
