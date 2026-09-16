@@ -29,6 +29,43 @@ $tokens = file_exists($tokensPath) ? json_decode(file_get_contents($tokensPath),
 $accessToken = isset($tokens['access_token']) ? $tokens['access_token'] : '';
 $envLabel = $isSandbox ? 'Sandbox' : 'Production';
 
+// TikTok access tokens last 24 hours. This page read the stored one straight off disk with
+// no refresh — tiktok-publish.php has always refreshed, this never did — so a day after
+// connecting it reported "not connected" and the connect button led to a flow that had not
+// actually lapsed. That is fatal for the one job this page exists to do: it is the page the
+// app-review demo records, and it would have failed mid-take.
+if ($accessToken && !empty($tokens['expires_at']) && time() > ($tokens['expires_at'] - 120) && !empty($tokens['refresh_token'])) {
+    $ck = $isSandbox ? (getenv('TIKTOK_SANDBOX_CLIENT_KEY') ?: '') : (getenv('TIKTOK_CLIENT_KEY') ?: '');
+    $cs = $isSandbox ? (getenv('TIKTOK_SANDBOX_CLIENT_SECRET') ?: '') : (getenv('TIKTOK_CLIENT_SECRET') ?: '');
+    if ($ck && $cs) {
+        $rc = curl_init('https://open.tiktokapis.com/v2/oauth/token/');
+        curl_setopt_array($rc, array(
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTPHEADER => array('Content-Type: application/x-www-form-urlencoded'),
+            CURLOPT_POSTFIELDS => http_build_query(array(
+                'client_key' => $ck,
+                'client_secret' => $cs,
+                'grant_type' => 'refresh_token',
+                'refresh_token' => $tokens['refresh_token'],
+            )),
+        ));
+        $rr = json_decode((string) curl_exec($rc), true);
+        curl_close($rc);
+        if (!empty($rr['access_token'])) {
+            $tokens = array(
+                'access_token' => $rr['access_token'],
+                'refresh_token' => $rr['refresh_token'] ?? $tokens['refresh_token'],
+                'open_id' => $rr['open_id'] ?? ($tokens['open_id'] ?? null),
+                'expires_at' => time() + (int) ($rr['expires_in'] ?? 86400),
+            );
+            file_put_contents($tokensPath, json_encode($tokens, JSON_PRETTY_PRINT));
+            $accessToken = $tokens['access_token'];
+        }
+    }
+}
+
 function ttCall($method, $url, $token, $body = null) {
     $ch = curl_init($url);
     $opts = array(
