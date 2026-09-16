@@ -2261,7 +2261,11 @@ $sitemapXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 $sitemapXml .= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
 $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n";
 
-$staticPages = array('about.html', 'privacy-policy.html', 'terms-of-service.html');
+// These three .html files have never existed — they answer 200 only because the SPA
+// catch-all swallows every unknown path, so the sitemap was handing Google three URLs
+// that render the homepage. The real pages built on 2026-09-15 are /privacy and /terms;
+// the author page has always been /syntaktis and is already listed below.
+$staticPages = array('privacy', 'terms');
 foreach ($staticPages as $page) {
     $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/" . $page . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.3</priority>\n  </url>\n";
 }
