@@ -134,6 +134,44 @@ if ($clientId && $clientSecret && file_exists($tokensPath)) {
                 'action' => 'Άνοιξε https://smartgarden.gr/youtube-auth-login.php και πάτα Αποδοχή — η ίδια σύνδεση καλύπτει και τα στατιστικά YouTube.',
             );
         } else {
+            // Which property exists is not knowable from here: a site can be verified as a
+            // domain property (sc-domain:) or as a URL prefix (https://...), and asking for
+            // the wrong one returns a permission error that reads like the account has no
+            // access at all. Ask Google which ones it has and match.
+            $ch = curl_init('https://www.googleapis.com/webmasters/v3/sites');
+            curl_setopt_array($ch, array(
+                CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTPHEADER => array('Authorization: Bearer ' . $token),
+            ));
+            $sitesRaw = curl_exec($ch);
+            curl_close($ch);
+            $sites = json_decode((string) $sitesRaw, true);
+
+            $entries = $sites['siteEntry'] ?? array();
+            $siteUrl = null;
+            foreach ($entries as $e) {
+                if (stripos($e['siteUrl'] ?? '', 'smartgarden.gr') !== false) { $siteUrl = $e['siteUrl']; break; }
+            }
+
+            if (!$siteUrl) {
+                $searchConsole = array(
+                    'available' => false,
+                    'reason' => 'Ο λογαριασμός δεν έχει καμία επαληθευμένη ιδιοκτησία για το smartgarden.gr στο Search Console.',
+                    'action' => 'Πήγαινε στο https://search.google.com/search-console, πρόσθεσε το smartgarden.gr και επαλήθευσέ το με τον ίδιο λογαριασμό Google.',
+                    'propertiesFound' => array_map(function ($e) { return $e['siteUrl']; }, $entries),
+                );
+                rs_out(array(
+                    'success' => true,
+                    'readerQuestions' => array(
+                        'total' => count($questions),
+                        'topTerms' => array_slice($askedTopics, 0, 20),
+                        'uncoveredGaps' => $gaps,
+                    ),
+                    'searchConsole' => $searchConsole,
+                    'articlesPublished' => count($articles),
+                ));
+            }
+
             $days = isset($_GET['days']) ? max(7, min(480, (int) $_GET['days'])) : 90;
             $body = json_encode(array(
                 'startDate' => gmdate('Y-m-d', time() - $days * 86400),
@@ -142,7 +180,7 @@ if ($clientId && $clientSecret && file_exists($tokensPath)) {
                 'rowLimit' => 200,
             ));
             $ch = curl_init('https://www.googleapis.com/webmasters/v3/sites/'
-                . rawurlencode('sc-domain:smartgarden.gr') . '/searchAnalytics/query');
+                . rawurlencode($siteUrl) . '/searchAnalytics/query');
             curl_setopt_array($ch, array(
                 CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_TIMEOUT => 45,
                 CURLOPT_HTTPHEADER => array('Authorization: Bearer ' . $token, 'Content-Type: application/json'),
@@ -173,6 +211,7 @@ if ($clientId && $clientSecret && file_exists($tokensPath)) {
                 usort($striking, function ($a, $b) { return $b['impressions'] <=> $a['impressions']; });
                 $searchConsole = array(
                     'available' => true,
+                    'property' => $siteUrl,
                     'totalQueries' => count($rows),
                     'strikingDistance' => array_slice($striking, 0, 25),
                 );
