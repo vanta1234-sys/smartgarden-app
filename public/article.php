@@ -129,8 +129,18 @@ if ($article) {
     $ssr = '<article>';
     $ssr .= '<h1>' . htmlspecialchars($h1, ENT_QUOTES, 'UTF-8') . '</h1>';
     if (!empty($article['image'])) {
-        $ssr .= '<img src="' . htmlspecialchars($article['image'], ENT_QUOTES) . '" alt="'
-              . htmlspecialchars($h1, ENT_QUOTES, 'UTF-8') . '" width="1200" height="900">';
+        // Ask for exactly what AnimatedShortVideo will ask for once React mounts (700x359).
+        // The stored URL is w=1200, so the browser was fetching a 175KB image for this tag
+        // and then a second, smaller one for the same slot - the large one never displayed.
+        $heroW = 700;
+        $heroH = (int) round($heroW / 1.95);
+        $hero = preg_replace('/([?&])w=\d+/', '${1}w=' . $heroW, $article['image']);
+        $hero = preg_match('/[?&]h=\d+/', $hero)
+            ? preg_replace('/([?&])h=\d+/', '${1}h=' . $heroH, $hero)
+            : preg_replace('/([?&])w=\d+/', '${1}w=' . $heroW . '&h=' . $heroH, $hero);
+        $ssr .= '<img src="' . htmlspecialchars($hero, ENT_QUOTES) . '" alt="'
+              . htmlspecialchars($h1, ENT_QUOTES, 'UTF-8') . '" width="' . $heroW . '" height="' . $heroH
+              . '" fetchpriority="high" decoding="async">';
     }
     if ($summaryFull !== '') {
         $ssr .= '<p>' . htmlspecialchars($summaryFull, ENT_QUOTES, 'UTF-8') . '</p>';
