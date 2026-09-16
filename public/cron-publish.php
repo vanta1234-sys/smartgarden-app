@@ -1936,7 +1936,7 @@ function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
             // billing console. Both halves are counted: an article comes from two parallel
             // calls and totalling one would halve the answer. Best-effort by design.
             require_once __DIR__ . '/usage-ledger.php';
-            @sg_record_usage(array($rawA, $rawB), $model, $selectedTopic['slug'] ?? '');
+            @sg_record_usage(array($rawA, $rawB), $model, $topic['slug'] ?? '');
             $textA = extractGeminiText($rawA, $codeA);
             $textB = extractGeminiText($rawB, $codeB);
 
