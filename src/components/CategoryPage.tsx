@@ -13,6 +13,14 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ articles, categorySl
   const matches = articles.filter((a) => a.category === categorySlug);
   const label = matches[0]?.categoryLabel?.el || categorySlug;
 
+  // Two categories hold one article each. static-meta.php fills those pages out for a
+  // crawler, but Google indexes what React renders — and React was rendering a single
+  // card, so the page came back down to ~400 characters the moment the app mounted. The
+  // same articles the server offers are offered here.
+  const others = matches.length < 4
+    ? articles.filter((a) => a.category !== categorySlug).slice(0, 12)
+    : [];
+
   useEffect(() => {
     document.title = `${label} — Οδηγοί & Άρθρα | SmartGarden.gr`;
     let meta = document.querySelector('meta[name="description"]');
@@ -71,6 +79,27 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ articles, categorySl
 
         {matches.length === 0 && (
           <p className="text-sm text-slate-400">Δεν βρέθηκαν άρθρα σε αυτή την κατηγορία προς το παρόν.</p>
+        )}
+
+        {others.length > 0 && (
+          <section className="pt-4 border-t border-slate-800 space-y-4">
+            <h2 className="text-lg font-bold text-slate-100">Πρόσφατα από τις υπόλοιπες κατηγορίες</h2>
+            <ul className="space-y-3">
+              {others.map((article) => (
+                <li key={article.id}>
+                  <button
+                    onClick={() => onOpenArticle(article)}
+                    className="text-left w-full group cursor-pointer"
+                  >
+                    <span className="block text-sm font-semibold text-slate-100 group-hover:text-emerald-400 transition-colors">
+                      {article.title.el}
+                    </span>
+                    <span className="block text-xs text-slate-400 mt-0.5 line-clamp-2">{article.summary.el}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
       </div>
     </div>
