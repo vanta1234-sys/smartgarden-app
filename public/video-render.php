@@ -214,6 +214,10 @@ if ($action === 'testalert') {
 if ($action === 'jobs') {
     $rows = array();
     foreach ((array) glob($JOBS_ROOT . '/*', GLOB_ONLYDIR) as $d) {
+        // Directories starting with _ are scratch space for the diagnostics above, not
+        // renders. Counting _probe as a failed job made the health summary report a
+        // permanent phantom failure that no amount of successful publishing would clear.
+        if (strpos(basename($d), '_') === 0) continue;
         $status = json_decode((string) @file_get_contents($d . '/status.json'), true);
         $job = json_decode((string) @file_get_contents($d . '/job.json'), true);
         $video = $d . '/video.mp4';
