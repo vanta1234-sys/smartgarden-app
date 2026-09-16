@@ -151,6 +151,23 @@ $analyticsUrl = 'https://youtubeanalytics.googleapis.com/v2/reports?ids=channel=
     . '&dimensions=video&sort=-views&maxResults=200';
 $an = yt_get($analyticsUrl, $accessToken);
 
+// Swallowing this was a mistake: when the Analytics call failed the report simply showed
+// no retention anywhere, which looks identical to a channel too young to have any.
+$analyticsError = null;
+if ($an['status'] !== 200) {
+    $analyticsError = array(
+        'http' => $an['status'],
+        'message' => $an['data']['error']['message'] ?? substr($an['raw'], 0, 400),
+        'hint' => 'Συνήθως: το YouTube Analytics API δεν είναι ενεργοποιημένο στο project του Google Cloud, ή το κανάλι δεν έχει ακόμη αρκετά δεδομένα.',
+    );
+} elseif (empty($an['data']['rows'])) {
+    $analyticsError = array(
+        'http' => 200,
+        'message' => 'Το API απάντησε κανονικά αλλά χωρίς γραμμές.',
+        'hint' => 'Το YouTube χρειάζεται 24-48 ώρες για να συγκεντρώσει στοιχεία, και δεν αναφέρει καθόλου για private βίντεο με ελάχιστες προβολές.',
+    );
+}
+
 $retention = array();
 if ($an['status'] === 200 && isset($an['data']['rows'])) {
     foreach ($an['data']['rows'] as $row) {
@@ -229,6 +246,7 @@ yt_out(array(
     'verdict' => count($withRetention) < 8
         ? 'Πολύ μικρό δείγμα (' . count($withRetention) . ' βίντεο με στοιχεία). Οι διαφορές ανά κατηγορία δεν είναι ακόμη αξιόπιστες — χρειάζονται τουλάχιστον 8-10.'
         : 'Αρκετό δείγμα για πρώτα συμπεράσματα.',
+    'analyticsError' => $analyticsError,
     'byHookStyle' => yt_group($rows, 'hookStyle'),
     'byCategory' => yt_group($rows, 'category'),
     'rows' => $rows,
