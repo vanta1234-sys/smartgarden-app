@@ -182,6 +182,23 @@ if ($route === 'home') {
     $body = '<h1>' . sg_e($label) . '</h1>'
           . '<p>' . count($inCat) . ' οδηγοί στην κατηγορία «' . sg_e($label) . '» από το SmartGarden.gr.</p>'
           . sg_article_list($inCat, 50);
+
+    // Two categories hold a single article each, which left those pages at ~330 characters
+    // — thin enough that Google files them as "crawled, not indexed" and they never pay
+    // back the crawl. Filling out a short category with the newest guides from elsewhere
+    // gives the page something to say and the crawler somewhere to go.
+    if (count($inCat) < 4) {
+        $rest = array();
+        foreach ($articles as $a) {
+            if (($a['category'] ?? '') === $slug) continue;
+            $rest[] = $a;
+            if (count($rest) >= 12) break;
+        }
+        if (count($rest)) {
+            $body .= '<nav>' . sg_article_list($rest, 12, 'Πρόσφατα από τις υπόλοιπες κατηγορίες') . '</nav>';
+        }
+    }
+    $body .= '<p><a href="/">Όλοι οι οδηγοί του SmartGarden.gr</a> · <a href="/fyta">Βάση δεδομένων φυτών</a></p>';
     $ld = sg_breadcrumbs(array('Αρχική' => $home, $label => $home . 'kategoria/' . rawurlencode($slug)));
 
 } elseif ($route === 'fyta') {
