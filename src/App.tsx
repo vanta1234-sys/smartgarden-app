@@ -22,6 +22,8 @@ import { CompanionMatrix } from './components/CompanionMatrix';
 import { MyBalcony } from './components/MyBalcony';
 import { NewsletterSignup } from './components/NewsletterSignup';
 import { FaqAccordion } from './components/FaqAccordion';
+import { AdSlot } from './components/AdSlot';
+import { AD_SLOTS } from './config/ads';
 import { getFaqsForArticle } from './services/schemaService';
 import { ArticleMarkdown } from './components/ArticleMarkdown';
 
@@ -2302,8 +2304,16 @@ pause
                 "{selectedArticle.summary.el}"
               </blockquote>
 
+              {/* Placed ad units. The article is read inside a fixed overlay with its own
+                  scroll container, which Auto Ads will not reliably place into — these sit
+                  in the reader's normal flow instead. Both render nothing until a slot ID
+                  is filled in at src/config/ads.ts. */}
+              <AdSlot slot={AD_SLOTS.articleTop} />
+
               {/* Full Content */}
               <ArticleMarkdown content={selectedArticle.content.el} />
+
+              <AdSlot slot={AD_SLOTS.articleEnd} />
 
               {/* Key Takeaways Card */}
               <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-2xl p-5 space-y-3">
