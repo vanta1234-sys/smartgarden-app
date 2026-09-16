@@ -198,25 +198,104 @@ if ($route === 'home') {
         $plant = null;
         foreach ($plants as $pl) if (($pl['slug'] ?? '') === $slug) { $plant = $pl; break; }
         if ($plant) {
-            $body = '<h1>' . sg_e($plant['name']) . ' — Οδηγός Καλλιέργειας</h1>'
-                  . '<p><strong>Botanical:</strong> <em>' . sg_e($plant['botanical'] ?? '') . '</em></p>'
-                  . '<ul>'
-                  . '<li>Ελάχιστη θερμοκρασία: ' . sg_e($plant['minTempC'] ?? '—') . ' °C</li>'
-                  . '<li>Ηλιοφάνεια: ' . sg_e($plant['sun'] ?? '—') . '</li>'
-                  . '<li>pH εδάφους: ' . sg_e($plant['ph'] ?? '—') . '</li>'
-                  . '</ul>';
+            $M = array('', 'Ιανουάριο', 'Φεβρουάριο', 'Μάρτιο', 'Απρίλιο', 'Μάιο', 'Ιούνιο',
+                       'Ιούλιο', 'Αύγουστο', 'Σεπτέμβριο', 'Οκτώβριο', 'Νοέμβριο', 'Δεκέμβριο');
+            $months = function ($nums) use ($M) {
+                $out = array();
+                foreach ((array) $nums as $n) if (isset($M[(int) $n])) $out[] = $M[(int) $n];
+                return count($out) ? implode(', ', $out) : '';
+            };
+            $sow = $months($plant['sowMonths'] ?? array());
+            $harvest = $months($plant['harvestMonths'] ?? array());
+            $name = $plant['name'];
+
+            $intro = 'Ο πλήρης οδηγός καλλιέργειας για ' . $name . ' (<em>' . sg_e($plant['botanical'] ?? '') . '</em>'
+                   . (!empty($plant['family']) ? ', οικογένεια ' . sg_e($plant['family']) : '') . ') σε ελληνικό κλίμα: '
+                   . 'πότε σπέρνουμε, τι γλάστρα χρειάζεται, πόσο νερό θέλει και ποιο είναι το λάθος που το σκοτώνει.';
+
+            $rows = array(
+                'Ηλιοφάνεια' => $plant['sun'] ?? '',
+                'Πότισμα' => $plant['water'] ?? '',
+                'Μέγεθος γλάστρας' => $plant['potLitres'] ?? '',
+                'pH εδάφους' => $plant['ph'] ?? '',
+                'Αντέχει έως' => isset($plant['minTempC']) ? $plant['minTempC'] . ' °C' : '',
+                'Δυσκολία' => $plant['difficulty'] ?? '',
+                'Σπορά / φύτευση' => $sow,
+                'Συγκομιδή / ανθοφορία' => $harvest,
+                'Κατηγορία' => $plant['categoryLabel'] ?? '',
+            );
+            $table = '<table><tbody>';
+            foreach ($rows as $k => $v) {
+                if ($v === '' || $v === null) continue;
+                $table .= '<tr><th>' . sg_e($k) . '</th><td>' . sg_e($v) . '</td></tr>';
+            }
+            $table .= '</tbody></table>';
+
+            $body = '<h1>' . sg_e($name) . ' — Οδηγός Καλλιέργειας</h1>'
+                  . '<p>' . $intro . '</p>'
+                  . '<h2>Απαιτήσεις με μια ματιά</h2>' . $table;
+
+            if ($sow !== '') {
+                $body .= '<h2>Πότε σπέρνουμε ' . sg_e($name) . '</h2>'
+                       . '<p>Η σπορά ή φύτευση γίνεται ' . sg_e($sow) . '.'
+                       . ($harvest !== '' ? ' Η συγκομιδή ξεκινά ' . sg_e($harvest) . '.' : '')
+                       . (isset($plant['minTempC'])
+                            ? ' Το φυτό αντέχει μέχρι τους ' . sg_e($plant['minTempC']) . ' °C, οπότε σε περιοχές με '
+                            . 'όψιμο παγετό περιμένουμε — δες τις <a href="/pagetos">ημερομηνίες παγετού ανά περιοχή</a>.'
+                            : '')
+                       . '</p>';
+            }
+            if (!empty($plant['commonProblem'])) {
+                $body .= '<h2>Το συνηθέστερο πρόβλημα</h2><p>' . sg_e($plant['commonProblem']) . '</p>';
+            }
+            if (!empty($plant['keyTip'])) {
+                $body .= '<h2>Η συμβουλή που κάνει τη διαφορά</h2><p>' . sg_e($plant['keyTip']) . '</p>';
+            }
+            if (!empty($plant['companions']) && is_array($plant['companions'])) {
+                $body .= '<h2>Καλές συντροφιές στη γλάστρα</h2><p>' . sg_e($name) . ' ταιριάζει με: '
+                       . sg_e(implode(', ', $plant['companions'])) . '.</p>';
+            }
+            $body .= '<p><a href="/fyta">Όλα τα φυτά στη βάση δεδομένων</a> · '
+                   . '<a href="/xoma">Υπολογιστής χώματος &amp; γλάστρας</a> · '
+                   . '<a href="/imerologio-sporas">Ημερολόγιο σποράς</a></p>';
+
             // Articles that actually mention this plant, so the page links somewhere useful.
             $rel = array();
-            $needle = mb_strtolower($plant['name'], 'UTF-8');
+            $needle = mb_strtolower($name, 'UTF-8');
             foreach ($articles as $a) {
                 $hay = mb_strtolower(($a['title']['el'] ?? '') . ' ' . ($a['summary']['el'] ?? ''), 'UTF-8');
                 if (mb_strpos($hay, mb_substr($needle, 0, max(4, mb_strlen($needle) - 2), 'UTF-8')) !== false) $rel[] = $a;
             }
             if (count($rel)) $body .= sg_article_list($rel, 10, 'Σχετικοί οδηγοί');
-            $ld = sg_breadcrumbs(array(
+
+            // Breadcrumbs plus the questions this page actually answers. The answers are the
+            // page's own text, which is what Google requires of FAQ markup.
+            $faq = array();
+            if ($sow !== '') {
+                $faq[] = array('Πότε σπέρνουμε ' . $name . ';',
+                    'Η σπορά ή φύτευση γίνεται ' . $sow . ($harvest !== '' ? ', με συγκομιδή ' . $harvest : '') . '.');
+            }
+            if (!empty($plant['commonProblem'])) {
+                $faq[] = array('Ποιο είναι το συνηθέστερο πρόβλημα στη/στον ' . $name . ';', $plant['commonProblem']);
+            }
+            if (!empty($plant['potLitres'])) {
+                $faq[] = array('Τι γλάστρα χρειάζεται ' . $name . ';',
+                    'Γλάστρα ' . $plant['potLitres'] . ', με pH εδάφους ' . ($plant['ph'] ?? '6.0-7.0')
+                    . ' και ' . mb_strtolower($plant['water'] ?? 'μέτριο', 'UTF-8') . ' πότισμα.');
+            }
+            $ld = array(sg_breadcrumbs(array(
                 'Αρχική' => $home, 'Φυτά' => $home . 'fyta',
-                $plant['name'] => $home . 'fyta/' . rawurlencode($slug),
-            ));
+                $name => $home . 'fyta/' . rawurlencode($slug),
+            )));
+            if (count($faq)) {
+                $ld[] = array(
+                    '@context' => 'https://schema.org', '@type' => 'FAQPage',
+                    'mainEntity' => array_map(function ($q) {
+                        return array('@type' => 'Question', 'name' => $q[0],
+                            'acceptedAnswer' => array('@type' => 'Answer', 'text' => $q[1]));
+                    }, $faq),
+                );
+            }
         }
     }
 

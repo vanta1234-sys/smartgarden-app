@@ -1,0 +1,23 @@
+/**
+ * Mirror the plant reference into public/plants.json for the PHP side.
+ *
+ * The file was maintained by hand and had drifted to seven of the seventeen fields, which
+ * is why /fyta/<slug> served 391 characters: the sowing months, watering, pot size, the
+ * plant's usual failure and the one tip that prevents it were all in the TypeScript source
+ * and never reached the server. Generated on every build so it cannot drift again.
+ */
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { PLANTS, PLANT_CATEGORY_LABELS } from '../src/data/plantDatabase';
+
+const dir = path.dirname(fileURLToPath(import.meta.url));
+const out = path.join(dir, '..', 'public', 'plants.json');
+
+const rows = PLANTS.map((p) => ({
+  ...p,
+  categoryLabel: PLANT_CATEGORY_LABELS[p.category],
+}));
+
+fs.writeFileSync(out, JSON.stringify(rows, null, 2), 'utf8');
+console.log(`plants.json: ${rows.length} plants, ${Object.keys(rows[0]).length} fields`);

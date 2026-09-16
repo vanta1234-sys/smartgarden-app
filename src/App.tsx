@@ -1,5 +1,9 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { generateBotanicalArticle } from './services/botanicalAiEngine';
+// The botanical generator and the article templates behind it are ~250KB, and they only
+// ever run in the editor when Gemini is unreachable. Readers were downloading the machinery
+// that writes the site's articles in order to read one, so it is fetched on demand.
+const loadBotanicalEngine = () =>
+  import('./services/botanicalAiEngine').then((m) => m.generateBotanicalArticle);
 import { getSmartArticleImage, CURATED_GARDENING_PHOTOS, FALLBACK_BOTANICAL_PHOTOS } from './services/imageService';
 import { AnimatedShortVideo } from './components/AnimatedShortVideo';
 import { SmartBalconyCalculator } from './components/SmartBalconyCalculator';
@@ -9,19 +13,9 @@ import { LiveWeatherData } from './services/weatherService';
 import { SocialShareBar } from './components/SocialShareBar';
 import { SprayDosageCalculator } from './components/SprayDosageCalculator';
 import { PlantDoctor } from './components/PlantDoctor';
-import { CategoryPage } from './components/CategoryPage';
-import { AuthorBioPage } from './components/AuthorBioPage';
-import { PlantingCalendarPage } from './components/PlantingCalendarPage';
-import { ClimateComparisonPage } from './components/ClimateComparisonPage';
-import { FrostDatesPage } from './components/FrostDatesPage';
-import { PlantDatabasePage } from './components/PlantDatabasePage';
-import { AskAgronomistPage } from './components/AskAgronomistPage';
-import { InstagramStudio } from './components/InstagramStudio';
 import { ArticleToolLinks } from './components/ArticleToolLinks';
-import { LunarCalendarPage, LunarBadge } from './components/LunarCalendarPage';
+import { LunarBadge } from './components/LunarBadge';
 import { DailyBrief } from './components/DailyBrief';
-import { SoilCalculatorPage } from './components/SoilCalculatorPage';
-import { LegalPage } from './components/LegalPage';
 import { SoilCalculator } from './components/SoilCalculator';
 import { SymptomWizard } from './components/SymptomWizard';
 import { CompanionMatrix } from './components/CompanionMatrix';
@@ -35,6 +29,21 @@ import { ArticleMarkdown } from './components/ArticleMarkdown';
 // the Remotion/video-rendering and SEO-audit code paths they'll never use.
 const TikTokStudio = lazy(() => import('./components/TikTokStudio').then(m => ({ default: m.TikTokStudio })));
 const SeoMetadataAuditor = lazy(() => import('./components/SeoMetadataAuditor').then(m => ({ default: m.SeoMetadataAuditor })));
+
+// Pages that own a whole route. A reader who came for an article should not have to
+// download the frost-date tables, the plant database and the legal pages before the
+// article renders - each of these is its own chunk, fetched only when its URL is open.
+const CategoryPage = lazy(() => import('./components/CategoryPage').then(m => ({ default: m.CategoryPage })));
+const AuthorBioPage = lazy(() => import('./components/AuthorBioPage').then(m => ({ default: m.AuthorBioPage })));
+const PlantingCalendarPage = lazy(() => import('./components/PlantingCalendarPage').then(m => ({ default: m.PlantingCalendarPage })));
+const ClimateComparisonPage = lazy(() => import('./components/ClimateComparisonPage').then(m => ({ default: m.ClimateComparisonPage })));
+const FrostDatesPage = lazy(() => import('./components/FrostDatesPage').then(m => ({ default: m.FrostDatesPage })));
+const SoilCalculatorPage = lazy(() => import('./components/SoilCalculatorPage').then(m => ({ default: m.SoilCalculatorPage })));
+const AskAgronomistPage = lazy(() => import('./components/AskAgronomistPage').then(m => ({ default: m.AskAgronomistPage })));
+const LegalPage = lazy(() => import('./components/LegalPage').then(m => ({ default: m.LegalPage })));
+const InstagramStudio = lazy(() => import('./components/InstagramStudio').then(m => ({ default: m.InstagramStudio })));
+const PlantDatabasePage = lazy(() => import('./components/PlantDatabasePage').then(m => ({ default: m.PlantDatabasePage })));
+const LunarCalendarPage = lazy(() => import('./components/LunarCalendarPage').then(m => ({ default: m.LunarCalendarPage })));
 import { injectGlobalSiteSchema, injectArticleSchema } from './services/schemaService';
 import {
   Globe,
@@ -90,11 +99,35 @@ import {
 } from 'lucide-react';
 import { ArticleItem } from './types';
 import { WEEKLY_TRENDING_TOPICS, TrendingTopic } from './data/trendingTopics';
-import { build50MasterArticles } from './data/master50Articles';
+import { MASTER_50_SEED } from './data/master50Seed';
 import { cleanGreekTextForSpeech } from './utils/greekSpeechSanitizer';
 import { speakGreekTextWithWebSpeech, stopWebSpeech, VoiceProfile } from './utils/greekSpeechSynthesizer';
 
-const INITIAL_ARTICLES: ArticleItem[] = build50MasterArticles();
+/**
+ * Route pages are separate chunks now, so there is a network round trip between the URL
+ * changing and the page existing. This covers it with something that looks like the site
+ * rather than a blank screen.
+ */
+const RoutePage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Suspense
+    fallback={
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-slate-500 text-sm">
+          <span className="w-4 h-4 rounded-full border-2 border-slate-700 border-t-emerald-500 animate-spin" />
+          Φόρτωση…
+        </div>
+      </div>
+    }
+  >
+    {children}
+  </Suspense>
+);
+
+// Placeholder for the few hundred milliseconds before /latest_articles.json arrives.
+// It carries no article bodies: shipping fifty of them to every visitor cost ~390KB of
+// JavaScript for content that is replaced before anyone can read it. The full set is
+// imported dynamically below, only if the fetch fails.
+const INITIAL_ARTICLES: ArticleItem[] = MASTER_50_SEED;
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
@@ -262,8 +295,18 @@ export default function App() {
         }
       })
       .catch(() => {
-        // Use default initial articles if offline
-        if (isArticleRoute()) injectArticleSchema(INITIAL_ARTICLES[0]);
+        // Offline, or the file is missing. Only now is it worth paying for the article
+        // bodies, so that the page has something to show rather than empty cards.
+        import('./data/master50Articles')
+          .then((m) => {
+            const full = m.build50MasterArticles();
+            setArticles(full);
+            setSelectedArticle(full[0]);
+            if (isArticleRoute()) injectArticleSchema(full[0]);
+          })
+          .catch(() => {
+            if (isArticleRoute()) injectArticleSchema(INITIAL_ARTICLES[0]);
+          });
       });
   }, []);
 
@@ -349,7 +392,7 @@ export default function App() {
 
       // 2. If Gemini API was not configured or timed out, use the specialized botanical agronomy engine
       if (!aiData) {
-        aiData = generateBotanicalArticle(
+        aiData = (await loadBotanicalEngine())(
           customTopicTitle,
           customCategory,
           customDifficulty,
@@ -449,14 +492,14 @@ export default function App() {
   };
 
   // Select a researched trending topic
-  const handleSelectTrendingTopic = (trend: TrendingTopic) => {
+  const handleSelectTrendingTopic = async (trend: TrendingTopic) => {
     const newId = String(Date.now());
     
     // Ensure full in-depth 2.200+ words article for the selected trend topic
     let fullContent = trend.fullDraft;
     let keyPoints = trend.keyPoints;
     if (!fullContent || fullContent.length < 1500) {
-      const generated = generateBotanicalArticle(
+      const generated = (await loadBotanicalEngine())(
         trend.title,
         trend.category,
         "Μέτριο",
@@ -715,7 +758,7 @@ export default function App() {
       }
 
       if (!expanded) {
-        const botData = generateBotanicalArticle(editTitle, editCategory, selectedArticle.difficulty);
+        const botData = (await loadBotanicalEngine())(editTitle, editCategory, selectedArticle.difficulty);
         expanded = botData.content;
         newSummary = botData.summary;
       }
@@ -917,49 +960,51 @@ pause
   const categoryMatch = pathname.match(/^\/kategoria\/([^/]+)\/?$/);
   if (categoryMatch) {
     return (
-      <CategoryPage
-        articles={articles}
-        categorySlug={decodeURIComponent(categoryMatch[1])}
-        onOpenArticle={handleOpenArticleFromStaticPage}
-        onBack={handleBackToHome}
-      />
+      <RoutePage>
+        <CategoryPage
+          articles={articles}
+          categorySlug={decodeURIComponent(categoryMatch[1])}
+          onOpenArticle={handleOpenArticleFromStaticPage}
+          onBack={handleBackToHome}
+        />
+      </RoutePage>
     );
   }
   if (pathname.match(/^\/syntaktis\/?/)) {
-    return <AuthorBioPage articles={articles} onOpenArticle={handleOpenArticleFromStaticPage} onBack={handleBackToHome} />;
+    return <RoutePage><AuthorBioPage articles={articles} onOpenArticle={handleOpenArticleFromStaticPage} onBack={handleBackToHome} /></RoutePage>;
   }
   if (pathname.match(/^\/imerologio-sporas\/?/)) {
-    return <PlantingCalendarPage onBack={handleBackToHome} />;
+    return <RoutePage><PlantingCalendarPage onBack={handleBackToHome} /></RoutePage>;
   }
   if (pathname.match(/^\/klima-kipoy\/?/)) {
-    return <ClimateComparisonPage onBack={handleBackToHome} />;
+    return <RoutePage><ClimateComparisonPage onBack={handleBackToHome} /></RoutePage>;
   }
   if (pathname.match(/^\/pagetos\/?/)) {
-    return <FrostDatesPage onBack={handleBackToHome} />;
+    return <RoutePage><FrostDatesPage onBack={handleBackToHome} /></RoutePage>;
   }
   if (pathname.match(/^\/xoma\/?/)) {
-    return <SoilCalculatorPage onBack={handleBackToHome} />;
+    return <RoutePage><SoilCalculatorPage onBack={handleBackToHome} /></RoutePage>;
   }
   if (pathname.match(/^\/selini\/?/)) {
-    return <LunarCalendarPage onBack={handleBackToHome} />;
+    return <RoutePage><LunarCalendarPage onBack={handleBackToHome} /></RoutePage>;
   }
   if (pathname.match(/^\/rotiste\/?/)) {
-    return <AskAgronomistPage onBack={handleBackToHome} />;
+    return <RoutePage><AskAgronomistPage onBack={handleBackToHome} /></RoutePage>;
   }
   if (pathname.match(/^\/privacy\/?$/)) {
-    return <LegalPage variant="privacy" onBack={handleBackToHome} />;
+    return <RoutePage><LegalPage variant="privacy" onBack={handleBackToHome} /></RoutePage>;
   }
   if (pathname.match(/^\/terms\/?$/)) {
-    return <LegalPage variant="terms" onBack={handleBackToHome} />;
+    return <RoutePage><LegalPage variant="terms" onBack={handleBackToHome} /></RoutePage>;
   }
   // Internal content tool — reachable by URL but deliberately kept out of the sitemap,
   // the footer and llms.txt, since it is for producing posts, not for readers.
   if (pathname.match(/^\/instagram-studio\/?/)) {
-    return <InstagramStudio onBack={handleBackToHome} />;
+    return <RoutePage><InstagramStudio onBack={handleBackToHome} /></RoutePage>;
   }
   const plantMatch = pathname.match(/^\/fyta(?:\/([^/]+))?\/?$/);
   if (plantMatch) {
-    return <PlantDatabasePage onBack={handleBackToHome} initialSlug={plantMatch[1] ? decodeURIComponent(plantMatch[1]) : undefined} />;
+    return <RoutePage><PlantDatabasePage onBack={handleBackToHome} initialSlug={plantMatch[1] ? decodeURIComponent(plantMatch[1]) : undefined} /></RoutePage>;
   }
 
   return (
