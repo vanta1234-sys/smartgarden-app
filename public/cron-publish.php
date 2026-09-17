@@ -1711,7 +1711,12 @@ if (file_exists($latestFile)) {
     $rawLatest = @file_get_contents($latestFile);
     $decodedLatest = json_decode($rawLatest, true);
     if (is_array($decodedLatest)) {
-        $existingArticles = $decodedLatest;
+        // Two articles carry U+FFFD pairs where a kappa should be, from something upstream
+        // re-encoding the JSON a byte at a time. article.php repairs them when it serves a
+        // page, but rss.xml is written from this array — so repairing here fixes the stored
+        // file the next time the cron rewrites it, and the feed with it.
+        require_once __DIR__ . '/ssr-lib.php';
+        $existingArticles = array_map('sg_repair_article', $decodedLatest);
     }
 }
 
