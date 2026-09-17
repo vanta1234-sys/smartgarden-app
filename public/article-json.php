@@ -20,7 +20,8 @@ $articles = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.
 if (is_array($articles)) {
     foreach ($articles as $a) {
         if (($a['slug'] ?? '') === $slug) {
-            echo json_encode($a, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            require_once __DIR__ . '/ssr-lib.php';
+            echo json_encode(sg_repair_article($a), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             exit;
         }
     }

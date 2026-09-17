@@ -294,3 +294,42 @@ function sg_insert_real_photo($markdown, $photo) {
     return substr($markdown, 0, $at) . ltrim($block) . "
 " . substr($markdown, $at);
 }
+
+/**
+ * Repair text that lost a character somewhere upstream.
+ *
+ * Two published articles carry U+FFFD REPLACEMENT CHARACTER pairs where a kappa should be
+ * — "Ανθε??τικά", "Θερμο??οιτίδες" — one pair per lost two-byte letter, so something
+ * re-encoded the JSON a byte at a time. The stored data is owned by the live cron, so it
+ * is repaired here, where every reader and crawler passes through.
+ *
+ * The known cases are listed rather than guessed at: a rule that replaced any pair with a
+ * kappa would confidently invent the wrong letter the next time this happens. Anything not
+ * listed has the marker removed, so a reader sees a missing letter and not a black diamond.
+ */
+function sg_repair_text($t) {
+    if (!is_string($t)) return $t;
+    $bad = "\xEF\xBF\xBD";
+    if (strpos($t, $bad) === false) return $t;
+    $t = strtr($t, array(
+        'Ανθε' . $bad . $bad . 'τικά' => 'Ανθεκτικά',
+        'Θερμο' . $bad . $bad . 'οιτίδες' => 'Θερμοκοιτίδες',
+    ));
+    return str_replace($bad, '', $t);
+}
+
+/** Apply sg_repair_text to the fields a reader ever sees. */
+function sg_repair_article($a) {
+    if (!is_array($a)) return $a;
+    foreach (array('title', 'summary', 'content') as $field) {
+        if (!isset($a[$field])) continue;
+        if (is_string($a[$field])) {
+            $a[$field] = sg_repair_text($a[$field]);
+        } elseif (is_array($a[$field])) {
+            foreach ($a[$field] as $lang => $v) {
+                if (is_string($v)) $a[$field][$lang] = sg_repair_text($v);
+            }
+        }
+    }
+    return $a;
+}

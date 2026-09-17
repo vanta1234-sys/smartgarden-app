@@ -137,6 +137,7 @@ if ($title && $description) {
 require_once __DIR__ . '/ssr-lib.php';
 
 $articles = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true) ?: array();
+$articles = array_map('sg_repair_article', $articles);
 $body = '';
 $ld = null;
 $home = 'https://smartgarden.gr/';

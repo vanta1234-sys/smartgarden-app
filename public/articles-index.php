@@ -25,7 +25,11 @@ if (!file_exists($src)) {
     exit;
 }
 
-if (file_exists($cache) && filemtime($cache) >= filemtime($src)) {
+// Rebuild when the data changes, and also when this script or ssr-lib.php does — the text
+// repair lives in ssr-lib, and a cache keyed on the data alone would serve the broken
+// version until the next publish.
+$newest = max(filemtime($src), filemtime(__FILE__), @filemtime(__DIR__ . '/ssr-lib.php') ?: 0);
+if (file_exists($cache) && filemtime($cache) >= $newest) {
     readfile($cache);
     exit;
 }
@@ -36,7 +40,9 @@ if (!is_array($articles)) {
     exit;
 }
 
+require_once __DIR__ . '/ssr-lib.php';
 foreach ($articles as &$a) {
+    $a = sg_repair_article($a);
     $a['content'] = array('el' => '', 'en' => '');
 }
 unset($a);

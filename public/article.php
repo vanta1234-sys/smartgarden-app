@@ -30,7 +30,7 @@ if ($slug && file_exists($articlesPath)) {
     if (is_array($articles)) {
         foreach ($articles as $a) {
             if (($a['slug'] ?? '') === $slug) {
-                $article = $a;
+                $article = sg_repair_article($a);
                 break;
             }
         }
