@@ -335,6 +335,25 @@ if ($route === 'home') {
         }
     }
 
+} elseif ($route === 'imerologio-sporas') {
+    // The same year-at-a-glance the React page renders below its month picker.
+    $body = '<h1>Ημερολόγιο Σποράς &amp; Εργασιών Κήπου</h1>'
+          . '<p>Τι κάνουμε κάθε μήνα στο ελληνικό μπαλκόνι και κήπο — σπορά, κλάδεμα, άρδευση, '
+          . 'θρέψη και φυτοπροστασία, από τον Ιανουάριο ως τον Δεκέμβριο.</p>';
+    $months = json_decode((string) @file_get_contents(__DIR__ . '/monthly-guides.json'), true) ?: array();
+    foreach ($months as $m) {
+        if (!count($m['tasks'] ?? array())) continue;
+        $body .= '<h2>' . sg_e($m['name']) . '</h2><ul>';
+        foreach ($m['tasks'] as $t) {
+            $body .= '<li><strong>' . sg_e($t['title']) . '.</strong> ' . sg_e($t['desc']) . '</li>';
+        }
+        $body .= '</ul>';
+    }
+    $body .= '<p><a href="/pagetos">Ημερομηνίες παγετού ανά περιοχή</a> · '
+           . '<a href="/fyta">Βάση δεδομένων φυτών</a> · '
+           . '<a href="/">Όλοι οι οδηγοί</a></p>';
+    $ld = sg_breadcrumbs(array('Αρχική' => $home, 'Ημερολόγιο Σποράς' => $home . 'imerologio-sporas'));
+
 } elseif ($title) {
     // The remaining tool and hub pages already have a hand-written title and description
     // upstairs; promoting those into real body copy beats leaving the page blank.

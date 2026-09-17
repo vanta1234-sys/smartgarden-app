@@ -112,6 +112,34 @@ export const PlantingCalendarPage: React.FC<PlantingCalendarPageProps> = ({ onBa
             <p className="text-sm text-slate-400 col-span-2">Δεν υπάρχουν εργασίες αυτού του τύπου για τον {MONTH_NAMES_EL[activeMonth]}.</p>
           )}
         </div>
+
+        {/* The month picker shows one month at a time, which is right for someone asking
+            "what now?" and wrong for someone planning a season — and it left the page with
+            three tasks on it where thirty-seven exist. The whole year is listed below. */}
+        <section className="pt-6 mt-2 border-t border-slate-800 space-y-5">
+          <div>
+            <h2 className="text-lg font-bold text-slate-100">Όλο το έτος με μια ματιά</h2>
+            <p className="text-xs text-slate-400 mt-1">
+              Οι εργασίες κάθε μήνα στο ελληνικό μπαλκόνι και κήπο, από τον Ιανουάριο ως τον Δεκέμβριο.
+            </p>
+          </div>
+          {MONTH_NAMES_EL.map((name, monthIdx) => {
+            const monthTasks = MONTHLY_GUIDES[monthIdx] || [];
+            if (!monthTasks.length) return null;
+            return (
+              <div key={name}>
+                <h3 className="text-sm font-bold text-emerald-400 mb-2">{name}</h3>
+                <ul className="space-y-1.5">
+                  {monthTasks.map((task, i) => (
+                    <li key={i} className="text-xs text-slate-400 leading-relaxed">
+                      <strong className="text-slate-200">{task.title}.</strong> {task.desc}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </section>
       </div>
     </div>
   );
