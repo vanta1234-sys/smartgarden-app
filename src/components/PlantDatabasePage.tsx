@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { REAL_PHOTOS } from '../data/realPhotos';
-import { pageTitle } from '../utils/seoTitle';
+import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, Leaf, Search, Sun, Droplets, Thermometer, FlaskConical, AlertTriangle, Lightbulb, Snowflake, CalendarDays } from 'lucide-react';
 import { PLANTS, PLANT_CATEGORY_LABELS, Plant, PlantCategory, getPlantBySlug } from '../data/plantDatabase';
 
@@ -62,9 +62,9 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
     if (meta) {
       meta.setAttribute(
         'content',
-        selected
-          ? `${selected.name} (${selected.botanical}): αντοχή στο κρύο έως ${selected.minTempC}°C, pH ${selected.ph}, ${selected.sun.toLowerCase()}. Πότε φυτεύεται και τι πάει στραβά συχνότερα.`
-          : `Αναλυτικά δεδομένα καλλιέργειας για ${PLANTS.length} φυτά προσαρμοσμένα στο ελληνικό κλίμα: αντοχή στον παγετό, pH, μέγεθος γλάστρας, μήνες σποράς και το συχνότερο λάθος για κάθε φυτό.`
+        metaDescription(selected
+          ? `${selected.name}: γλάστρα ${selected.potLitres}, pH ${selected.ph}, ${selected.sun.toLowerCase()}, αντοχή έως ${selected.minTempC}°C. Πότε σπέρνεται και το λάθος που το σκοτώνει.`
+          : `Αναλυτικά δεδομένα καλλιέργειας για ${PLANTS.length} φυτά προσαρμοσμένα στο ελληνικό κλίμα: αντοχή στον παγετό, pH, μέγεθος γλάστρας, μήνες σποράς και το συχνότερο λάθος για κάθε φυτό.`)
       );
     }
   }, [selected]);

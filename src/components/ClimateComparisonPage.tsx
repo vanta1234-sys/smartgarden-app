@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { pageTitle } from '../utils/seoTitle';
+import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, Gauge, Droplets, RotateCw } from 'lucide-react';
 import { POPULAR_GREEK_CITIES, fetchLiveWeatherData, LiveWeatherData } from '../services/weatherService';
 
@@ -19,7 +19,7 @@ export const ClimateComparisonPage: React.FC<ClimateComparisonPageProps> = ({ on
     document.title = pageTitle('Ζωντανή Σύγκριση Εξατμισοδιαπνοής (ET₀) Ελληνικών Πόλεων — SmartGarden.gr');
     let meta = document.querySelector('meta[name="description"]');
     if (meta) {
-      meta.setAttribute('content', 'Ζωντανά δεδομένα εξατμισοδιαπνοής (ET₀), θερμοκρασίας και υγρασίας για 15 ελληνικές πόλεις — δείτε ποια περιοχή έχει τη μεγαλύτερη ανάγκη ποτίσματος σήμερα.');
+      meta.setAttribute('content', metaDescription('Ζωντανά δεδομένα εξατμισοδιαπνοής (ET₀), θερμοκρασίας και υγρασίας για 15 ελληνικές πόλεις — δείτε ποια περιοχή έχει τη μεγαλύτερη ανάγκη ποτίσματος σήμερα.'));
     }
 
     Promise.all(POPULAR_GREEK_CITIES.map(async (city) => {

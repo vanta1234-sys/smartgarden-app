@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { pageTitle } from '../utils/seoTitle';
+import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, Snowflake, Sprout, CalendarDays, RotateCw, ThermometerSnowflake, ShieldCheck } from 'lucide-react';
 
 interface FrostStat {
@@ -59,7 +59,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
     if (meta) {
       meta.setAttribute(
         'content',
-        'Πραγματικές ημερομηνίες πρώτου και τελευταίου παγετού για 50+ ελληνικές περιοχές, από 20 χρόνια μετεωρολογικών δεδομένων. Δείτε πότε μπορείτε με ασφάλεια να φυτέψετε ντομάτες, βασιλικό και άλλα ευαίσθητα φυτά στην περιοχή σας.'
+        metaDescription('Πραγματικές ημερομηνίες πρώτου και τελευταίου παγετού για 50+ ελληνικές περιοχές, από 20 χρόνια μετεωρολογικών δεδομένων. Δείτε πότε μπορείτε με ασφάλεια να φυτέψετε ντομάτες, βασιλικό και άλλα ευαίσθητα φυτά στην περιοχή σας.')
       );
     }
 

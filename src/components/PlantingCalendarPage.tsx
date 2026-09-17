@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { pageTitle } from '../utils/seoTitle';
+import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { MONTH_NAMES_EL, MONTHLY_GUIDES } from './SeasonalAdviceBar';
 
@@ -16,7 +16,7 @@ export const PlantingCalendarPage: React.FC<PlantingCalendarPageProps> = ({ onBa
     document.title = pageTitle(`Ημερολόγιο Σποράς & Εργασιών Κήπου — SmartGarden.gr`);
     let meta = document.querySelector('meta[name="description"]');
     if (meta) {
-      meta.setAttribute('content', 'Τι σπέρνουμε, τι κλαδεύουμε και τι λιπαίνουμε κάθε μήνα στο ελληνικό μπαλκόνι & κήπο. Πλήρες ημερολόγιο εργασιών για όλο το χρόνο.');
+      meta.setAttribute('content', metaDescription('Τι σπέρνουμε, τι κλαδεύουμε και τι λιπαίνουμε κάθε μήνα στο ελληνικό μπαλκόνι & κήπο. Πλήρες ημερολόγιο εργασιών για όλο το χρόνο.'));
     }
   }, []);
 

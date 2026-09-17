@@ -412,3 +412,19 @@ function sg_plant_photos($slug) {
     }
     return $out;
 }
+
+/**
+ * A meta description that fits the snippet. Mirrors metaDescription in
+ * src/utils/seoTitle.ts.
+ *
+ * 76 of 146 pages ran past 165 characters, so Google cut the tail — which on the plant
+ * pages was the part saying what the page answers.
+ */
+function sg_meta_description($text, $max = 155) {
+    $t = trim(preg_replace('/\s+/u', ' ', (string) $text));
+    if (mb_strlen($t, 'UTF-8') <= $max) return $t;
+    $cut = mb_substr($t, 0, $max - 1, 'UTF-8');
+    $sp = mb_strrpos($cut, ' ', 0, 'UTF-8');
+    if ($sp !== false && $sp > $max * 0.6) $cut = mb_substr($cut, 0, $sp, 'UTF-8');
+    return preg_replace('/[\s,·;:\-]+$/u', '', $cut) . '…';
+}

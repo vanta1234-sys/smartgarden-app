@@ -100,3 +100,18 @@ export function pageTitle(full: string): string {
   const withoutBrand = (full || '').replace(/\s*[|—–-]\s*SmartGarden\.gr\s*$/u, '').trim();
   return seoTitle(withoutBrand || 'SmartGarden.gr');
 }
+
+/**
+ * A meta description that fits the snippet.
+ *
+ * 76 of 146 pages ran past 165 characters, so Google cut the tail — which on the plant
+ * pages was the part that said what the page answers. Trimmed on a word boundary at 155,
+ * which is inside every rendering width Google uses.
+ */
+export function metaDescription(text: string, max = 155): string {
+  const t = (text || '').replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max - 1);
+  const sp = cut.lastIndexOf(' ');
+  return (sp > max * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s,·;:\-]+$/u, '') + '…';
+}

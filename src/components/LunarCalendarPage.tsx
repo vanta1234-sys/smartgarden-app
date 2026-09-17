@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { pageTitle } from '../utils/seoTitle';
+import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, Moon, Sprout, Scissors, Info, ArrowUpRight } from 'lucide-react';
 import { getLunarInfo, getLunarGuidance, LunarInfo } from '../services/lunarService';
 
@@ -28,7 +28,7 @@ export const LunarCalendarPage: React.FC<{ onBack: () => void }> = ({ onBack }) 
     if (meta) {
       meta.setAttribute(
         'content',
-        'Φάση σελήνης σήμερα και τι λέει η ελληνική παράδοση για σπορά, φύτευση και κλάδεμα στη χάση και στη γέμιση — μαζί με το τι δείχνουν πραγματικά τα γεωπονικά δεδομένα.'
+        metaDescription('Φάση σελήνης σήμερα και τι λέει η ελληνική παράδοση για σπορά, φύτευση και κλάδεμα στη χάση και στη γέμιση — μαζί με το τι δείχνουν πραγματικά τα γεωπονικά δεδομένα.')
       );
     }
   }, []);

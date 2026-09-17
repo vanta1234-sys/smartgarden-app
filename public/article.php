@@ -48,15 +48,15 @@ if ($article) {
 
     $replacements = [
         '/<title>.*?<\/title>/s' => '<title>' . htmlspecialchars($seoTitle, ENT_QUOTES) . '</title>',
-        '/<meta name="description" content=".*?"/s' => '<meta name="description" content="' . htmlspecialchars($description, ENT_QUOTES) . '"',
+        '/<meta name="description" content=".*?"/s' => '<meta name="description" content="' . htmlspecialchars(sg_meta_description($description), ENT_QUOTES) . '"',
         '/<link rel="canonical" href=".*?"/s' => '<link rel="canonical" href="' . htmlspecialchars($url, ENT_QUOTES) . '"',
         '/<meta property="og:url" content=".*?"/s' => '<meta property="og:url" content="' . htmlspecialchars($url, ENT_QUOTES) . '"',
         '/<meta property="og:title" content=".*?"/s' => '<meta property="og:title" content="' . htmlspecialchars($title, ENT_QUOTES) . '"',
-        '/<meta property="og:description" content=".*?"/s' => '<meta property="og:description" content="' . htmlspecialchars($description, ENT_QUOTES) . '"',
+        '/<meta property="og:description" content=".*?"/s' => '<meta property="og:description" content="' . htmlspecialchars(sg_meta_description($description), ENT_QUOTES) . '"',
         '/<meta property="og:image" content=".*?"/s' => '<meta property="og:image" content="' . htmlspecialchars($image, ENT_QUOTES) . '"',
         '/<meta property="og:type" content=".*?"/s' => '<meta property="og:type" content="article"',
         '/<meta name="twitter:title" content=".*?"/s' => '<meta name="twitter:title" content="' . htmlspecialchars($title, ENT_QUOTES) . '"',
-        '/<meta name="twitter:description" content=".*?"/s' => '<meta name="twitter:description" content="' . htmlspecialchars($description, ENT_QUOTES) . '"',
+        '/<meta name="twitter:description" content=".*?"/s' => '<meta name="twitter:description" content="' . htmlspecialchars(sg_meta_description($description), ENT_QUOTES) . '"',
         '/<meta name="twitter:image" content=".*?"/s' => '<meta name="twitter:image" content="' . htmlspecialchars($image, ENT_QUOTES) . '"',
     ];
 

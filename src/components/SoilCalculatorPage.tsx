@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { pageTitle } from '../utils/seoTitle';
+import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, Leaf } from 'lucide-react';
 import { SoilCalculator } from './SoilCalculator';
 
@@ -16,7 +16,7 @@ export const SoilCalculatorPage: React.FC<{ onBack: () => void }> = ({ onBack })
     if (meta) {
       meta.setAttribute(
         'content',
-        'Δωρεάν υπολογιστής: δώστε τις διαστάσεις της γλάστρας σας και τον τύπο φυτού και μάθετε ακριβώς πόσα λίτρα χώμα, περλίτη και κομπόστ χρειάζεστε.'
+        metaDescription('Δωρεάν υπολογιστής: δώστε τις διαστάσεις της γλάστρας σας και τον τύπο φυτού και μάθετε ακριβώς πόσα λίτρα χώμα, περλίτη και κομπόστ χρειάζεστε.')
       );
     }
   }, []);

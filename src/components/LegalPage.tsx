@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { pageTitle } from '../utils/seoTitle';
+import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, ShieldCheck, ScrollText, Mail, Leaf } from 'lucide-react';
 
 /**
@@ -323,7 +323,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({ variant, onBack }) => {
     };
     document.title = pageTitle(titles[variant]);
     const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute('content', descriptions[variant]);
+    if (meta) meta.setAttribute('content', metaDescription(descriptions[variant]));
   }, [variant]);
 
   return (

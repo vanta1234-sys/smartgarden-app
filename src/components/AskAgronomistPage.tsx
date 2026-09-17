@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { pageTitle } from '../utils/seoTitle';
+import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, MessageCircleQuestion, Send, CheckCircle2, AlertCircle, RotateCw } from 'lucide-react';
 
 interface PublicQuestion {
@@ -30,7 +30,7 @@ export const AskAgronomistPage: React.FC<AskAgronomistPageProps> = ({ onBack }) 
     if (meta) {
       meta.setAttribute(
         'content',
-        'Στείλτε την ερώτησή σας για φυτά, γλάστρες, ασθένειες ή πότισμα και πάρτε τεκμηριωμένη απάντηση. Δείτε απαντήσεις σε πραγματικές ερωτήσεις άλλων αναγνωστών.'
+        metaDescription('Στείλτε την ερώτησή σας για φυτά, γλάστρες, ασθένειες ή πότισμα και πάρτε τεκμηριωμένη απάντηση. Δείτε απαντήσεις σε πραγματικές ερωτήσεις άλλων αναγνωστών.')
       );
     }
 

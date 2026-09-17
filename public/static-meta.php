@@ -76,9 +76,9 @@ if ($route === 'kategoria' && $slug) {
     }
     if ($plant) {
         $title = $plant['name'] . ' (' . $plant['botanical'] . '): Καλλιέργεια & Φροντίδα στην Ελλάδα | SmartGarden.gr';
-        $description = $plant['name'] . ' (' . $plant['botanical'] . '): αντοχή στο κρύο έως ' . $plant['minTempC']
-            . '°C, ιδανικό pH ' . $plant['ph'] . ', ' . mb_strtolower($plant['sun'], 'UTF-8')
-            . '. Πότε φυτεύεται στην περιοχή σας και ποιο είναι το συχνότερο λάθος.';
+        $description = $plant['name'] . ': γλάστρα ' . $plant['potLitres'] . ', pH ' . $plant['ph']
+            . ', ' . mb_strtolower($plant['sun'], 'UTF-8') . ', αντοχή έως ' . $plant['minTempC']
+            . '°C. Πότε σπέρνεται και το λάθος που το σκοτώνει.';
         $url = 'https://smartgarden.gr/fyta/' . rawurlencode($plant['slug']);
         // Share a real photograph of the plant where there is one, rather than the site's
         // generic default. Requires ssr-lib, which is loaded at the top of this file.
@@ -118,14 +118,14 @@ if ($route === 'kategoria' && $slug) {
 if ($title && $description) {
     $replacements = [
         '/<title>.*?<\/title>/s' => '<title>' . htmlspecialchars(sg_page_title($title), ENT_QUOTES) . '</title>',
-        '/<meta name="description" content=".*?"/s' => '<meta name="description" content="' . htmlspecialchars($description, ENT_QUOTES) . '"',
+        '/<meta name="description" content=".*?"/s' => '<meta name="description" content="' . htmlspecialchars(sg_meta_description($description), ENT_QUOTES) . '"',
         '/<link rel="canonical" href=".*?"/s' => '<link rel="canonical" href="' . htmlspecialchars($url, ENT_QUOTES) . '"',
         '/<meta property="og:url" content=".*?"/s' => '<meta property="og:url" content="' . htmlspecialchars($url, ENT_QUOTES) . '"',
         '/<meta property="og:title" content=".*?"/s' => '<meta property="og:title" content="' . htmlspecialchars($title, ENT_QUOTES) . '"',
-        '/<meta property="og:description" content=".*?"/s' => '<meta property="og:description" content="' . htmlspecialchars($description, ENT_QUOTES) . '"',
+        '/<meta property="og:description" content=".*?"/s' => '<meta property="og:description" content="' . htmlspecialchars(sg_meta_description($description), ENT_QUOTES) . '"',
         '/<meta property="og:image" content=".*?"/s' => '<meta property="og:image" content="' . htmlspecialchars($image, ENT_QUOTES) . '"',
         '/<meta name="twitter:title" content=".*?"/s' => '<meta name="twitter:title" content="' . htmlspecialchars($title, ENT_QUOTES) . '"',
-        '/<meta name="twitter:description" content=".*?"/s' => '<meta name="twitter:description" content="' . htmlspecialchars($description, ENT_QUOTES) . '"',
+        '/<meta name="twitter:description" content=".*?"/s' => '<meta name="twitter:description" content="' . htmlspecialchars(sg_meta_description($description), ENT_QUOTES) . '"',
         '/<meta name="twitter:image" content=".*?"/s' => '<meta name="twitter:image" content="' . htmlspecialchars($image, ENT_QUOTES) . '"',
     ];
     foreach ($replacements as $pattern => $replacement) {
