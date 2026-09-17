@@ -63,3 +63,38 @@ export function plantingByRegion(
   }
   return out;
 }
+
+export interface FamilyMate {
+  slug: string;
+  name: string;
+}
+
+/**
+ * The other plants in this one's botanical family.
+ *
+ * Shared family means shared soil pathogens and shared pests, which is the whole basis of
+ * crop rotation — and it is the one relationship the database already knows about every
+ * plant, unlike companion planting, which is filled in for five of fifty-nine.
+ */
+export function familyMates(
+  slug: string,
+  family: string,
+  all: Array<{ slug: string; name: string; family: string }>
+): FamilyMate[] {
+  if (!family) return [];
+  return all
+    .filter((p) => p.family === family && p.slug !== slug)
+    .map((p) => ({ slug: p.slug, name: p.name }));
+}
+
+/** Rotation is a vegetable-bed concern; for everything else the point is shared pests. */
+export function familyAdvice(category: string, family: string, names: string[]): string {
+  const list = names.join(', ');
+  if (category === 'lachanika') {
+    return `Ανήκει στην οικογένεια ${family}, μαζί με ${list}. Τα παθογόνα του εδάφους είναι κοινά, `
+      + `οπότε μην το φυτέψετε σε θέση όπου την προηγούμενη χρονιά υπήρχε κάποιο από αυτά — `
+      + `αφήστε τρεις καλλιεργητικές περιόδους πριν επιστρέψει η ίδια οικογένεια στο ίδιο χώμα.`;
+  }
+  return `Ανήκει στην οικογένεια ${family}, μαζί με ${list}. Προσβάλλονται από τα ίδια παράσιτα `
+    + `και μυκητολογικά, οπότε ό,τι εμφανιστεί στο ένα αξίζει να το ελέγξετε και στα υπόλοιπα.`;
+}

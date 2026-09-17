@@ -479,3 +479,37 @@ function sg_planting_by_region($minTempC, $category) {
     }
     return $out;
 }
+
+/**
+ * The other plants in this one's botanical family, and what that means.
+ * Mirrors familyMates/familyAdvice in src/utils/plantRegions.ts.
+ *
+ * Shared family means shared soil pathogens and shared pests — the basis of crop rotation,
+ * and the one relationship the database knows for every plant, unlike companion planting,
+ * which is filled in for five of fifty-nine.
+ */
+function sg_family_mates($slug, $family) {
+    if ($family === '') return array();
+    $plants = json_decode((string) @file_get_contents(__DIR__ . '/plants.json'), true) ?: array();
+    $out = array();
+    foreach ($plants as $p) {
+        if (($p['family'] ?? '') === $family && ($p['slug'] ?? '') !== $slug) {
+            $out[] = array('slug' => $p['slug'], 'name' => $p['name']);
+        }
+    }
+    return $out;
+}
+
+/** Rotation is a vegetable-bed concern; for everything else the point is shared pests. */
+function sg_family_advice($category, $family, array $names) {
+    $list = implode(', ', $names);
+    if ($category === 'lachanika') {
+        return 'Ανήκει στην οικογένεια ' . $family . ', μαζί με ' . $list . '. Τα παθογόνα του '
+             . 'εδάφους είναι κοινά, οπότε μην το φυτέψετε σε θέση όπου την προηγούμενη χρονιά '
+             . 'υπήρχε κάποιο από αυτά — αφήστε τρεις καλλιεργητικές περιόδους πριν επιστρέψει '
+             . 'η ίδια οικογένεια στο ίδιο χώμα.';
+    }
+    return 'Ανήκει στην οικογένεια ' . $family . ', μαζί με ' . $list . '. Προσβάλλονται από τα '
+         . 'ίδια παράσιτα και μυκητολογικά, οπότε ό,τι εμφανιστεί στο ένα αξίζει να το ελέγξετε '
+         . 'και στα υπόλοιπα.';
+}

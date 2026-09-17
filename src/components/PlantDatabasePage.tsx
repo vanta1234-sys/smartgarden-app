@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { plantingByRegion, regionTableApplies } from '../utils/plantRegions';
+import { plantingByRegion, regionTableApplies, familyMates, familyAdvice } from '../utils/plantRegions';
 import { REAL_PHOTOS } from '../data/realPhotos';
 import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, Leaf, Search, Sun, Droplets, Thermometer, FlaskConical, AlertTriangle, Lightbulb, Snowflake, CalendarDays } from 'lucide-react';
@@ -127,6 +127,33 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight mt-3">{selected.name}</h1>
             <p className="text-sm text-slate-400 italic">{selected.botanical} · Οικογένεια {selected.family}</p>
           </div>
+
+          {/* Same botanical family means shared soil pathogens and shared pests — the basis
+              of crop rotation, and the one relationship the database knows for every plant. */}
+          {(() => {
+            const mates = familyMates(selected.slug, selected.family, PLANTS);
+            if (!mates.length) return null;
+            return (
+              <section>
+                <h2 className="text-sm font-bold text-slate-100 mb-1.5">Ίδια οικογένεια</h2>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {familyAdvice(selected.category, selected.family, mates.map((m) => m.name))}
+                </p>
+                <ul className="flex flex-wrap gap-2 mt-2.5">
+                  {mates.map((m) => (
+                    <li key={m.slug}>
+                      <a
+                        href={`/fyta/${encodeURIComponent(m.slug)}`}
+                        className="inline-block text-xs px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-emerald-400 hover:border-emerald-500/50 transition-colors"
+                      >
+                        {m.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })()}
 
           {/* When it can go outside, region by region. The plant knows the lowest
               temperature it survives and frost_dates.json holds twenty years of ERA5 for

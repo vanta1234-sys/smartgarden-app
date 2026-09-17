@@ -271,6 +271,20 @@ if ($route === 'home') {
 
             $body .= '<h2>Απαιτήσεις με μια ματιά</h2>' . $table;
 
+            // Same family means shared soil pathogens and shared pests.
+            $mates = sg_family_mates($slug, $plant['family'] ?? '');
+            if (count($mates)) {
+                $body .= '<h2>Ίδια οικογένεια</h2><p>'
+                       . sg_e(sg_family_advice($plant['category'] ?? '', $plant['family'] ?? '',
+                              array_column($mates, 'name')))
+                       . '</p><ul>';
+                foreach ($mates as $m) {
+                    $body .= '<li><a href="/fyta/' . sg_e(rawurlencode($m['slug'])) . '">'
+                           . sg_e($m['name']) . '</a></li>';
+                }
+                $body .= '</ul>';
+            }
+
             // The same region-by-region answer PlantDatabasePage renders.
             $byRegion = sg_planting_by_region($plant['minTempC'] ?? 99, $plant['category'] ?? '');
             if (count($byRegion)) {
