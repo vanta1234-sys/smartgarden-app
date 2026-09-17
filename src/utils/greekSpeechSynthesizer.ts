@@ -267,7 +267,14 @@ function speakWithNativeVoice(
     }
   }) || voices.find((v) => (v.lang || '').toLowerCase().startsWith('el'));
 
-  if (greekVoice) utterance.voice = greekVoice;
+  // No Greek voice on this device means the utterance would be read by whatever default
+  // voice exists — an English one spelling its way through Greek. Better to make no sound
+  // and let the caller use the server voice.
+  if (!greekVoice) {
+    if (onEnd) onEnd();
+    return false;
+  }
+  utterance.voice = greekVoice;
   utterance.onend = () => onEnd && onEnd();
   utterance.onerror = () => onEnd && onEnd();
   window.speechSynthesis.speak(utterance);
@@ -288,6 +295,42 @@ function speakWithNativeVoice(
  * server would make forty sequential requests before the first sound. Sentence-sized blocks
  * start almost immediately and the next one is fetched while the current plays.
  */
+/**
+ * How long to wait for the better voice.
+ *
+ * tts-edge.php answers in 6-7 seconds from this host and sounds like a person;
+ * tts-greek.php answers in under one and does not. Waiting applies to every block,
+ * including the first: a voice that changes partway through an article is worse than a
+ * few seconds before it starts.
+ */
+/**
+ * The device's own Greek voice, if it has one.
+ *
+ * A real Greek system voice sounds considerably better than the fallback engine, so it is
+ * preferred when present — but getVoices() is populated asynchronously, and asking too
+ * early returns an empty list and wrongly concludes there is none.
+ */
+let greekVoiceKnown: boolean | null = null;
+
+async function deviceHasGreekVoice(): Promise<boolean> {
+  if (greekVoiceKnown !== null) return greekVoiceKnown;
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+    greekVoiceKnown = false;
+    return false;
+  }
+  const look = () => window.speechSynthesis.getVoices().some((v) => (v.lang || '').toLowerCase().startsWith('el'));
+  if (look()) { greekVoiceKnown = true; return true; }
+  await new Promise<void>((resolve) => {
+    const done = () => resolve();
+    window.speechSynthesis.addEventListener('voiceschanged', done, { once: true });
+    setTimeout(done, 1200);
+  });
+  greekVoiceKnown = look();
+  return greekVoiceKnown;
+}
+
+const EDGE_TIMEOUT_MS = 12000;
+
 function chunkForSpeech(text: string, max = 600): string[] {
   const sentences = text.split(/(?<=[.!;?])\s+/u);
   const chunks: string[] = [];
@@ -337,23 +380,40 @@ export function speakGreekTextWithWebSpeech(
   const effectiveRate = baseRate * rate;
   const chunks = chunkForSpeech(rawText.trim());
   let index = 0;
+  // If the very first block never makes a sound — no network, endpoints down — the whole
+  // text is handed to the browser's own voice instead. Decided before anything plays, so it
+  // cannot become the mid-article voice change it used to be.
+  let playedAnything = false;
 
   const finish = () => {
     if (session !== speechSession) return;
     if (onEnd) onEnd();
   };
 
-  const playChunk = (text: string, next: () => void, patient = false) => {
+  /**
+   * Play one block, then advance exactly once.
+   *
+   * Three things used to be able to call `next` for the same block — onended, onerror and a
+   * rejected play() — and the last two also started the browser's built-in Greek voice on
+   * text that was already playing. That is what made the narration change voice partway
+   * through and then re-read the paragraph from somewhere in the middle. A block that fails
+   * is now skipped in silence rather than read a second time by something else.
+   */
+  const playChunk = (text: string, next: () => void) => {
     if (session !== speechSession) return;
-    // Measured from this host: Edge answers in 6-7s and sounds better, Google in under a
-    // second and does not. The first block decides how long the reader waits for any sound
-    // at all, so it goes to whoever is quickest; every later block is fetched while the
-    // previous one plays, which is far more time than Edge needs.
-    fetchGreekAudioUrl(text, patient ? 12000 : 1500)
+
+    let advanced = false;
+    const advance = () => {
+      if (advanced || session !== speechSession) return;
+      advanced = true;
+      next();
+    };
+
+    fetchGreekAudioUrl(text, EDGE_TIMEOUT_MS)
       .then((audioUrl) => {
         if (session !== speechSession) return;
         if (!audioUrl) {
-          speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
+          advance();
           return;
         }
         try {
@@ -372,42 +432,57 @@ export function speakGreekTextWithWebSpeech(
           source.connect(chainInput);
 
           fallbackAudioElem = audio;
-          audio.onended = () => {
-            fallbackAudioElem = null;
-            next();
-          };
-          audio.onerror = () => {
-            fallbackAudioElem = null;
-            speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
-          };
-          audio.play().catch(() => {
-            fallbackAudioElem = null;
-            speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
-          });
-        } catch (err) {
-          console.warn('Pitch-preserving playback setup failed, falling back to native voice:', err);
-          speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
+          audio.onplaying = () => { playedAnything = true; };
+          audio.onended = () => { fallbackAudioElem = null; advance(); };
+          audio.onerror = () => { fallbackAudioElem = null; advance(); };
+          audio.play().catch(() => { fallbackAudioElem = null; advance(); });
+        } catch {
+          advance();
         }
       })
-      .catch(() => {
-        if (session !== speechSession) return;
-        speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
-      });
+      .catch(() => advance());
+  };
+
+  /** The device's own Greek voice, reading the same blocks in the same order. */
+  const playNative = () => {
+    if (session !== speechSession) return;
+    if (index >= chunks.length) { finish(); return; }
+    const text = chunks[index++];
+    const ok = speakWithNativeVoice(text, playNative, rate, pitch, voiceProfile);
+    if (!ok) useServerVoice();
+  };
+
+  const useServerVoice = () => {
+    index = 0;
+    playNext();
   };
 
   const playNext = () => {
     if (session !== speechSession) return;
+    if (index === 1 && !playedAnything) {
+      // The first block made no sound at all — no network, or the endpoints are down.
+      finish();
+      return;
+    }
     if (index >= chunks.length) {
       finish();
       return;
     }
     const text = chunks[index++];
     // Fetch the following block while this one plays, so the gap between them is silence
-    // the reader does not hear — and give Edge long enough to win that one.
-    if (index < chunks.length) fetchGreekAudioUrl(chunks[index], 12000).catch(() => {});
-    playChunk(text, playNext, index > 1);
+    // the reader does not hear — and so Edge has time to answer for it too.
+    if (index < chunks.length) fetchGreekAudioUrl(chunks[index], EDGE_TIMEOUT_MS).catch(() => {});
+    playChunk(text, playNext);
   };
 
-  playNext();
+  // Decided once, before a word is spoken, so the voice never changes partway through an
+  // article. A real Greek system voice sounds better than the fallback engine; a device
+  // without one gets the server's, which at least speaks Greek.
+  deviceHasGreekVoice().then((hasGreek) => {
+    if (session !== speechSession) return;
+    if (hasGreek) playNative();
+    else playNext();
+  });
+
   return true;
 }
