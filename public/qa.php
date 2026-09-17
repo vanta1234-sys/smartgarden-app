@@ -118,7 +118,9 @@ qa_save($USAGE, $usage);
 
 $body = json_decode(file_get_contents('php://input'), true);
 $question = isset($body['question']) ? trim($body['question']) : '';
-$askedBy  = isset($body['name']) ? trim(substr($body['name'], 0, 40)) : '';
+// mb_substr, not substr: a Greek name cut at byte 40 can end mid-character, and the
+// broken tail makes json_encode return false when the question is saved.
+$askedBy  = isset($body['name']) ? trim(mb_substr((string) $body['name'], 0, 40, 'UTF-8')) : '';
 
 if (mb_strlen($question, 'UTF-8') < 15) qa_fail(400, 'Η ερώτηση είναι πολύ σύντομη — περιγράψτε λίγο περισσότερο το πρόβλημα.');
 if (mb_strlen($question, 'UTF-8') > 600) qa_fail(400, 'Η ερώτηση είναι πολύ μεγάλη (μέγιστο 600 χαρακτήρες).');

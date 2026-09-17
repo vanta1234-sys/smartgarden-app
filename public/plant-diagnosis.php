@@ -55,7 +55,9 @@ foreach ($usage as $ip => $timestamps) {
 $raw = file_get_contents('php://input');
 $body = json_decode($raw, true);
 $imageDataUri = isset($body['image']) ? $body['image'] : '';
-$userNote = isset($body['note']) ? trim(substr($body['note'], 0, 300)) : '';
+// mb_substr, not substr: the note is Greek, and a cut at byte 300 can land inside a
+// two-byte letter — which then travels into the model prompt as invalid UTF-8.
+$userNote = isset($body['note']) ? trim(mb_substr((string) $body['note'], 0, 300, 'UTF-8')) : '';
 
 if (!$imageDataUri || strpos($imageDataUri, 'base64,') === false) {
     http_response_code(400);
