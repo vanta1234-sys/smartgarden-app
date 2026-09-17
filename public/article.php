@@ -82,7 +82,13 @@ if ($article) {
     $mdToHtml = function ($md) {
         $out = '';
         $listOpen = false;
-        foreach (preg_split('/\R/', (string) $md) as $line) {
+        // Not '/\R/': without the u modifier PCRE matches the raw byte 0x85 as NEL, and
+        // 0x85 is the second byte of υ (U+03C5). Every υ in the article was a line break,
+        // so each one split a character in half — 186 of them in one article — and
+        // htmlspecialchars returns an empty string for invalid UTF-8, which is why the
+        // server-rendered body was a run of empty <p> tags and half-words. Spelling the
+        // line endings out leaves nothing to interpret.
+        foreach (explode("\n", str_replace(array("\r\n", "\r"), "\n", (string) $md)) as $line) {
             $line = rtrim($line);
             if ($line === '') {
                 if ($listOpen) { $out .= "</ul>
@@ -162,7 +168,8 @@ if ($article) {
     }
     // One of our own garden photographs, dropped into the body rather than used as the
     // lead image. src/utils/articlePhoto.ts does the same to what React renders.
-    $ssr .= $mdToHtml(sg_insert_real_photo($bodyMd, sg_pick_real_photo($article)));
+    $realPhoto = sg_pick_real_photo($article);
+    $ssr .= $mdToHtml(sg_insert_real_photo($bodyMd, $realPhoto));
     $ssr .= '</article>';
 
     // Related reading. Two jobs at once: it gives a crawler eight internal links out of
@@ -210,7 +217,13 @@ if ($article) {
         '@type' => 'Article',
         'headline' => mb_substr($h1, 0, 110),
         'description' => $summaryFull,
-        'image' => $article['image'] ?? '',
+        // Both images: the article's own header photo, and — where there is one — the
+        // photograph we took of the thing the article is about. Article accepts a list, and
+        // a page whose structured data points at an original photo is making a different
+        // claim from one that points only at stock.
+        'image' => $realPhoto
+            ? array($article['image'] ?? '', 'https://smartgarden.gr' . $realPhoto['file'])
+            : ($article['image'] ?? ''),
         'datePublished' => $article['date'] ?? '',
         'dateModified' => $article['date'] ?? '',
         'author' => array('@type' => 'Organization', 'name' => 'SmartGarden.gr', 'url' => 'https://smartgarden.gr'),

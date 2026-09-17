@@ -159,8 +159,7 @@ function sg_unique_description($article, $allArticles, $max = 200) {
     // Fall back to the first real paragraph: skip headings, lists, tables and emphasis-only
     // lines, and strip the markdown so what lands in the tag is prose.
     $body = $article['content']['el'] ?? (is_string($article['content'] ?? null) ? $article['content'] : '');
-    foreach (preg_split('/
-+/u', (string) $body) as $line) {
+    foreach (preg_split("/[\r\n]+/", (string) $body) as $line) {
         $line = trim($line);
         if ($line === '' || $line[0] === '#' || $line[0] === '|' || $line[0] === '-'
             || $line[0] === '*' || $line[0] === '>') continue;
