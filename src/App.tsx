@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { sizedImage } from './utils/imageSize';
 // The botanical generator and the article templates behind it are ~250KB, and they only
 // ever run in the editor when Gemini is unreachable. Readers were downloading the machinery
 // that writes the site's articles in order to read one, so it is fetched on demand.
@@ -1524,7 +1525,7 @@ pause
                       className="flex-1 flex items-start gap-3 text-left cursor-pointer min-w-0"
                     >
                       <img
-                        src={art.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80"}
+                        src={sizedImage(art.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", 96, 96)}
                         alt={art.title?.el || art.title || ''}
                         loading="lazy"
                         referrerPolicy="no-referrer"
@@ -2375,7 +2376,7 @@ pause
                           className="text-left bg-slate-950 border border-slate-800 hover:border-emerald-500/50 rounded-xl overflow-hidden transition-colors group"
                         >
                           <img
-                            src={r.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&auto=format&fit=crop&q=80"}
+                            src={sizedImage(r.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&auto=format&fit=crop&q=80", 300, 80)}
                             alt={r.title?.el || ''}
                             loading="lazy"
                             referrerPolicy="no-referrer"

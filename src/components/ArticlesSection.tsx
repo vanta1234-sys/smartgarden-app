@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { sizedImage } from '../utils/imageSize';
 import { 
   Search, 
   Clock, 
@@ -150,7 +151,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
               >
                 <div className="h-28 w-full overflow-hidden bg-neutral-900">
                   <img
-                    src={article.image}
+                    src={sizedImage(article.image, 360, 112)}
                     alt={article.title[lang] || article.title.el}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -211,7 +212,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
                   />
                 ) : (
                   <img 
-                    src={featuredArticle.image} 
+                    src={sizedImage(featuredArticle.image, 700)} 
                     alt={featuredArticle.title[lang] || featuredArticle.title.el} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -312,7 +313,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
                     />
                   ) : (
                     <img
-                      src={article.image}
+                      src={sizedImage(article.image, 360, 112)}
                       alt={article.title[lang] || article.title.el}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />

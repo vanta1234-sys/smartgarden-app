@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { sizedImage } from '../utils/imageSize';
 import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { BookOpen, ArrowLeft, Clock } from 'lucide-react';
 import { ArticleItem } from '../types';
@@ -60,7 +61,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ articles, categorySl
             >
               <div className="aspect-video overflow-hidden bg-slate-900">
                 <img
-                  src={article.image}
+                  src={sizedImage(article.image, 360, 203)}
                   alt={article.title.el}
                   loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
