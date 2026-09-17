@@ -19,6 +19,13 @@ export interface RealPhoto {
   source: string;
   /** Where to crop the portrait original from. Defaults to centre; set when that misses. */
   crop?: 'top' | 'centre' | 'bottom';
+  /**
+   * /fyta pages this photo belongs on. The plant pages are the thinnest thing on the site
+   * and carry no image at all; a photograph of the actual plant is the cheapest way to
+   * make one worth landing on. Listed explicitly rather than matched by name — a page
+   * about tomatoes gets a tomato, or nothing.
+   */
+  plants?: string[];
 }
 
 export const REAL_PHOTOS: RealPhoto[] = [
@@ -30,7 +37,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "λεμονα",
       "εσπεριδοειδ"
     ],
-    "source": "20260912_122729.jpg"
+    "source": "20260912_122729.jpg",
+    "plants": [
+      "lemonia"
+    ]
   },
   {
     "file": "/photos/lemoni-klado.jpg",
@@ -40,7 +50,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "λεμονα",
       "εσπεριδοειδ"
     ],
-    "source": "20260912_122755.jpg"
+    "source": "20260912_122755.jpg",
+    "plants": [
+      "lemonia"
+    ]
   },
   {
     "file": "/photos/lemoni-orimo.jpg",
@@ -52,7 +65,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "κουμκουατ",
       "μανταριν"
     ],
-    "source": "20260912_122757.jpg"
+    "source": "20260912_122757.jpg",
+    "plants": [
+      "lemonia"
+    ]
   },
   {
     "file": "/photos/lemonia-talaipwrimena-fylla.jpg",
@@ -83,7 +99,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "πιπερι",
       "πιπεριε"
     ],
-    "source": "20260912_122813.jpg"
+    "source": "20260912_122813.jpg",
+    "plants": [
+      "piperia"
+    ]
   },
   {
     "file": "/photos/piperia-keratos.jpg",
@@ -92,7 +111,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "πιπερι",
       "πιπεριε"
     ],
-    "source": "20260912_122828.jpg"
+    "source": "20260912_122828.jpg",
+    "plants": [
+      "piperia"
+    ]
   },
   {
     "file": "/photos/piperies-karpoi.jpg",
@@ -101,7 +123,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "πιπερι",
       "πιπεριε"
     ],
-    "source": "20260912_123052.jpg"
+    "source": "20260912_123052.jpg",
+    "plants": [
+      "piperia"
+    ]
   },
   {
     "file": "/photos/piperia-fyto.jpg",
@@ -110,7 +135,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "πιπερι",
       "πιπεριε"
     ],
-    "source": "20260912_122809.jpg"
+    "source": "20260912_122809.jpg",
+    "plants": [
+      "piperia"
+    ]
   },
   {
     "file": "/photos/ntomatia-karpoforia.jpg",
@@ -118,7 +146,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
     "match": [
       "ντοματ"
     ],
-    "source": "20260912_122901.jpg"
+    "source": "20260912_122901.jpg",
+    "plants": [
+      "ntomata"
+    ]
   },
   {
     "file": "/photos/ntomata-orimi.jpg",
@@ -126,7 +157,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
     "match": [
       "ντοματ"
     ],
-    "source": "20260912_122934.jpg"
+    "source": "20260912_122934.jpg",
+    "plants": [
+      "ntomata"
+    ]
   },
   {
     "file": "/photos/prasines-ntomates.jpg",
@@ -134,7 +168,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
     "match": [
       "ντοματ"
     ],
-    "source": "20260912_122917.jpg"
+    "source": "20260912_122917.jpg",
+    "plants": [
+      "ntomata"
+    ]
   },
   {
     "file": "/photos/ntomaties-ypostylosi.jpg",
@@ -143,7 +180,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "υποστυλωσ",
       "λαιμαργ"
     ],
-    "source": "20260912_123005.jpg"
+    "source": "20260912_123005.jpg",
+    "plants": [
+      "ntomata"
+    ]
   },
   {
     "file": "/photos/kolokythia-fyta.jpg",
@@ -151,7 +191,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
     "match": [
       "κολοκυθ"
     ],
-    "source": "20260912_123008.jpg"
+    "source": "20260912_123008.jpg",
+    "plants": [
+      "kolokythi"
+    ]
   },
   {
     "file": "/photos/anthos-kolokythias.jpg",
@@ -159,7 +202,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
     "match": [
       "κολοκυθ"
     ],
-    "source": "20260912_123038.jpg"
+    "source": "20260912_123038.jpg",
+    "plants": [
+      "kolokythi"
+    ]
   },
   {
     "file": "/photos/aggouri-fyto.jpg",
@@ -167,7 +213,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
     "match": [
       "αγγουρ"
     ],
-    "source": "20260912_123034.jpg"
+    "source": "20260912_123034.jpg",
+    "plants": [
+      "aggouri"
+    ]
   },
   {
     "file": "/photos/stagdin-ardefsi.jpg",
@@ -219,7 +268,10 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "μπιζελ",
       "αναρριχ"
     ],
-    "source": "20260912_123054.jpg"
+    "source": "20260912_123054.jpg",
+    "plants": [
+      "fasolakia"
+    ]
   },
   {
     "file": "/photos/lachanika-seires.jpg",

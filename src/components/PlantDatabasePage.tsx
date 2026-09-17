@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { REAL_PHOTOS } from '../data/realPhotos';
 import { pageTitle } from '../utils/seoTitle';
 import { ArrowLeft, Leaf, Search, Sun, Droplets, Thermometer, FlaskConical, AlertTriangle, Lightbulb, Snowflake, CalendarDays } from 'lucide-react';
 import { PLANTS, PLANT_CATEGORY_LABELS, Plant, PlantCategory, getPlantBySlug } from '../data/plantDatabase';
@@ -125,6 +126,36 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight mt-3">{selected.name}</h1>
             <p className="text-sm text-slate-400 italic">{selected.botanical} · Οικογένεια {selected.family}</p>
           </div>
+
+          {/* Our own photographs of this plant. These pages carried no image at all, and
+              the server renders the same set — Google indexes what React produces. */}
+          {(() => {
+            const own = REAL_PHOTOS.filter((p) => (p.plants || []).includes(selected.slug));
+            if (!own.length) return null;
+            return (
+              <section className="space-y-3">
+                <h2 className="text-sm font-bold text-slate-100">{selected.name} από τον κήπο μας</h2>
+                <div className={own.length > 1 ? 'grid grid-cols-1 sm:grid-cols-2 gap-3' : ''}>
+                  {own.map((photo, i) => (
+                    <figure key={photo.file}>
+                      <img
+                        src={photo.file}
+                        alt={photo.alt}
+                        width={900}
+                        height={675}
+                        loading={i === 0 ? 'eager' : 'lazy'}
+                        decoding="async"
+                        className="w-full rounded-xl border border-slate-800"
+                      />
+                      <figcaption className="text-[11px] text-slate-500 mt-1.5">
+                        {photo.alt} — δική μας φωτογραφία, Σεπτέμβριος 2026.
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
+              </section>
+            );
+          })()}
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[

@@ -80,6 +80,10 @@ if ($route === 'kategoria' && $slug) {
             . '°C, ιδανικό pH ' . $plant['ph'] . ', ' . mb_strtolower($plant['sun'], 'UTF-8')
             . '. Πότε φυτεύεται στην περιοχή σας και ποιο είναι το συχνότερο λάθος.';
         $url = 'https://smartgarden.gr/fyta/' . rawurlencode($plant['slug']);
+        // Share a real photograph of the plant where there is one, rather than the site's
+        // generic default. Requires ssr-lib, which is loaded at the top of this file.
+        $ownPhotos = sg_plant_photos($plant['slug']);
+        if (count($ownPhotos)) $image = 'https://smartgarden.gr' . $ownPhotos[0]['file'];
     } else {
         $title = 'Βάση Δεδομένων Φυτών: Καλλιέργεια & Φροντίδα στο Ελληνικό Κλίμα | SmartGarden.gr';
         $description = 'Αναλυτικά δεδομένα καλλιέργειας για δεκάδες φυτά προσαρμοσμένα στο ελληνικό κλίμα: αντοχή στον παγετό, pH, μέγεθος γλάστρας, μήνες σποράς και το συχνότερο λάθος για κάθε φυτό.';
@@ -251,8 +255,21 @@ if ($route === 'home') {
             $table .= '</tbody></table>';
 
             $body = '<h1>' . sg_e($name) . ' — Οδηγός Καλλιέργειας</h1>'
-                  . '<p>' . $intro . '</p>'
-                  . '<h2>Απαιτήσεις με μια ματιά</h2>' . $table;
+                  . '<p>' . $intro . '</p>';
+
+            // Our own photographs of this plant, where we have them.
+            $plantPhotos = sg_plant_photos($slug);
+            if (count($plantPhotos)) {
+                $body .= '<h2>' . sg_e($name) . ' από τον κήπο μας</h2>';
+                foreach ($plantPhotos as $i => $photo) {
+                    $body .= '<figure><img src="' . sg_e($photo['file']) . '" alt="' . sg_e($photo['alt'])
+                           . '" width="900" height="675" loading="' . ($i === 0 ? 'eager' : 'lazy')
+                           . '" decoding="async"><figcaption>' . sg_e($photo['alt'])
+                           . ' — δική μας φωτογραφία, Σεπτέμβριος 2026.</figcaption></figure>';
+                }
+            }
+
+            $body .= '<h2>Απαιτήσεις με μια ματιά</h2>' . $table;
 
             if ($sow !== '') {
                 $body .= '<h2>Πότε σπέρνουμε ' . sg_e($name) . '</h2>'

@@ -396,3 +396,19 @@ function sg_page_title($full) {
     $withoutBrand = trim(preg_replace('/\s*[|\x{2014}\x{2013}-]\s*SmartGarden\.gr\s*$/u', '', (string) $full));
     return sg_seo_title($withoutBrand !== '' ? $withoutBrand : 'SmartGarden.gr');
 }
+
+/**
+ * Our photographs of a given plant, for its /fyta page.
+ *
+ * Those pages are the thinnest thing on the site and carry no image at all. A page about
+ * tomatoes gets photographs of tomatoes from this garden, or nothing — the mapping is
+ * explicit in src/data/realPhotos.ts rather than matched by name.
+ */
+function sg_plant_photos($slug) {
+    if ($slug === '') return array();
+    $out = array();
+    foreach (sg_real_photos() as $photo) {
+        if (in_array($slug, $photo['plants'] ?? array(), true)) $out[] = $photo;
+    }
+    return $out;
+}
