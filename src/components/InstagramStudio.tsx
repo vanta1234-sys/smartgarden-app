@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { pageTitle } from '../utils/seoTitle';
 import { ArrowLeft, Download, Copy, Check, Instagram, RotateCw } from 'lucide-react';
 import { PLANTS, PLANT_CATEGORY_LABELS, Plant } from '../data/plantDatabase';
 
@@ -106,7 +107,7 @@ export const InstagramStudio: React.FC<{ onBack: () => void }> = ({ onBack }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = 'Instagram Studio — SmartGarden.gr';
+    document.title = pageTitle('Instagram Studio — SmartGarden.gr');
     fetch('/frost_dates.json')
       .then((r) => r.json())
       .then((d) => { setLocations(d.locations ?? []); setLoading(false); })

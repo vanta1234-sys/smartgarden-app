@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { pageTitle } from '../utils/seoTitle';
 import { ArrowLeft, Moon, Sprout, Scissors, Info, ArrowUpRight } from 'lucide-react';
 import { getLunarInfo, getLunarGuidance, LunarInfo } from '../services/lunarService';
 
@@ -22,7 +23,7 @@ export const LunarCalendarPage: React.FC<{ onBack: () => void }> = ({ onBack }) 
   const guidance = useMemo(() => getLunarGuidance(info), [info]);
 
   useEffect(() => {
-    document.title = 'Σεληνιακό Ημερολόγιο Κηπουρικής: Τι Φυτεύουμε στη Χάση & στη Γέμιση — SmartGarden.gr';
+    document.title = pageTitle('Σεληνιακό Ημερολόγιο Κηπουρικής: Τι Φυτεύουμε στη Χάση & στη Γέμιση — SmartGarden.gr');
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute(

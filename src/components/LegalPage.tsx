@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { pageTitle } from '../utils/seoTitle';
 import { ArrowLeft, ShieldCheck, ScrollText, Mail, Leaf } from 'lucide-react';
 
 /**
@@ -320,7 +321,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({ variant, onBack }) => {
       terms:
         'Οι όροι χρήσης του SmartGarden.gr: ενημερωτικός χαρακτήρας περιεχομένου, περιεχόμενο με βοήθεια AI, πνευματικά δικαιώματα και αποδεκτή χρήση.',
     };
-    document.title = titles[variant];
+    document.title = pageTitle(titles[variant]);
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute('content', descriptions[variant]);
   }, [variant]);

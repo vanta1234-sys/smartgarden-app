@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { pageTitle } from '../utils/seoTitle';
 import { ArrowLeft, Leaf } from 'lucide-react';
 import { SoilCalculator } from './SoilCalculator';
 
@@ -10,7 +11,7 @@ import { SoilCalculator } from './SoilCalculator';
  */
 export const SoilCalculatorPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   useEffect(() => {
-    document.title = 'Υπολογιστής Χώματος & Γλάστρας: Πόσα Λίτρα Χρειάζεστε — SmartGarden.gr';
+    document.title = pageTitle('Υπολογιστής Χώματος & Γλάστρας: Πόσα Λίτρα Χρειάζεστε — SmartGarden.gr');
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute(

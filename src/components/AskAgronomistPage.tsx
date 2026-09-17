@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { pageTitle } from '../utils/seoTitle';
 import { ArrowLeft, MessageCircleQuestion, Send, CheckCircle2, AlertCircle, RotateCw } from 'lucide-react';
 
 interface PublicQuestion {
@@ -24,7 +25,7 @@ export const AskAgronomistPage: React.FC<AskAgronomistPageProps> = ({ onBack }) 
   const [openId, setOpenId] = useState<string | null>(null);
 
   useEffect(() => {
-    document.title = 'Ρωτήστε τον Γεωπόνο: Απαντήσεις σε Πραγματικές Ερωτήσεις Κηπουρικής — SmartGarden.gr';
+    document.title = pageTitle('Ρωτήστε τον Γεωπόνο: Απαντήσεις σε Πραγματικές Ερωτήσεις Κηπουρικής — SmartGarden.gr');
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute(

@@ -18,6 +18,8 @@ if (!$html) {
 }
 
 $defaultImage = 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80';
+require_once __DIR__ . '/ssr-lib.php';
+
 $title = null;
 $description = null;
 $url = 'https://smartgarden.gr/';
@@ -111,7 +113,7 @@ if ($route === 'kategoria' && $slug) {
 
 if ($title && $description) {
     $replacements = [
-        '/<title>.*?<\/title>/s' => '<title>' . htmlspecialchars($title, ENT_QUOTES) . '</title>',
+        '/<title>.*?<\/title>/s' => '<title>' . htmlspecialchars(sg_page_title($title), ENT_QUOTES) . '</title>',
         '/<meta name="description" content=".*?"/s' => '<meta name="description" content="' . htmlspecialchars($description, ENT_QUOTES) . '"',
         '/<link rel="canonical" href=".*?"/s' => '<link rel="canonical" href="' . htmlspecialchars($url, ENT_QUOTES) . '"',
         '/<meta property="og:url" content=".*?"/s' => '<meta property="og:url" content="' . htmlspecialchars($url, ENT_QUOTES) . '"',
@@ -134,7 +136,6 @@ if ($title && $description) {
 // otherwise identical shell — the same fault that had Search Console filing 158 pages as
 // "Duplicate: Google chose a different canonical". Each route below now renders something
 // that is actually about that page, from data already on the server.
-require_once __DIR__ . '/ssr-lib.php';
 
 $articles = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true) ?: array();
 $articles = array_map('sg_repair_article', $articles);

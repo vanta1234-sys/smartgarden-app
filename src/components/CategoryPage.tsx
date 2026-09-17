@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { pageTitle } from '../utils/seoTitle';
 import { BookOpen, ArrowLeft, Clock } from 'lucide-react';
 import { ArticleItem } from '../types';
 
@@ -22,7 +23,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ articles, categorySl
     : [];
 
   useEffect(() => {
-    document.title = `${label} — Οδηγοί & Άρθρα | SmartGarden.gr`;
+    document.title = pageTitle(`${label} — Οδηγοί & Άρθρα | SmartGarden.gr`);
     let meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute('content', `Όλοι οι οδηγοί SmartGarden.gr για ${label}: ${matches.length} επιστημονικά άρθρα κηπουρικής για το ελληνικό κλίμα.`);

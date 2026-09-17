@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { pageTitle } from '../utils/seoTitle';
 import { ArrowLeft, GraduationCap, BookOpen, Award } from 'lucide-react';
 import { ArticleItem } from '../types';
 
@@ -16,7 +17,7 @@ export const AuthorBioPage: React.FC<AuthorBioPageProps> = ({ articles, onOpenAr
   const byAuthor = articles.filter((a) => a.author?.name === AUTHOR_NAME);
 
   useEffect(() => {
-    document.title = `${AUTHOR_NAME} — ${AUTHOR_ROLE} | SmartGarden.gr`;
+    document.title = pageTitle(`${AUTHOR_NAME} — ${AUTHOR_ROLE} | SmartGarden.gr`);
     let meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute('content', `Βιογραφικό & άρθρα του ${AUTHOR_NAME}, ${AUTHOR_ROLE} στο SmartGarden.gr.`);

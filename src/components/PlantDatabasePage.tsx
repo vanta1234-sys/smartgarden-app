@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { pageTitle } from '../utils/seoTitle';
 import { ArrowLeft, Leaf, Search, Sun, Droplets, Thermometer, FlaskConical, AlertTriangle, Lightbulb, Snowflake, CalendarDays } from 'lucide-react';
 import { PLANTS, PLANT_CATEGORY_LABELS, Plant, PlantCategory, getPlantBySlug } from '../data/plantDatabase';
 
@@ -55,7 +56,7 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
     const title = selected
       ? `${selected.name} (${selected.botanical}): Καλλιέργεια & Φροντίδα στην Ελλάδα — SmartGarden.gr`
       : 'Βάση Δεδομένων Φυτών: Καλλιέργεια & Φροντίδα στο Ελληνικό Κλίμα — SmartGarden.gr';
-    document.title = title;
+    document.title = pageTitle(title);
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute(

@@ -87,3 +87,16 @@ export function seoTitleFor(article: { slug?: string; title?: { el?: string } | 
   if (budget < 20) return short;
   return seoTitle(parts.join(': '), budget).replace(BRAND, '') + ' · ' + angle;
 }
+
+/**
+ * The short <title> for a page that is not an article.
+ *
+ * The plant pages, the tools and the homepage were all writing their own title with the
+ * brand already on the end — 69 to 94 characters, every one of them cut off in a search
+ * result. This strips whatever brand suffix is there, shortens what is left, and puts the
+ * brand back only if it fits.
+ */
+export function pageTitle(full: string): string {
+  const withoutBrand = (full || '').replace(/\s*[|—–-]\s*SmartGarden\.gr\s*$/u, '').trim();
+  return seoTitle(withoutBrand || 'SmartGarden.gr');
+}

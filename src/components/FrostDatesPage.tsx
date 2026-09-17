@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { pageTitle } from '../utils/seoTitle';
 import { ArrowLeft, Snowflake, Sprout, CalendarDays, RotateCw, ThermometerSnowflake, ShieldCheck } from 'lucide-react';
 
 interface FrostStat {
@@ -53,7 +54,7 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
   const [selectedId, setSelectedId] = useState<string>('athens');
 
   useEffect(() => {
-    document.title = 'Ημερομηνίες Παγετού & Ασφαλής Φύτευση ανά Περιοχή στην Ελλάδα — SmartGarden.gr';
+    document.title = pageTitle('Ημερομηνίες Παγετού & Ασφαλής Φύτευση ανά Περιοχή στην Ελλάδα — SmartGarden.gr');
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
       meta.setAttribute(

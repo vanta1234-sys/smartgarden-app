@@ -384,3 +384,15 @@ function sg_plants_mentioned($text, $limit = 6) {
     usort($found, function ($a, $b) { return $a['at'] - $b['at']; });
     return array_slice($found, 0, $limit);
 }
+
+/**
+ * The short <title> for a page that is not an article. Mirrors pageTitle in
+ * src/utils/seoTitle.ts.
+ *
+ * The plant pages, the tools and the homepage each wrote their own title with the brand
+ * already on the end — 69 to 94 characters, every one cut off in a search result.
+ */
+function sg_page_title($full) {
+    $withoutBrand = trim(preg_replace('/\s*[|\x{2014}\x{2013}-]\s*SmartGarden\.gr\s*$/u', '', (string) $full));
+    return sg_seo_title($withoutBrand !== '' ? $withoutBrand : 'SmartGarden.gr');
+}
