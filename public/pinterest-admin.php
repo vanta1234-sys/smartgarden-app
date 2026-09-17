@@ -30,7 +30,12 @@ if ($isSandbox) {
 } else {
     $tokensPath = __DIR__ . '/pinterest_tokens.json';
     $tokens = file_exists($tokensPath) ? json_decode(file_get_contents($tokensPath), true) : array();
-    $accessToken = isset($tokens['access_token']) ? $tokens['access_token'] : '';
+    // Through sg_pinterest_token so that opening this page also renews a token that is
+    // close to expiring — and so the renewal path gets exercised by a human, not only
+    // by the cron at 06:00.
+    require_once __DIR__ . '/pinterest-lib.php';
+    list($accessToken, $tokenNote) = sg_pinterest_token(__DIR__);
+    $accessToken = $accessToken ?: '';
     $connectedLabel = 'Production (' . $apiBase . ') — OAuth token from pinterest_tokens.json';
 }
 

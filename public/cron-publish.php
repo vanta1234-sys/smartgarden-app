@@ -2189,9 +2189,11 @@ if (FB_AUTO_POST_ENABLED && $fbPageId && $fbPageToken) {
 $pinterestTokensPath = __DIR__ . '/pinterest_tokens.json';
 $pinterestBoardsPath = __DIR__ . '/pinterest_boards.json';
 if (file_exists($pinterestTokensPath) && file_exists($pinterestBoardsPath)) {
-    $pinTokens = json_decode(@file_get_contents($pinterestTokensPath), true);
+    // The token lasts 30 days and nothing used to renew it, so this was going to stop
+    // working one day in October and say nothing.
+    require_once __DIR__ . '/pinterest-lib.php';
+    list($pinToken, $pinTokenNote) = sg_pinterest_token(__DIR__);
     $pinBoards = json_decode(@file_get_contents($pinterestBoardsPath), true);
-    $pinToken = isset($pinTokens['access_token']) ? $pinTokens['access_token'] : '';
     $pinCategory = isset($newArticleObj['category']) ? $newArticleObj['category'] : '';
     $pinBoardId = ($pinCategory && isset($pinBoards[$pinCategory])) ? $pinBoards[$pinCategory] : '';
 
@@ -2222,8 +2224,43 @@ if (file_exists($pinterestTokensPath) && file_exists($pinterestBoardsPath)) {
                 ),
             ), JSON_UNESCAPED_UNICODE),
         ));
-        curl_exec($pinCh); // best-effort — a Pinterest failure must never fail article publishing
+        // Still best-effort — a Pinterest failure must never fail article publishing — but
+        // the answer is recorded now instead of discarded, so a channel that quietly stops
+        // working is visible in the log and in the alert email.
+        $pinRaw = curl_exec($pinCh);
+        $pinStatus = curl_getinfo($pinCh, CURLINFO_HTTP_CODE);
         curl_close($pinCh);
+        $pinData = json_decode((string) $pinRaw, true);
+        $pinOk = ($pinStatus >= 200 && $pinStatus < 300);
+
+        sg_pinterest_log(array(
+            'slug' => $newArticleObj['slug'] ?? '',
+            'board' => $pinCategory,
+            'http' => $pinStatus,
+            'pinId' => $pinData['id'] ?? null,
+            'token' => $pinTokenNote,
+            'error' => $pinOk ? null : mb_substr((string) ($pinData['message'] ?? $pinRaw), 0, 200, 'UTF-8'),
+        ), __DIR__);
+
+        if (!$pinOk) {
+            require_once __DIR__ . '/notify.php';
+            sg_notify_failure('Pinterest: το αυτόματο pin απέτυχε', array(
+                'Άρθρο: ' . ($newArticleObj['slug'] ?? ''),
+                'HTTP: ' . $pinStatus,
+                'Μήνυμα: ' . mb_substr((string) ($pinData['message'] ?? $pinRaw), 0, 300, 'UTF-8'),
+                'Κατάσταση token: ' . $pinTokenNote,
+                'Αν χρειάζεται νέα σύνδεση: https://smartgarden.gr/pinterest-auth-login.php',
+            ));
+        }
+    } else {
+        require_once __DIR__ . '/pinterest-lib.php';
+        sg_pinterest_log(array(
+            'slug' => $newArticleObj['slug'] ?? '',
+            'board' => $pinCategory,
+            'http' => 0,
+            'error' => $pinToken ? ('Δεν βρέθηκε board για την κατηγορία ' . $pinCategory) : 'Χωρίς token',
+            'token' => $pinTokenNote ?? '',
+        ), __DIR__);
     }
 }
 
