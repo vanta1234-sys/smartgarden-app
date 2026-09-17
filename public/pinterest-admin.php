@@ -136,6 +136,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['articleId'], $_POST['
     </p>
   </div>
 
+  <?php
+  // The daily auto-pin writes here. It is denied to the public in .htaccess, so this is the
+  // only way to see whether the one traffic channel that works today is still working.
+  $pinLog = json_decode((string) @file_get_contents(__DIR__ . '/pinterest_posts.json'), true);
+  if (is_array($pinLog) && count($pinLog)):
+    $recent = array_slice($pinLog, -8);
+    $failures = count(array_filter($pinLog, function ($e) { return !empty($e['error']); }));
+  ?>
+  <div class="card">
+    <strong>Αυτόματα pin</strong>
+    <div style="font-size:13px;color:#5b6b5f;margin:6px 0 10px">
+      <?= count($pinLog) ?> καταγραφές, <?= $failures ?> με σφάλμα.
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <?php foreach (array_reverse($recent) as $e): ?>
+      <tr style="border-top:1px solid #eee7d8">
+        <td style="padding:6px 4px;white-space:nowrap"><?= htmlspecialchars(substr($e['at'] ?? '', 0, 10)) ?></td>
+        <td style="padding:6px 4px"><?= htmlspecialchars(mb_substr($e['slug'] ?? '', 0, 34)) ?></td>
+        <td style="padding:6px 4px;white-space:nowrap">
+          <?php if (!empty($e['error'])): ?>
+            <span style="color:#a3372e">✕ <?= htmlspecialchars(mb_substr($e['error'], 0, 60)) ?></span>
+          <?php else: ?>
+            <span style="color:#2E6B3A">✓ <?= htmlspecialchars($e['pinId'] ?? 'ok') ?></span>
+          <?php endif; ?>
+        </td>
+        <td style="padding:6px 4px;color:#8a8a7a"><?= htmlspecialchars(mb_substr($e['token'] ?? '', 0, 28)) ?></td>
+      </tr>
+      <?php endforeach; ?>
+    </table>
+  </div>
+  <?php endif; ?>
+
   <form method="post" class="card">
     <strong>2. Δημιουργία Pin</strong>
     <label for="articleId">Άρθρο</label>
