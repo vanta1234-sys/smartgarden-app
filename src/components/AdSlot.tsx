@@ -64,7 +64,11 @@ export const AdSlot: React.FC<AdSlotProps> = ({ slot, label = 'Διαφήμισ�
         data-ad-client={AD_CLIENT}
         data-ad-slot={slot}
         data-ad-format="auto"
-        data-full-width-responsive="true"
+        // Not full-width: the article is read inside a padded column, and a unit that
+        // expands to the viewport is 375px wide in a 293px box — clipped by the modal,
+        // which both looks wrong and counts against viewability. 293px is comfortably
+        // above the width AdSense needs to serve.
+        data-full-width-responsive="false"
       />
     </div>
   );

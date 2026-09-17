@@ -140,7 +140,7 @@ export function getAudioChainForProfile(
 //    stable for years; kept purely as an automatic fallback if #1 ever fails.
 // (/api/tts/greek, a Node/Express route in server.ts, is NOT used — it only runs in local
 // dev; production is static PHP hosting with no live Node server, so that route 404s there.)
-export async function fetchGreekAudioUrl(rawText: string): Promise<string | null> {
+export async function fetchGreekAudioUrl(rawText: string, timeoutMs = 4000): Promise<string | null> {
   if (!rawText || !rawText.trim()) return null;
   const trimmed = rawText.trim();
 
@@ -148,7 +148,7 @@ export async function fetchGreekAudioUrl(rawText: string): Promise<string | null
     return audioCache.get(trimmed)!;
   }
 
-  const url = await resolveGreekTtsUrl(trimmed);
+  const url = await resolveGreekTtsUrl(trimmed, timeoutMs);
   if (url) {
     audioCache.set(trimmed, url);
   }
@@ -343,9 +343,13 @@ export function speakGreekTextWithWebSpeech(
     if (onEnd) onEnd();
   };
 
-  const playChunk = (text: string, next: () => void) => {
+  const playChunk = (text: string, next: () => void, patient = false) => {
     if (session !== speechSession) return;
-    fetchGreekAudioUrl(text)
+    // Measured from this host: Edge answers in 6-7s and sounds better, Google in under a
+    // second and does not. The first block decides how long the reader waits for any sound
+    // at all, so it goes to whoever is quickest; every later block is fetched while the
+    // previous one plays, which is far more time than Edge needs.
+    fetchGreekAudioUrl(text, patient ? 12000 : 1500)
       .then((audioUrl) => {
         if (session !== speechSession) return;
         if (!audioUrl) {
@@ -399,9 +403,9 @@ export function speakGreekTextWithWebSpeech(
     }
     const text = chunks[index++];
     // Fetch the following block while this one plays, so the gap between them is silence
-    // the reader does not hear.
-    if (index < chunks.length) fetchGreekAudioUrl(chunks[index]).catch(() => {});
-    playChunk(text, playNext);
+    // the reader does not hear — and give Edge long enough to win that one.
+    if (index < chunks.length) fetchGreekAudioUrl(chunks[index], 12000).catch(() => {});
+    playChunk(text, playNext, index > 1);
   };
 
   playNext();
