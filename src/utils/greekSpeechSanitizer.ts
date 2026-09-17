@@ -7,6 +7,17 @@ export function cleanGreekTextForSpeech(rawText: string): string {
 
   let text = rawText;
 
+  // 0. Drop what only makes sense on a page.
+  //
+  // The articles carry markdown tables of growing parameters. Stripping the pipes leaves
+  // the cells running together — "Παράμετρος Εφαρμογής Βέλτιστη Τιμή Μονάδα Μέτρησης
+  // Βοτανική Ταξινόμηση 25 35 Liters" — which is unintelligible read aloud, so the rows go
+  // entirely. Horizontal rules and heading markers go too; a heading is left as its own
+  // sentence so the narration still has structure.
+  text = text.replace(/^\s*\|.*\|\s*$/gm, ' ');
+  text = text.replace(/^\s*[-*_]{3,}\s*$/gm, ' ');
+  text = text.replace(/^\s*#{1,6}\s*(.+)$/gm, '$1. ');
+
   // 1. Remove markdown bold, italic, quotes, asterisks, brackets
   text = text.replace(/[*_#`~«»"'\(\)\[\]\{\}]/g, ' ');
 

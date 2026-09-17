@@ -202,7 +202,14 @@ export async function fetchAndDecodeGreekAudio(
   }
 }
 
+/**
+ * Bumped by every stop. A chunk whose fetch or playback finishes after the reader pressed
+ * stop checks this and does nothing, instead of starting the next chunk over the silence.
+ */
+let speechSession = 0;
+
 export function stopWebSpeech(): void {
+  speechSession++;
   if (fallbackAudioElem) {
     try {
       fallbackAudioElem.pause();
@@ -272,6 +279,33 @@ function speakWithNativeVoice(
 // time-stretches rather than resamples) instead of AudioBufferSourceNode.playbackRate — the latter
 // is a naive resample, so speeding it up also raises the pitch ("chipmunk" effect / thinner voice).
 // preservesPitch keeps the same voice and tone at higher speed (2026-09-04 fix).
+/**
+ * Split for narration.
+ *
+ * The whole article goes to the TTS endpoint as one request otherwise: Edge renders the
+ * entire thing before answering — minutes for 7,000 characters, well past the 4s race that
+ * falls back to Google — and Google's engine is capped at 180 characters per call, so the
+ * server would make forty sequential requests before the first sound. Sentence-sized blocks
+ * start almost immediately and the next one is fetched while the current plays.
+ */
+function chunkForSpeech(text: string, max = 600): string[] {
+  const sentences = text.split(/(?<=[.!;?])\s+/u);
+  const chunks: string[] = [];
+  let current = '';
+  for (const sentence of sentences) {
+    const candidate = current ? current + ' ' + sentence : sentence;
+    if (candidate.length > max && current) {
+      chunks.push(current);
+      current = sentence;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+  // A single sentence longer than the limit still has to go somewhere.
+  return chunks.flatMap((c) => (c.length <= max * 2 ? [c] : c.match(new RegExp(`.{1,${max}}(\s|$)`, 'g')) || [c]));
+}
+
 export function speakGreekTextWithWebSpeech(
   rawText: string,
   onEnd?: () => void,
@@ -282,6 +316,7 @@ export function speakGreekTextWithWebSpeech(
   if (typeof window === 'undefined') return false;
 
   stopWebSpeech();
+  const session = speechSession;
 
   if (!rawText || !rawText.trim()) {
     if (onEnd) onEnd();
@@ -300,54 +335,75 @@ export function speakGreekTextWithWebSpeech(
   else if (voiceProfile === 'warm_female') baseRate = 0.98;
 
   const effectiveRate = baseRate * rate;
-  const trimmed = rawText.trim();
+  const chunks = chunkForSpeech(rawText.trim());
+  let index = 0;
 
-  try {
-    // fetchGreekAudioUrl tries tts-edge.php (free Microsoft neural voice) first, falling
-    // back to tts-greek.php (Google) automatically — must go through this shared resolver,
-    // not a hardcoded URL, or the Edge voice never actually gets used (2026-09-04 bugfix).
-    fetchGreekAudioUrl(trimmed).then((audioUrl) => {
-      if (!audioUrl) {
-        speakWithNativeVoice(rawText, onEnd, rate, pitch, voiceProfile);
-        return;
-      }
-      try {
-        const audio = new Audio(audioUrl);
-        audio.crossOrigin = 'anonymous';
-        audio.playbackRate = effectiveRate;
-        // Cross-browser preservesPitch flags (Chrome/Edge, Firefox, Safari respectively).
-        (audio as any).preservesPitch = true;
-        (audio as any).mozPreservesPitch = true;
-        (audio as any).webkitPreservesPitch = true;
+  const finish = () => {
+    if (session !== speechSession) return;
+    if (onEnd) onEnd();
+  };
 
-        // Route through the same character EQ filter chain as before, just fed by a
-        // pitch-preserving <audio> element instead of a raw resampled AudioBufferSourceNode.
-        const source = audioCtx.createMediaElementSource(audio);
-        const chainInput = getAudioChainForProfile(voiceProfile, audioCtx, audioCtx.destination);
-        source.connect(chainInput);
+  const playChunk = (text: string, next: () => void) => {
+    if (session !== speechSession) return;
+    fetchGreekAudioUrl(text)
+      .then((audioUrl) => {
+        if (session !== speechSession) return;
+        if (!audioUrl) {
+          speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
+          return;
+        }
+        try {
+          const audio = new Audio(audioUrl);
+          audio.crossOrigin = 'anonymous';
+          audio.playbackRate = effectiveRate;
+          // Cross-browser preservesPitch flags (Chrome/Edge, Firefox, Safari respectively).
+          (audio as any).preservesPitch = true;
+          (audio as any).mozPreservesPitch = true;
+          (audio as any).webkitPreservesPitch = true;
 
-        fallbackAudioElem = audio;
-        audio.onended = () => {
-          fallbackAudioElem = null;
-          if (onEnd) onEnd();
-        };
-        audio.onerror = () => {
-          fallbackAudioElem = null;
-          speakWithNativeVoice(rawText, onEnd, rate, pitch, voiceProfile);
-        };
-        audio.play().catch(() => {
-          fallbackAudioElem = null;
-          speakWithNativeVoice(rawText, onEnd, rate, pitch, voiceProfile);
-        });
-      } catch (err) {
-        console.warn('Pitch-preserving playback setup failed, falling back to native voice:', err);
-        speakWithNativeVoice(rawText, onEnd, rate, pitch, voiceProfile);
-      }
-    });
-  } catch (err) {
-    console.warn('TTS URL resolution failed, falling back to native voice:', err);
-    return speakWithNativeVoice(rawText, onEnd, rate, pitch, voiceProfile);
-  }
+          // Route through the same character EQ filter chain as before, just fed by a
+          // pitch-preserving <audio> element instead of a raw resampled AudioBufferSourceNode.
+          const source = audioCtx.createMediaElementSource(audio);
+          const chainInput = getAudioChainForProfile(voiceProfile, audioCtx, audioCtx.destination);
+          source.connect(chainInput);
 
+          fallbackAudioElem = audio;
+          audio.onended = () => {
+            fallbackAudioElem = null;
+            next();
+          };
+          audio.onerror = () => {
+            fallbackAudioElem = null;
+            speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
+          };
+          audio.play().catch(() => {
+            fallbackAudioElem = null;
+            speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
+          });
+        } catch (err) {
+          console.warn('Pitch-preserving playback setup failed, falling back to native voice:', err);
+          speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
+        }
+      })
+      .catch(() => {
+        if (session !== speechSession) return;
+        speakWithNativeVoice(text, next, rate, pitch, voiceProfile);
+      });
+  };
+
+  const playNext = () => {
+    if (session !== speechSession) return;
+    if (index >= chunks.length) {
+      finish();
+      return;
+    }
+    const text = chunks[index++];
+    // Fetch the following block while this one plays, so the gap between them is silence
+    // the reader does not hear.
+    if (index < chunks.length) fetchGreekAudioUrl(chunks[index]).catch(() => {});
+    playChunk(text, playNext);
+  };
+
+  playNext();
   return true;
 }

@@ -183,9 +183,25 @@ export default function App() {
   const [visibleArticleCount, setVisibleArticleCount] = useState<number>(ARTICLES_PAGE_SIZE);
   const [isModalImageHovered, setIsModalImageHovered] = useState<boolean>(false);
   const [isArticleReadingAudioActive, setIsArticleReadingAudioActive] = useState<boolean>(false);
-  const [readingVoiceProfile, setReadingVoiceProfile] = useState<VoiceProfile>('deep_male');
-  const [readingSpeed, setReadingSpeed] = useState<number>(1.0);
+  // Female voice and 1.2x by default: what someone pressing "Άκουσε το" on a twelve-minute
+  // article wants is to get through it without it sounding rushed. 'light_female' is the
+  // clearer of the two female profiles. Both are one tap away in the voice settings.
+  const [readingVoiceProfile, setReadingVoiceProfile] = useState<VoiceProfile>('light_female');
+  const [readingSpeed, setReadingSpeed] = useState<number>(1.2);
   const [showReadingVoiceSettings, setShowReadingVoiceSettings] = useState<boolean>(false);
+
+  /**
+   * What the narration actually reads.
+   *
+   * It used to be the title and the summary — about fifteen seconds, which is why the
+   * audio always seemed to stop at the beginning. cleanGreekTextForSpeech turns the
+   * markdown body into something worth hearing: no tables, no asterisks, headings left as
+   * their own sentences.
+   */
+  const articleSpeechText = (a: ArticleItem) => {
+    const body = a.content?.el || (typeof a.content === 'string' ? a.content : '');
+    return cleanGreekTextForSpeech(`${a.title.el}. ${a.summary.el}. ${body}`);
+  };
 
   const handleToggleArticleSpeech = (
     textToRead: string,
@@ -2142,7 +2158,7 @@ pause
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
-                    onClick={() => handleToggleArticleSpeech(`${selectedArticle.title.el}. ${selectedArticle.summary.el}`)}
+                    onClick={() => handleToggleArticleSpeech(articleSpeechText(selectedArticle))}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                       isArticleReadingAudioActive
                         ? 'bg-emerald-500 text-white border-emerald-400 font-bold animate-pulse shadow-md shadow-emerald-500/30'
@@ -2189,7 +2205,7 @@ pause
                             setReadingVoiceProfile('deep_male');
                             if (isArticleReadingAudioActive) {
                               handleToggleArticleSpeech(
-                                `${selectedArticle.title.el}. ${selectedArticle.summary.el}`,
+                                articleSpeechText(selectedArticle),
                                 'deep_male',
                                 readingSpeed
                               );
@@ -2209,7 +2225,7 @@ pause
                             setReadingVoiceProfile('light_female');
                             if (isArticleReadingAudioActive) {
                               handleToggleArticleSpeech(
-                                `${selectedArticle.title.el}. ${selectedArticle.summary.el}`,
+                                articleSpeechText(selectedArticle),
                                 'light_female',
                                 readingSpeed
                               );
@@ -2229,7 +2245,7 @@ pause
                             setReadingVoiceProfile('warm_female');
                             if (isArticleReadingAudioActive) {
                               handleToggleArticleSpeech(
-                                `${selectedArticle.title.el}. ${selectedArticle.summary.el}`,
+                                articleSpeechText(selectedArticle),
                                 'warm_female',
                                 readingSpeed
                               );
@@ -2252,7 +2268,7 @@ pause
                         ⚡ Ταχύτητα:
                       </span>
                       <div className="inline-flex rounded-lg bg-slate-900 p-0.5 border border-slate-800 gap-0.5">
-                        {[0.8, 1.0, 1.2, 1.5].map((speed) => (
+                        {[0.8, 1.0, 1.2, 1.5, 2.0].map((speed) => (
                           <button
                             key={speed}
                             type="button"
@@ -2260,7 +2276,7 @@ pause
                               setReadingSpeed(speed);
                               if (isArticleReadingAudioActive) {
                                 handleToggleArticleSpeech(
-                                  `${selectedArticle.title.el}. ${selectedArticle.summary.el}`,
+                                  articleSpeechText(selectedArticle),
                                   readingVoiceProfile,
                                   speed
                                 );

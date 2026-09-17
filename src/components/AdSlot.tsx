@@ -21,6 +21,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({ slot, label = 'Διαφήμισ�
   const pushed = useRef(false);
   const insRef = useRef<HTMLModElement | null>(null);
   const [unfilled, setUnfilled] = useState(false);
+  const [filled, setFilled] = useState(false);
 
   useEffect(() => {
     if (!slot || pushed.current) return;
@@ -32,32 +33,30 @@ export const AdSlot: React.FC<AdSlotProps> = ({ slot, label = 'Διαφήμισ�
     }
   }, [slot]);
 
-  // AdSense marks a unit it had nothing to fill with data-ad-status="unfilled" and leaves
-  // the reserved height behind. On a site with no fill yet that is a 280px hole under a
-  // heading that says "Διαφήμιση" — worse than showing nothing, so the whole block goes.
+  // AdSense marks a unit it had nothing to fill with data-ad-status="unfilled". Only that
+  // hides the block — an earlier version hid it after six seconds of silence, which was
+  // worse than the problem: a hidden <ins> has zero width, and AdSense cannot fill a slot
+  // it cannot measure. So the unit always keeps its space, and only the "Διαφήμιση" label
+  // waits for a real ad, so that nothing announces an ad that never arrives.
   useEffect(() => {
     const el = insRef.current;
     if (!slot || !el) return;
     const check = () => {
       const status = el.getAttribute('data-ad-status');
       if (status === 'unfilled') setUnfilled(true);
-      else if (status === 'filled') setUnfilled(false);
+      else if (status === 'filled') { setUnfilled(false); setFilled(true); }
     };
     check();
     const observer = new MutationObserver(check);
     observer.observe(el, { attributes: true, attributeFilter: ['data-ad-status'] });
-    // A unit the script never touches at all — blocked, or no script — is also nothing.
-    const giveUp = window.setTimeout(() => {
-      if (!el.getAttribute('data-ad-status')) setUnfilled(true);
-    }, 6000);
-    return () => { observer.disconnect(); window.clearTimeout(giveUp); };
+    return () => observer.disconnect();
   }, [slot]);
 
   if (!slot) return null;
 
   return (
     <div className={`my-6 ${className}`} hidden={unfilled}>
-      <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">{label}</div>
+      <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1" hidden={!filled}>{label}</div>
       <ins
         ref={insRef}
         className="adsbygoogle block"
