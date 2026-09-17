@@ -1,4 +1,5 @@
 import { CATEGORY_FAQS, DEFAULT_FAQS, FaqItem } from '../data/categoryFaqs';
+import { seoTitleFor } from '../utils/seoTitle';
 
 export interface ArticleItem {
   id: string;
@@ -246,7 +247,8 @@ export function injectArticleSchema(article: ArticleItem) {
 
   // Also update standard document title and meta tags dynamically for client-side preview
   if (typeof document !== 'undefined') {
-    document.title = `${title} | SmartGarden.gr`;
+    // The same title article.php wrote into the HTML — see src/utils/seoTitle.ts.
+    document.title = seoTitleFor(article);
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc && summary) {
       metaDesc.setAttribute('content', summary.slice(0, 160));

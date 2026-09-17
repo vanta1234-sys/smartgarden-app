@@ -94,7 +94,17 @@ if ($article) {
             $inline = function ($t) use ($esc) {
                 return preg_replace('/\*\*(.+?)\*\*/u', '<strong>$1</strong>', $esc($t));
             };
-            if (preg_match('/^###\s+(.*)$/u', $line, $m)) {
+            // A line that is only an image is one of our own photographs.
+            if (preg_match('/^!\\[(.*?)\\]\\((.+?)\\)$/u', $line, $m)) {
+                if ($listOpen) { $out .= "</ul>
+"; $listOpen = false; }
+                $out .= '<figure><img src="' . $esc($m[2]) . '" alt="' . $esc($m[1])
+                      . '" width="900" height="675" loading="lazy" decoding="async">'
+                      . '<figcaption>' . $esc($m[1]) . ' — δική μας φωτογραφία, Σεπτέμβριος 2026.</figcaption>'
+                      . "</figure>
+";
+            } elseif (preg_match('/^###\s+(.*)$/u', $line, $m)) {
+
                 if ($listOpen) { $out .= "</ul>
 "; $listOpen = false; }
                 $out .= '<h3>' . $inline($m[1]) . "</h3>
@@ -150,7 +160,9 @@ if ($article) {
         foreach ($takeaways as $t) $ssr .= '<li>' . htmlspecialchars((string) $t, ENT_QUOTES, 'UTF-8') . '</li>';
         $ssr .= '</ul>';
     }
-    $ssr .= $mdToHtml($bodyMd);
+    // One of our own garden photographs, dropped into the body rather than used as the
+    // lead image. src/utils/articlePhoto.ts does the same to what React renders.
+    $ssr .= $mdToHtml(sg_insert_real_photo($bodyMd, sg_pick_real_photo($article)));
     $ssr .= '</article>';
 
     // Related reading. Two jobs at once: it gives a crawler eight internal links out of

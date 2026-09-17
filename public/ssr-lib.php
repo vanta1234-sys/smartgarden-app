@@ -203,3 +203,94 @@ function sg_seo_title_unique($rawTitle, $allArticles, $slug, $max = 60) {
 
     return sg_seo_title($base, '', $budget) . ' · ' . $angle;
 }
+
+/**
+ * Our own garden photographs, placed inside the article body.
+ *
+ * Mirrors src/utils/articlePhoto.ts. Both must agree: the crawler is served this version
+ * and then renders the React one, and a photo that appears in only one of them looks like
+ * something injected for the crawler's benefit.
+ */
+/**
+ * Lowercase and drop Greek accents.
+ *
+ * Greek moves its accent when a word inflects — "κρεμμύδι" becomes "κρεμμυδιού" — so a
+ * keyword written in one form silently misses the other. Mirrors the NFD normalisation in
+ * src/utils/articlePhoto.ts.
+ */
+function sg_flatten_greek($t) {
+    $t = mb_strtolower((string) $t, 'UTF-8');
+    return strtr($t, array(
+        'ά' => 'α', 'έ' => 'ε', 'ή' => 'η', 'ί' => 'ι', 'ό' => 'ο', 'ύ' => 'υ', 'ώ' => 'ω',
+        'ϊ' => 'ι', 'ϋ' => 'υ', 'ΐ' => 'ι', 'ΰ' => 'υ',
+        'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u',
+    ));
+}
+
+function sg_real_photos() {
+    static $cache = null;
+    if ($cache === null) {
+        $cache = json_decode((string) @file_get_contents(__DIR__ . '/real-photos.json'), true) ?: array();
+    }
+    return $cache;
+}
+
+/** Stable per-slug pick, so two tomato articles do not get the same tomato photo. */
+function sg_pick_real_photo($article) {
+    $title = $article['title']['el'] ?? (is_string($article['title'] ?? null) ? $article['title'] : '');
+    $summary = $article['summary']['el'] ?? (is_string($article['summary'] ?? null) ? $article['summary'] : '');
+    $title = sg_flatten_greek($title);
+    // The slug names the subject too, and one article's title is truncated to the point
+    // that only its slug still says what it is about.
+    $secondary = sg_flatten_greek($summary . ' ' . str_replace('-', ' ', $article['slug'] ?? ''));
+    if (trim($title) === '' && trim($secondary) === '') return null;
+
+    // Score by the longest keyword that matched, so the most specific photo wins: an article
+    // about tomatoes that also mentions watering gets the tomato, not the drip line.
+    // A hit in the title outranks a hit in the summary or slug: the title says what the
+    // article is about, while a summary mentions half the garden in passing.
+    $best = 0;
+    $hits = array();
+    foreach (sg_real_photos() as $photo) {
+        $score = 0;
+        foreach ($photo['match'] ?? array() as $needle) {
+            $k = sg_flatten_greek($needle);
+            if ($k !== '' && mb_strpos($title, $k) !== false) $score = max($score, 2);
+            elseif ($k !== '' && mb_strpos($secondary, $k) !== false) $score = max($score, 1);
+        }
+        if (!$score) continue;
+        if ($score > $best) { $best = $score; $hits = array(); }
+        if ($score === $best) $hits[] = $photo;
+    }
+    if (!count($hits)) return null;
+
+    $key = $article['slug'] ?? $title;
+    $h = 0;
+    foreach (preg_split('//u', $key, -1, PREG_SPLIT_NO_EMPTY) as $ch) {
+        $h = ($h * 31 + mb_ord($ch, 'UTF-8')) % 4294967296;
+    }
+    return $hits[$h % count($hits)];
+}
+
+/**
+ * Put it before the third `##` heading — past the opening, but early enough that most
+ * readers reach it. Never the lead image: the header photo is the article's own.
+ */
+function sg_insert_real_photo($markdown, $photo) {
+    if (!$photo || $markdown === '') return $markdown;
+    if (strpos($markdown, $photo['file']) !== false) return $markdown;
+
+    $block = "
+![" . $photo['alt'] . "](" . $photo['file'] . ")
+
+";
+    if (!preg_match_all('/^##[ 	]+/mu', $markdown, $m, PREG_OFFSET_CAPTURE)) {
+        return $markdown . "
+
+" . ltrim($block);
+    }
+    $positions = array_map(function ($x) { return $x[1]; }, $m[0]);
+    $at = $positions[min(2, count($positions) - 1)];
+    return substr($markdown, 0, $at) . ltrim($block) . "
+" . substr($markdown, $at);
+}

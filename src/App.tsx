@@ -26,6 +26,8 @@ import { AdSlot } from './components/AdSlot';
 import { AD_SLOTS } from './config/ads';
 import { getFaqsForArticle } from './services/schemaService';
 import { ArticleMarkdown } from './components/ArticleMarkdown';
+import { pickRealPhoto, insertRealPhoto } from './utils/articlePhoto';
+import { setSeoTitleCorpus } from './utils/seoTitle';
 
 // Admin-only tools: kept out of the main bundle so regular readers never download
 // the Remotion/video-rendering and SEO-audit code paths they'll never use.
@@ -281,6 +283,7 @@ export default function App() {
       })
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
+          setSeoTitleCorpus(data);
           setArticles(data);
           // Respect a direct /article/<slug> link (Google, Pinterest, social shares) —
           // without this, every inbound article visit silently landed on the homepage
@@ -349,7 +352,10 @@ export default function App() {
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [selectedArticle?.slug]);
+    // Keyed on the body as well as the slug: the article list arrives after this has
+    // already merged the inlined article and puts the content-free copy back, which a
+    // slug-only dependency would not notice.
+  }, [selectedArticle?.slug, selectedArticle?.content?.el]);
 
   // Edit Form State
   const [editTitle, setEditTitle] = useState(selectedArticle.title.el);
@@ -2311,7 +2317,9 @@ pause
               <AdSlot slot={AD_SLOTS.articleTop} />
 
               {/* Full Content */}
-              <ArticleMarkdown content={selectedArticle.content.el} />
+              <ArticleMarkdown
+                content={insertRealPhoto(selectedArticle.content.el, pickRealPhoto(selectedArticle))}
+              />
 
               <AdSlot slot={AD_SLOTS.articleEnd} />
 
