@@ -280,7 +280,23 @@ function sg_load_catalogue() {
     $path = __DIR__ . '/photo-catalogue.json';
     $data = file_exists($path) ? json_decode(file_get_contents($path), true) : null;
     if (!is_array($data) || empty($data['curated'])) {
-        return array('curated' => array(), 'neutral' => array(), 'fallback' => array());
+        $data = array('curated' => array(), 'neutral' => array(), 'fallback' => array());
+    }
+
+    // Our own garden photographs join the curated pool, keyed on the same words that decide
+    // which article they illustrate. A real photograph of a pepper, taken here, beats a
+    // stock photograph of something else — and it is the same standard the articles are
+    // held to.
+    $own = json_decode((string) @file_get_contents(__DIR__ . '/real-photos.json'), true);
+    if (is_array($own)) {
+        foreach ($own as $photo) {
+            if (empty($photo['file']) || empty($photo['match'])) continue;
+            $data['curated'][] = array(
+                'url' => 'https://smartgarden.gr' . $photo['file'],
+                'keywords' => $photo['match'],
+                'own' => true,
+            );
+        }
     }
     return $data;
 }
@@ -339,8 +355,17 @@ function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
         $bestUrl = null;
         $bestScore = 0;
         foreach ($curated as $p) {
-            $s = sg_match_score($text, $p['keywords']);
+            // Our own photographs are chosen per article, not per sentence, so they are
+            // scored against the article's subject as well: a video about peppers should
+            // use our photograph of a pepper even in a scene that does not repeat the word.
+            $against = !empty($p['own']) ? ($text . ' ' . $articleTitle) : $text;
+            $s = sg_match_score($against, $p['keywords']);
             if ($s <= 0) continue;
+            // Our own photographs carry one or two keywords where a stock entry carries
+            // eight, so on raw score they lost every time. When ours matches the scene at
+            // all, it is a photograph of this plant taken in a real garden, which is worth
+            // more than a closer keyword count on a stock image.
+            if (!empty($p['own'])) $s += 20;
             if (isset($used[$p['url']])) $s -= 100;
             if ($s > $bestScore) { $bestScore = $s; $bestUrl = $p['url']; }
         }
@@ -350,6 +375,12 @@ function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
                 if (!isset($used[$u])) { $bestUrl = $u; break; }
             }
         }
+        // Before reaching for a generic shot: the article's own photograph is the one image
+        // known to match this subject, because every article is given one deliberately. A
+        // field of rocket on a scene about a ZZ plant is worse than seeing the lead photo
+        // twice — and that is exactly what the generic pool produced.
+        if ($bestUrl === null && $articleImage && $i > 1) $bestUrl = $articleImage;
+
         if ($bestUrl === null) {
             while ($neutralIdx < count($neutral)) {
                 $u = $neutral[$neutralIdx++];

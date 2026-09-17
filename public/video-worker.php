@@ -214,8 +214,14 @@ function sg_run_job($dir) {
                 foreach ($layout as $k => $wd) {
                     $txtFile = $base . '_w' . $k . '.txt';
                     file_put_contents($txtFile, $wd['text']);
+                    // y is the top of the glyph box, and that box is measured from the
+                    // glyphs actually in the word — so "το", which has neither ascender nor
+                    // descender, sat visibly higher than "πέφτει" next to it and the line
+                    // came out looking scattered. drawtext exposes `ascent` for the same
+                    // rendered glyphs, so subtracting it pins every word to one baseline.
+                    $baseline = $wd['y'] + $offsetY + $size;
                     $common = 'fontfile=' . SG_FONT . ':textfile=' . $txtFile
-                            . ':x=' . $wd['x'] . ':y=' . ($wd['y'] + $offsetY)
+                            . ':x=' . $wd['x'] . ":y='" . $baseline . "-ascent'"
                             . ':fontsize=' . $size . ':borderw=6:bordercolor=black@0.85';
                     $start = sprintf('%.3f', max(0, $wd['start']));
                     $end = sprintf('%.3f', max(0.05, $wd['end']));
