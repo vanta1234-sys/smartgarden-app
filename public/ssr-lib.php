@@ -343,11 +343,23 @@ function sg_plant_stems($name) {
     $out = array();
     foreach (explode('/', $name) as $part) {
         $f = sg_flatten_greek(trim($part));
+        if (mb_strlen($f, 'UTF-8') < 4) continue;
+
+        // Greek names a fruit tree by adding -ιά to the fruit: λεμόνι -> λεμονιά,
+        // πορτοκάλι -> πορτοκαλιά. Dropping the last letter of the tree lands back on the
+        // fruit, so "2 σταγόνες λεμονιού" in a recipe read as an article about growing
+        // lemon trees. These keep the ending they are named by, in both the forms the tree
+        // itself takes.
+        if (mb_substr($f, -2, null, 'UTF-8') === 'ια') {
+            $out[] = $f;
+            $out[] = mb_substr($f, 0, -1, 'UTF-8') . 'ε';
+            continue;
+        }
+
         // "Ντομάτα" must match "ντομάτας" and "ντομάτες", so a long name gives up its last
         // letter. Short ones do not: "Λάχανο" shortened to "λαχαν" matches "λαχανικά",
         // which is a different word, and "Ελιά" shortened matches half the dictionary.
-        if (mb_strlen($f, 'UTF-8') > 6) $f = mb_substr($f, 0, -1, 'UTF-8');
-        if (mb_strlen($f, 'UTF-8') >= 4) $out[] = $f;
+        $out[] = mb_strlen($f, 'UTF-8') > 6 ? mb_substr($f, 0, -1, 'UTF-8') : $f;
     }
     return $out;
 }

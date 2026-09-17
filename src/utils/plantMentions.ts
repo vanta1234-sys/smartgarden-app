@@ -21,10 +21,22 @@ const flat = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u
  * different word, and "Ελιά" shortened matches half the dictionary.
  */
 function stems(name: string): string[] {
-  return name.split('/').map((part) => {
+  const out: string[] = [];
+  for (const part of name.split('/')) {
     const f = flat(part.trim());
-    return f.length > 6 ? f.slice(0, -1) : f;
-  }).filter((s) => s.length >= 4);
+    if (f.length < 4) continue;
+
+    // Greek names a fruit tree by adding -ιά to the fruit: λεμόνι -> λεμονιά, πορτοκάλι ->
+    // πορτοκαλιά. Dropping the last letter of the tree lands back on the fruit, so
+    // "2 σταγόνες λεμονιού" in a recipe read as an article about growing lemon trees. These
+    // keep the ending they are named by, in both the forms the tree itself takes.
+    if (f.endsWith('ια')) {
+      out.push(f, f.slice(0, -1) + 'ε');
+      continue;
+    }
+    out.push(f.length > 6 ? f.slice(0, -1) : f);
+  }
+  return out.filter((s) => s.length >= 4);
 }
 
 const TABLE = PLANT_INDEX.map((p) => ({ ...p, stems: stems(p.name) }));
