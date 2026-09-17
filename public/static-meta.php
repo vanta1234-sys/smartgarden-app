@@ -345,5 +345,9 @@ if ($route === 'home') {
 
 if ($body !== '') $html = sg_inject_body($html, $body, $ld);
 
+// Same as article.php: the slot ids travel with the page instead of costing a request.
+$adSlots = json_encode(json_decode((string) @file_get_contents(__DIR__ . '/ads-slots.json'), true) ?: new stdClass()) ?: '{}';
+$html = str_replace('</body>', '<script>window.__SG_ADS__=' . $adSlots . ';</script></body>', $html);
+
 header('Content-Type: text/html; charset=utf-8');
 echo $html;

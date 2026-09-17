@@ -295,6 +295,9 @@ if ($article) {
             // The reader's own copy, so the page it landed on needs no second request for
             // its body. HEX_TAG/HEX_AMP keep any '</script>' inside the article text from
             // ending this one.
+            // The AdSense slot ids, so the reader's page needs no extra request to know
+            // whether there are ads to place. Pasted on the live site via ads-admin.php.
+            . '<script>window.__SG_ADS__=' . (json_encode(json_decode((string) @file_get_contents(__DIR__ . '/ads-slots.json'), true) ?: new stdClass()) ?: '{}') . ';</script>'
             . '<script>window.__SG_ARTICLE__=' . json_encode($article,
                   JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP
                   | JSON_HEX_APOS | JSON_HEX_QUOT) . ';</script>',

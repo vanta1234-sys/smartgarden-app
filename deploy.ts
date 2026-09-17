@@ -36,6 +36,10 @@ const SERVER_OWNED_FILES = new Set([
   "gemini_usage.json",
   // Rebuilt on the server whenever latest_articles.json changes.
   "articles-index.cache.json",
+  // The AdSense slot ids, pasted on the live site via ads-admin.php.
+  "ads-slots.json",
+  // The Pinterest pin log, appended to by the cron.
+  "pinterest_posts.json",
 ]);
 
 async function deploy() {

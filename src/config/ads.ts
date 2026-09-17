@@ -16,9 +16,28 @@
  */
 export const AD_CLIENT = 'ca-pub-6346961910073260';
 
-export const AD_SLOTS = {
+/**
+ * The ids themselves live on the server, in ads-slots.json, and travel with the page as
+ * window.__SG_ADS__. Compiling them into the bundle meant the site could not start earning
+ * until someone was at a machine with the repo and ran a deploy; now pasting them on
+ * /ads-admin.php is enough.
+ */
+type Slots = { articleTop: string; articleEnd: string };
+
+const COMPILED: Slots = {
   /** Between the article's key points and the body — seen by everyone who opens it. */
   articleTop: '',
   /** After the body, before the FAQ — seen by readers who finished, so worth the most. */
   articleEnd: '',
 };
+
+function fromPage(): Partial<Slots> {
+  try {
+    const s = (window as any).__SG_ADS__;
+    return s && typeof s === 'object' ? s : {};
+  } catch {
+    return {};
+  }
+}
+
+export const AD_SLOTS: Slots = { ...COMPILED, ...fromPage() };
