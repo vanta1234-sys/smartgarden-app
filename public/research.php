@@ -226,11 +226,30 @@ if ($clientId && $clientSecret && file_exists($tokensPath)) {
                     }
                 }
                 usort($striking, function ($a, $b) { return $b['impressions'] <=> $a['impressions']; });
+
+                // While the site is new, striking distance is empty — nothing ranks 5-20
+                // yet — and reporting only that says nothing at all. The queries Google is
+                // already showing the site for, at whatever position, are the only real
+                // evidence of what it is understood to be about.
+                $top = array();
+                foreach ($rows as $r) {
+                    $top[] = array(
+                        'query' => $r['keys'][0] ?? '',
+                        'impressions' => (int) ($r['impressions'] ?? 0),
+                        'clicks' => (int) ($r['clicks'] ?? 0),
+                        'position' => round((float) ($r['position'] ?? 99), 1),
+                    );
+                }
+                usort($top, function ($a, $b) { return $b['impressions'] <=> $a['impressions']; });
+
                 $searchConsole = array(
                     'available' => true,
                     'property' => $siteUrl,
                     'totalQueries' => count($rows),
+                    'totalImpressions' => array_sum(array_column($top, 'impressions')),
+                    'totalClicks' => array_sum(array_column($top, 'clicks')),
                     'strikingDistance' => array_slice($striking, 0, 25),
+                    'topQueries' => array_slice($top, 0, 30),
                 );
             } else {
                 $searchConsole = array(
