@@ -2314,7 +2314,19 @@ foreach ($staticPages as $page) {
 
 // Client-rendered hub pages (category listings, author bio, planting calendar) — no
 // server-side route/file, but real crawlable URLs the SPA handles via pathname routing.
-$appRoutes = array('syntaktis', 'imerologio-sporas', 'klima-kipoy', 'pagetos', 'fyta', 'rotiste', 'selini', 'xoma');
+$appRoutes = array('syntaktis', 'imerologio-sporas', 'klima-kipoy', 'pagetos', 'fyta', 'selini', 'xoma');
+
+// /rotiste is a form and a promise until a reader's question has actually been answered on
+// it — it says so itself: "Δεν έχει δημοσιευτεί ακόμη καμία ερώτηση". Asking Google to
+// index an empty page invites exactly the "thin content" judgement the rest of this work
+// exists to avoid, so it joins the sitemap on the day it has something to show.
+$qaAnswered = json_decode((string) @file_get_contents(__DIR__ . '/qa_questions.json'), true);
+if (is_array($qaAnswered)) {
+    $published = array_filter($qaAnswered, function ($q) {
+        return !empty($q['answer']) && ($q['status'] ?? 'published') !== 'pending';
+    });
+    if (count($published) > 0) $appRoutes[] = 'rotiste';
+}
 foreach ($appRoutes as $route) {
     $sitemapXml .= "  <url>\n    <loc>https://smartgarden.gr/" . $route . "</loc>\n    <lastmod>" . date('Y-m-d') . "</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>\n";
 }
