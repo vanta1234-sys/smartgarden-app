@@ -440,3 +440,42 @@ function sg_meta_description($text, $max = 155) {
     if ($sp !== false && $sp > $max * 0.6) $cut = mb_substr($cut, 0, $sp, 'UTF-8');
     return preg_replace('/[\s,·;:\-]+$/u', '', $cut) . '…';
 }
+
+/**
+ * When a plant can go outside, region by region. Mirrors src/utils/plantRegions.ts.
+ *
+ * The plant knows the lowest temperature it survives; frost_dates.json holds twenty years
+ * of ERA5 reanalysis for 52 Greek locations. Together they answer "πότε φυτεύω ντομάτα"
+ * with a date instead of a season. Eight locations, not fifty-two: the answer only changes
+ * when the climate does, and the rest would be the same row repeated.
+ */
+function sg_planting_by_region($minTempC, $category) {
+    // A houseplant has no outdoor planting date, and printing one for a Monstera would be
+    // telling someone to put it on the balcony in March.
+    if ($category === 'esoterikou') return array();
+
+    $data = json_decode((string) @file_get_contents(__DIR__ . '/frost_dates.json'), true);
+    $locations = $data['locations'] ?? array();
+    if (!count($locations)) return array();
+
+    $ids = array('rhodes', 'heraklion', 'athens', 'patras', 'volos', 'thessaloniki', 'ioannina', 'kozani');
+    $out = array();
+    foreach ($ids as $id) {
+        $loc = null;
+        foreach ($locations as $l) if (($l['id'] ?? '') === $id) { $loc = $l; break; }
+        if (!$loc) continue;
+
+        if ($minTempC <= ($loc['absolute_min_c'] ?? 99)) {
+            $out[] = array('name' => $loc['name'], 'advice' => 'Αντέχει τον χειμώνα έξω');
+            continue;
+        }
+        $safe = $loc['hard_frost']['safe_planting_date']['label'] ?? null;
+        $out[] = array(
+            'name' => $loc['name'],
+            // No safe date means no hard frost was ever recorded there; a tender plant still
+            // wants cover on the worst nights.
+            'advice' => $safe ? ('Μετά τις ' . $safe) : 'Όλο τον χρόνο, με κάλυψη στις ψυχρές νύχτες',
+        );
+    }
+    return $out;
+}

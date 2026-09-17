@@ -271,6 +271,18 @@ if ($route === 'home') {
 
             $body .= '<h2>Απαιτήσεις με μια ματιά</h2>' . $table;
 
+            // The same region-by-region answer PlantDatabasePage renders.
+            $byRegion = sg_planting_by_region($plant['minTempC'] ?? 99, $plant['category'] ?? '');
+            if (count($byRegion)) {
+                $body .= '<h2>Πότε φυτεύεται ' . sg_e(mb_strtolower($name, 'UTF-8')) . ' ανά περιοχή</h2><table><tbody>';
+                foreach ($byRegion as $r) {
+                    $body .= '<tr><th>' . sg_e($r['name']) . '</th><td>' . sg_e($r['advice']) . '</td></tr>';
+                }
+                $body .= '</tbody></table><p>Υπολογισμένο από την αντοχή του φυτού ('
+                       . sg_e($plant['minTempC'] ?? '—') . '°C) και είκοσι χρόνια καταγραφών παγετού ανά περιοχή. '
+                       . '<a href="/pagetos">Δες όλες τις περιοχές</a>.</p>';
+            }
+
             if ($sow !== '') {
                 $body .= '<h2>Πότε σπέρνουμε ' . sg_e($name) . '</h2>'
                        . '<p>Η σπορά ή φύτευση γίνεται ' . sg_e($sow) . '.'

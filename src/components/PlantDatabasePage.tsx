@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { plantingByRegion, regionTableApplies } from '../utils/plantRegions';
 import { REAL_PHOTOS } from '../data/realPhotos';
 import { pageTitle, metaDescription } from '../utils/seoTitle';
 import { ArrowLeft, Leaf, Search, Sun, Droplets, Thermometer, FlaskConical, AlertTriangle, Lightbulb, Snowflake, CalendarDays } from 'lucide-react';
@@ -126,6 +127,33 @@ export const PlantDatabasePage: React.FC<PlantDatabasePageProps> = ({ onBack, in
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight mt-3">{selected.name}</h1>
             <p className="text-sm text-slate-400 italic">{selected.botanical} · Οικογένεια {selected.family}</p>
           </div>
+
+          {/* When it can go outside, region by region. The plant knows the lowest
+              temperature it survives and frost_dates.json holds twenty years of ERA5 for
+              each location, so this answers "πότε φυτεύω" with a date instead of a season. */}
+          {regionTableApplies(selected.category) && frostLocations.length > 0 && (
+            <section>
+              <h2 className="text-sm font-bold text-slate-100 mb-2">
+                Πότε φυτεύεται {selected.name.toLowerCase()} ανά περιοχή
+              </h2>
+              <div className="overflow-x-auto rounded-xl border border-slate-800">
+                <table className="w-full text-xs border-collapse">
+                  <tbody>
+                    {plantingByRegion(selected.minTempC, frostLocations as any).map((r) => (
+                      <tr key={r.name} className="border-b border-slate-900 last:border-0">
+                        <th className="text-left font-semibold text-slate-300 px-3 py-2 whitespace-nowrap">{r.name}</th>
+                        <td className={`px-3 py-2 ${r.hardy ? 'text-emerald-400' : 'text-slate-400'}`}>{r.advice}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1.5">
+                Υπολογισμένο από την αντοχή του φυτού ({selected.minTempC}°C) και είκοσι χρόνια
+                καταγραφών παγετού ανά περιοχή. <a href="/pagetos" className="text-emerald-500 hover:underline">Δες όλες τις περιοχές</a>.
+              </p>
+            </section>
+          )}
 
           {/* Our own photographs of this plant. These pages carried no image at all, and
               the server renders the same set — Google indexes what React produces. */}
