@@ -156,6 +156,8 @@ export default function App() {
   const [articles, setArticles] = useState<ArticleItem[]>(INITIAL_ARTICLES);
   const [selectedArticle, setSelectedArticle] = useState<ArticleItem>(INITIAL_ARTICLES[0]);
   const [isReadingModalOpen, setIsReadingModalOpen] = useState(false);
+  /** True once /articles-index.php has replaced the seed placeholders. */
+  const [articlesReady, setArticlesReady] = useState(false);
   const [copiedNotification, setCopiedNotification] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [showTrendsModal, setShowTrendsModal] = useState(false);
@@ -198,6 +200,23 @@ export default function App() {
    * markdown body into something worth hearing: no tables, no asterisks, headings left as
    * their own sentences.
    */
+  /**
+   * Open an article and put its URL in the address bar.
+   *
+   * Selecting one without doing that left the page showing one article, titled as a second
+   * and declaring a canonical for it, while the URL still named the first — so copying the
+   * link gave the wrong article, and a crawler that followed a related link read a page
+   * claiming to be a duplicate of a different one.
+   */
+  const openArticle = (article: ArticleItem) => {
+    if (typeof window !== 'undefined' && article?.slug) {
+      const next = `/article/${encodeURIComponent(article.slug)}`;
+      if (window.location.pathname !== next) window.history.pushState(null, '', next);
+    }
+    setSelectedArticle(article);
+    setIsReadingModalOpen(true);
+  };
+
   const articleSpeechText = (a: ArticleItem) => {
     const body = a.content?.el || (typeof a.content === 'string' ? a.content : '');
     return cleanGreekTextForSpeech(`${a.title.el}. ${a.summary.el}. ${body}`);
@@ -302,6 +321,7 @@ export default function App() {
         if (Array.isArray(data) && data.length > 0) {
           setSeoTitleCorpus(data);
           setArticles(data);
+          setArticlesReady(true);
           // Respect a direct /article/<slug> link (Google, Pinterest, social shares) —
           // without this, every inbound article visit silently landed on the homepage
           // instead of the article the visitor actually clicked through for.
@@ -348,6 +368,14 @@ export default function App() {
     const current = selectedArticle;
     const slug = current?.slug;
     if (!slug) return;
+    // Only when someone is actually reading. selectedArticle is set on every route — it
+    // starts as the first seed entry and is replaced by the first live one — so without
+    // this the frost-date page and the soil calculator each fetched an article body twice
+    // and displayed neither.
+    if (!isReadingModalOpen && !isArticleRoute()) return;
+    // Until the list arrives, selectedArticle is the seed's first entry — an article nobody
+    // asked for. Waiting for the real list avoids fetching its body on every page view.
+    if (!articlesReady) return;
     const body = current.content?.el || (typeof current.content === 'string' ? current.content : '');
     if (body) return;
 
@@ -372,7 +400,7 @@ export default function App() {
     // Keyed on the body as well as the slug: the article list arrives after this has
     // already merged the inlined article and puts the content-free copy back, which a
     // slug-only dependency would not notice.
-  }, [selectedArticle?.slug, selectedArticle?.content?.el]);
+  }, [selectedArticle?.slug, selectedArticle?.content?.el, isReadingModalOpen, articlesReady]);
 
   // Edit Form State
   const [editTitle, setEditTitle] = useState(selectedArticle.title.el);
@@ -1006,11 +1034,7 @@ pause
   // IMPORTANT: any new route added here must also be added to `isStaticPageRoute`'s
   // regex above, or that page's <title>/meta tags get silently overwritten.
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-  const handleOpenArticleFromStaticPage = (article: ArticleItem) => {
-    window.history.pushState(null, '', `/article/${article.slug}`);
-    setSelectedArticle(article);
-    setIsReadingModalOpen(true);
-  };
+  const handleOpenArticleFromStaticPage = openArticle;
   const handleBackToHome = () => {
     window.history.pushState(null, '', '/');
     window.location.reload();
@@ -1291,8 +1315,7 @@ pause
               onOpenArticle={(slug) => {
                 const target = articles.find(a => a.slug === slug);
                 if (target) {
-                  setSelectedArticle(target);
-                  setIsReadingModalOpen(true);
+                  openArticle(target);
                 } else {
                   setIsReadingModalOpen(true);
                 }
@@ -1357,10 +1380,7 @@ pause
                 {articles.slice(0, visibleArticleCount).map((art, articleIdx) => (
                   <div
                     key={art.id}
-                    onClick={() => {
-                      setSelectedArticle(art);
-                      setIsReadingModalOpen(true);
-                    }}
+                    onClick={() => openArticle(art)}
                     // Pointer-only affordance on purpose: the "Ανάγνωση" button below stays
                     // the real focusable control, so keyboard and screen-reader users get one
                     // clear target instead of a duplicate tab stop, and there is no
@@ -1422,10 +1442,7 @@ pause
                         <span>{art.author.name}</span>
                       </div>
                       <button
-                        onClick={() => {
-                          setSelectedArticle(art);
-                          setIsReadingModalOpen(true);
-                        }}
+                        onClick={() => openArticle(art)}
                         className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer"
                       >
                         Ανάγνωση (2.200 λέξεις)
@@ -1537,7 +1554,7 @@ pause
                     }`}
                   >
                     <button
-                      onClick={() => setSelectedArticle(art)}
+                      onClick={() => openArticle(art)}
                       className="flex-1 flex items-start gap-3 text-left cursor-pointer min-w-0"
                     >
                       <img
@@ -2388,7 +2405,7 @@ pause
                       {related.map(r => (
                         <button
                           key={r.id}
-                          onClick={() => setSelectedArticle(r)}
+                          onClick={() => openArticle(r)}
                           className="text-left bg-slate-950 border border-slate-800 hover:border-emerald-500/50 rounded-xl overflow-hidden transition-colors group"
                         >
                           <img
