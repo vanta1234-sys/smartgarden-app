@@ -278,6 +278,14 @@ export const PLANTS: Plant[] = [
     keyTip: 'Κόψτε το φυτό κατά το 1/3 στα μέσα του καλοκαιριού και λιπάνετε — ξαναβγάζει πυκνή ανθοφορία μέσα σε 2-3 εβδομάδες.',
   },
   {
+    slug: 'kalimprachoi', name: 'Καλιμπραχόη', botanical: 'Calibrachoa × hybrida', family: 'Solanaceae',
+    category: 'anthofora', minTempC: 2, sun: 'Πλήρης ήλιος', water: 'Μέτριο', ph: '5.4-6.2',
+    potLitres: '4-8 L', sowMonths: [3, 4, 9], harvestMonths: [4, 5, 6, 7, 8, 9, 10], difficulty: 'Εύκολο',
+    commonProblem: 'Κιτρίνισμα των νεαρών φύλλων με πράσινες νευρώσεις — τροφοπενία σιδήρου, που εμφανίζεται μόλις το pH του υποστρώματος ξεπεράσει το 6.5.',
+    keyTip: 'Θέλει πιο όξινο υπόστρωμα από τις υπόλοιπες καλλωπιστικές και εβδομαδιαίο υγρό λίπασμα στο πότισμα. Δεν χρειάζεται αφαίρεση μαραμένων ανθέων, σε αντίθεση με την πετούνια.',
+    companions: ['Πετούνια', 'Λεβάντα'],
+  },
+  {
     slug: 'triantafyllia', name: 'Τριανταφυλλιά', botanical: 'Rosa spp.', family: 'Rosaceae',
     category: 'anthofora', minTempC: -15, sun: 'Πλήρης ήλιος', water: 'Μέτριο', ph: '6.0-6.8',
     potLitres: '30-40 L', sowMonths: [11, 12, 1, 2], harvestMonths: [4, 5, 6, 9, 10], difficulty: 'Μέτριο',
@@ -406,6 +414,13 @@ export const PLANTS: Plant[] = [
     potLitres: '15-30 L', sowMonths: [3, 4, 5, 6], harvestMonths: [], difficulty: 'Εύκολο',
     commonProblem: 'Φύλλα χωρίς τις χαρακτηριστικές σχισμές — ένδειξη ανεπαρκούς φωτός, όχι ηλικίας.',
     keyTip: 'Θέλει έντονο έμμεσο φως και στήριγμα με βρύα για να βγάλει μεγάλα, σχισμένα φύλλα. Πότισμα μόνο όταν στεγνώσουν τα πρώτα 5 cm.',
+  },
+  {
+    slug: 'kaoutsoukodentro', name: 'Καουτσουκόδεντρο', botanical: 'Ficus elastica', family: 'Moraceae',
+    category: 'esoterikou', minTempC: 12, sun: 'Ήλιος / ημισκιά', water: 'Χαμηλό', ph: '6.0-6.5',
+    potLitres: '10-25 L', sowMonths: [4, 5, 6], harvestMonths: [], difficulty: 'Εύκολο',
+    commonProblem: 'Πτώση των κάτω φύλλων μετά από μετακίνηση ή υπερβολικό πότισμα — το φυτό αντιδρά στην αλλαγή φωτός και στο κορεσμένο χώμα, όχι σε έλλειψη νερού.',
+    keyTip: 'Αφήστε τα πρώτα 5 cm υποστρώματος να στεγνώσουν πριν ξαναποτίσετε και σκουπίζετε τα φύλλα με υγρό πανί — η σκόνη μειώνει αισθητά τη φωτοσύνθεση στα μεγάλα, δερματώδη φύλλα.',
   },
   {
     slug: 'zamioulkas', name: 'Ζαμιοκούλκας', botanical: 'Zamioculcas zamiifolia', family: 'Araceae',

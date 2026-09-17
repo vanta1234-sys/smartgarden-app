@@ -161,6 +161,11 @@ export const PLANT_INDEX: Array<{ slug: string; name: string; minTempC: number }
     "minTempC": 2
   },
   {
+    "slug": "kalimprachoi",
+    "name": "Καλιμπραχόη",
+    "minTempC": 2
+  },
+  {
     "slug": "triantafyllia",
     "name": "Τριανταφυλλιά",
     "minTempC": -15
@@ -249,6 +254,11 @@ export const PLANT_INDEX: Array<{ slug: string; name: string; minTempC: number }
     "slug": "monstera",
     "name": "Μονστέρα",
     "minTempC": 10
+  },
+  {
+    "slug": "kaoutsoukodentro",
+    "name": "Καουτσουκόδεντρο",
+    "minTempC": 12
   },
   {
     "slug": "zamioulkas",
