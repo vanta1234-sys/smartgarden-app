@@ -332,3 +332,55 @@ function sg_repair_article($a) {
     }
     return $a;
 }
+
+/**
+ * Which plants an article actually talks about. Mirrors src/utils/plantMentions.ts.
+ *
+ * The 57 /fyta pages are the thinnest thing in the sitemap and almost nothing links to
+ * them. An article about tomatoes should point at the tomato page.
+ */
+function sg_plant_stems($name) {
+    $out = array();
+    foreach (explode('/', $name) as $part) {
+        $f = sg_flatten_greek(trim($part));
+        // "Ντομάτα" must match "ντομάτας" and "ντομάτες", so a long name gives up its last
+        // letter. Short ones do not: "Λάχανο" shortened to "λαχαν" matches "λαχανικά",
+        // which is a different word, and "Ελιά" shortened matches half the dictionary.
+        if (mb_strlen($f, 'UTF-8') > 6) $f = mb_substr($f, 0, -1, 'UTF-8');
+        if (mb_strlen($f, 'UTF-8') >= 4) $out[] = $f;
+    }
+    return $out;
+}
+
+/**
+ * The stem has to be a whole word, give or take an ending.
+ *
+ * Starting a word is not enough on its own: without the leading check "παρακάτω" was an
+ * Αρακάς, "υδροδιαλυτό" a Ροδιά and "προκαλεί" a Ρόκα, which put those three links on all
+ * 71 articles — and without the trailing one, "λαχανόκηπος" was a Λάχανο. Greek inflection
+ * adds at most a few letters, so anything longer is a different word.
+ */
+function sg_first_mention($hay, $stem) {
+    $pattern = '/(?:^|[^\p{L}])' . preg_quote($stem, '/') . '\p{L}{0,3}(?![\p{L}])/u';
+    if (!preg_match($pattern, $hay, $m, PREG_OFFSET_CAPTURE)) return -1;
+    return $m[0][1];
+}
+
+function sg_plants_mentioned($text, $limit = 6) {
+    $hay = sg_flatten_greek((string) $text);
+    if ($hay === '') return array();
+    $plants = json_decode((string) @file_get_contents(__DIR__ . '/plants.json'), true) ?: array();
+
+    $found = array();
+    foreach ($plants as $p) {
+        $at = -1;
+        foreach (sg_plant_stems($p['name'] ?? '') as $stem) {
+            $i = sg_first_mention($hay, $stem);
+            if ($i >= 0 && ($at < 0 || $i < $at)) $at = $i;
+        }
+        if ($at >= 0) $found[] = array('slug' => $p['slug'], 'name' => $p['name'], 'at' => $at);
+    }
+    // Earliest mention first: the plant the article opens with is the one it is about.
+    usort($found, function ($a, $b) { return $a['at'] - $b['at']; });
+    return array_slice($found, 0, $limit);
+}

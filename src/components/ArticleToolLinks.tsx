@@ -1,31 +1,21 @@
 import React from 'react';
 import { Leaf, Snowflake, MessageCircleQuestion, ArrowUpRight } from 'lucide-react';
-import { PLANTS } from '../data/plantDatabase';
-
-/** Lowercase and strip Greek accents so "Ντομάτας" still matches "Ντομάτα". */
-function normalise(s: string): string {
-  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-}
+import { PLANT_INDEX } from '../data/plantIndex';
+import { plantsMentioned } from '../utils/plantMentions';
 
 /**
- * Finds plants the article is actually about, by matching a stem of each plant's name
- * against the title and summary. Stem matching catches inflected Greek forms
- * (ντομάτα / ντομάτας / ντομάτες) that an exact match would miss. Names shorter than
- * 5 characters are matched in full instead, since a 3-4 letter stem produces
- * false positives.
+ * This component used to carry its own plant matcher and import the full 42KB
+ * plantDatabase to do it — into the main bundle, for every visitor, to render three links.
+ * It now shares plantsMentioned with the server, so the links a crawler is served and the
+ * links a reader sees are the same ones, and it reads the 4KB generated index instead.
  */
-function matchPlants(title: string, summary: string) {
-  const haystack = normalise(title + ' ' + summary);
-  return PLANTS.filter((p) => {
-    const name = normalise(p.name.split(/[\s/(]/)[0]);
-    if (name.length < 5) return haystack.includes(name);
-    return haystack.includes(name.slice(0, Math.max(5, name.length - 1)));
-  }).slice(0, 3);
-}
+const MIN_TEMP = new Map(PLANT_INDEX.map((p) => [p.slug, p.minTempC]));
 
 interface ArticleToolLinksProps {
   title: string;
   summary: string;
+  /** The body as well, where there is one: most plants are named in it, not in the title. */
+  content?: string;
 }
 
 const go = (path: string) => (e: React.MouseEvent) => {
@@ -34,8 +24,8 @@ const go = (path: string) => (e: React.MouseEvent) => {
   window.location.reload();
 };
 
-export const ArticleToolLinks: React.FC<ArticleToolLinksProps> = ({ title, summary }) => {
-  const plants = matchPlants(title, summary);
+export const ArticleToolLinks: React.FC<ArticleToolLinksProps> = ({ title, summary, content = '' }) => {
+  const plants = plantsMentioned(`${title} ${summary} ${content}`, 4);
 
   return (
     <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-5 space-y-3">
@@ -55,7 +45,7 @@ export const ArticleToolLinks: React.FC<ArticleToolLinksProps> = ({ title, summa
               <Leaf className="w-3.5 h-3.5 text-lime-400 shrink-0" />
               <span>
                 <strong className="font-semibold">{p.name}</strong>
-                <span className="text-slate-500"> · αντέχει {p.minTempC}°C</span>
+                <span className="text-slate-500"> · αντέχει {MIN_TEMP.get(p.slug)}°C</span>
               </span>
             </span>
             <ArrowUpRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-emerald-400 shrink-0" />

@@ -172,6 +172,19 @@ if ($article) {
     $ssr .= $mdToHtml(sg_insert_real_photo($bodyMd, $realPhoto));
     $ssr .= '</article>';
 
+    // The plants this article discusses. The /fyta pages are the thinnest thing in the
+    // sitemap and almost nothing points at them; an article about tomatoes linking to the
+    // tomato page is a real link for a reader and the only inbound link most of them get.
+    $mentioned = sg_plants_mentioned($h1 . ' ' . $summaryFull . ' ' . $bodyMd);
+    if (count($mentioned)) {
+        $ssr .= '<nav><h2>Φυτά που αναφέρονται</h2><ul>';
+        foreach ($mentioned as $pl) {
+            $ssr .= '<li><a href="/fyta/' . sg_e(rawurlencode($pl['slug'])) . '">'
+                  . sg_e($pl['name']) . '</a></li>';
+        }
+        $ssr .= '</ul></nav>';
+    }
+
     // Related reading. Two jobs at once: it gives a crawler eight internal links out of
     // every article — which is how the other seventy get discovered and how link equity
     // moves around a flat site — and it gives a reader somewhere to go next, which is the

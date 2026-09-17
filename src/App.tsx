@@ -2347,7 +2347,11 @@ pause
                 url={typeof window !== 'undefined' ? `${window.location.origin}/article/${selectedArticle.slug}` : `https://smartgarden.gr/article/${selectedArticle.slug}`}
               />
 
-              <ArticleToolLinks title={selectedArticle.title.el} summary={selectedArticle.summary.el} />
+              <ArticleToolLinks
+                title={selectedArticle.title.el}
+                summary={selectedArticle.summary.el}
+                content={selectedArticle.content.el}
+              />
 
               <FaqAccordion faqs={getFaqsForArticle(selectedArticle)} />
 
