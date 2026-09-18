@@ -82,6 +82,57 @@ function sg_shorten($text, $max) {
 }
 
 /**
+ * One spoken line for a scene, never cut mid-thought.
+ *
+ * sg_shorten cut at a fixed 58 characters and appended an ellipsis. The key takeaways are
+ * 83-93 characters and each is a single sentence whose point lands after a colon or a dash,
+ * so 58 removed exactly the part worth hearing: "μεταβολισμό CAM: ανοίγει στομάτια…",
+ * "η διαπνοή πέφτει: το πότισμα πρέπει να…". The viewer was left with the setup and none of
+ * the answer, four times in a row.
+ *
+ * So: keep a whole sentence when one fits, otherwise fall back to the last clause boundary
+ * and finish with a full stop rather than an ellipsis — and never end on a word like "να"
+ * or "πρέπει", which promises something that is not coming.
+ */
+function sg_scene_line($text, $max) {
+    $t = trim(preg_replace('/\s+/u', ' ', (string) $text));
+    if ($t === '') return '';
+    if (mb_strlen($t, 'UTF-8') <= $max) return $t;
+
+    // A complete sentence that fits is always the best answer.
+    if (preg_match_all('/[.!;]/u', mb_substr($t, 0, $max, 'UTF-8'), $m, PREG_OFFSET_CAPTURE)) {
+        $last = end($m[0]);
+        $upto = mb_strlen(substr($t, 0, $last[1] + strlen($last[0])), 'UTF-8');
+        if ($upto >= $max * 0.5) return mb_substr($t, 0, $upto, 'UTF-8');
+    }
+
+    $cut = mb_substr($t, 0, $max, 'UTF-8');
+    // Clause boundaries, in order of how cleanly they close a thought.
+    foreach (array('—', '–', ':', ',') as $sep) {
+        $at = mb_strrpos($cut, $sep, 0, 'UTF-8');
+        if ($at !== false && $at >= $max * 0.5) { $cut = mb_substr($cut, 0, $at, 'UTF-8'); break; }
+    }
+    if (mb_strlen($cut, 'UTF-8') === $max) {
+        $sp = mb_strrpos($cut, ' ', 0, 'UTF-8');
+        if ($sp !== false && $sp >= $max * 0.5) $cut = mb_substr($cut, 0, $sp, 'UTF-8');
+    }
+
+    // Words that only make sense with what follows them.
+    $dangling = array('να', 'θα', 'και', 'σε', 'με', 'για', 'από', 'πρέπει', 'μπορεί', 'το',
+                      'τη', 'την', 'τον', 'τα', 'του', 'της', 'των', 'ή', 'που', 'ως', 'στο', 'στη');
+    for ($i = 0; $i < 3; $i++) {
+        $cut = preg_replace('/[\s,·;:\-—–]+$/u', '', $cut);
+        $sp = mb_strrpos($cut, ' ', 0, 'UTF-8');
+        if ($sp === false) break;
+        $lastWord = mb_strtolower(mb_substr($cut, $sp + 1, null, 'UTF-8'), 'UTF-8');
+        if (!in_array($lastWord, $dangling, true)) break;
+        $cut = mb_substr($cut, 0, $sp, 'UTF-8');
+    }
+    $cut = preg_replace('/[\s,·;:\-—–]+$/u', '', $cut);
+    return $cut === '' ? mb_substr($t, 0, $max, 'UTF-8') : $cut . '.';
+}
+
+/**
  * Lay spoken words out into centred lines and hand back a box for each one.
  *
  * Positions come from the same FreeType metrics GD draws with, so a word measured here
@@ -219,7 +270,7 @@ function sg_build_script($article) {
             // Greek TTS runs at roughly 17 characters a second, so these caps are really
             // duration caps. The whole video targets ~20s: past that, watch-through on a
             // Short falls off a cliff and the payoff never gets seen.
-            'voiceover' => sg_shorten($summary, 58),
+            'voiceover' => sg_scene_line($summary, 95),
             'onScreenText' => $angle['problemText'],
             'step' => 0,
         ),
@@ -232,10 +283,10 @@ function sg_build_script($article) {
             'tag' => 'ΒΗΜΑ ' . ($i + 1),
             // No spoken "Πρώτον/Δεύτερον" any more: the numbered badge on screen already
             // says which step this is, and the word cost most of a second each time.
-            'voiceover' => sg_shorten($bullet, 58),
+            'voiceover' => sg_scene_line($bullet, 95),
             // Generous, because the renderer wraps to four lines and shrinks the type to fit.
             // Cutting at 95 chars put an ellipsis in the middle of most takeaways.
-            'onScreenText' => sg_shorten($bullet, 95),
+            'onScreenText' => sg_scene_line($bullet, 95),
             'step' => $i + 1,
         );
     }
@@ -373,6 +424,10 @@ function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
             // all, it is a photograph of this plant taken in a real garden, which is worth
             // more than a closer keyword count on a stock image.
             if (!empty($p['own'])) $s += 20;
+            // Effectively one use per photo. Softening this to -8 looked reasonable and was
+            // measurably worse: the highest-scoring photo then won every scene, and the
+            // pepper guide went from four of our own photographs to the same stock chilli
+            // six times. Forcing variety is what surfaces the second and third best match.
             if (isset($used[$p['url']])) $s -= 100;
             if ($s > $bestScore) { $bestScore = $s; $bestUrl = $p['url']; }
         }
