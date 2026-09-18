@@ -482,11 +482,36 @@ function sg_publish($job, $dir, $jobId) {
     $article = $job['article'];
     $result = array();
 
+    // Public, but only for a render that looks like the ones we have watched.
+    //
+    // Uploads were private and waiting on a person because on 2026-09-12 a broken
+    // 9-minute render with dead air went public. That render would have failed every one
+    // of these checks, and a video nobody can see earns nothing: the one public Short on
+    // this channel has 277 views, the private ones have zero between them.
+    $checks = array();
+    $checks['διάρκεια'] = ($duration >= 15 && $duration <= 60);
+    $checks['μέγεθος'] = (@filesize($final) > 1000000);
+    $checks['σκηνές'] = (count($script['scenes']) >= 4);
+    $failed = array_keys(array_filter($checks, function ($ok) { return !$ok; }));
+    $visibility = count($failed) ? 'private' : 'public';
+    sg_log($dir, 'visibility: ' . $visibility . (count($failed) ? ' (απέτυχε: ' . implode(', ', $failed) . ')' : ''));
+
+    if (count($failed)) {
+        require_once __DIR__ . '/notify.php';
+        sg_notify_failure('Το βίντεο ανέβηκε private — δεν πέρασε τους ελέγχους', array(
+            'Job: ' . $jobId,
+            'Απέτυχε: ' . implode(', ', $failed),
+            'Διάρκεια: ' . $duration . 's',
+            'Δες το στο YouTube Studio πριν το κάνεις public.',
+        ));
+    }
+
     $yt = sg_post_json('https://smartgarden.gr/youtube-publish.php', array(
         'job' => $jobId,
         'key' => $key,
         'title' => $script['youtubeTitle'],
         'description' => $script['youtubeDescription'],
+        'privacyStatus' => $visibility,
     ));
     $result['youtube'] = array(
         'ok' => !empty($yt['body']['success']),

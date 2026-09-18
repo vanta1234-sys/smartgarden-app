@@ -115,6 +115,10 @@ if (stripos($title . $description, '#shorts') === false) {
     $description = trim($description . "\n\n#Shorts #Κηπουρική #SmartGarden");
 }
 
+$privacyStatus = isset($body['privacyStatus']) && in_array($body['privacyStatus'], array('private', 'unlisted', 'public'), true)
+    ? $body['privacyStatus']
+    : 'private';
+
 $metadata = json_encode([
     'snippet' => [
         'title' => mb_substr($title, 0, 100),
@@ -123,13 +127,12 @@ $metadata = json_encode([
         'categoryId' => '26', // Howto & Style
     ],
     'status' => [
-        // Uploads default to private until a human reviews and promotes them (2026-09-12,
-        // after a broken 9-minute render with dead air went public and was seen before
-        // anyone caught it — see tiktok_integration memory). Flip to 'public' in YouTube
-        // Studio once you've actually watched it. The stored OAuth token only has upload
-        // scope (no videos.update/delete), so this can't be changed back to public from
-        // here either — that's also a manual Studio step, same as this was.
-        'privacyStatus' => 'private',
+        // Private unless the caller says otherwise. The default exists because on
+        // 2026-09-12 a broken 9-minute render with dead air went public and was seen before
+        // anyone caught it; the worker now only asks for 'public' when the render passes
+        // the checks that would have caught that one. The stored OAuth token has upload
+        // scope only, so a video already up can be changed only in Studio.
+        'privacyStatus' => $privacyStatus,
         'selfDeclaredMadeForKids' => false,
     ],
 ], JSON_UNESCAPED_UNICODE);

@@ -636,6 +636,28 @@ function sg_render_overlay($scene, $dest) {
     // that crowds the bottom fifth of the screen.
     $hookY = 920 - (int) ((count($hookLines) - 1) * $lineHeight / 2);
 
+    // A panel behind the spoken words.
+    //
+    // In word mode ffmpeg draws each word as it is said, over whatever the photograph
+    // happens to be — white letters with a black outline, floating. The one video on this
+    // channel that has actually been watched puts its text on a dark block instead, and it
+    // reads far better at thumbnail size. The words still arrive one at a time; they just
+    // land on something now.
+    if ($wordMode) {
+        // Generous enough for the four lines the layout can produce, centred on the same
+        // band (~900px) the static headline uses.
+        $panelTop = 742;
+        $panelBottom = 1024;
+        $pad = 28;
+        for ($y = $panelTop; $y <= $panelBottom; $y++) {
+            // Soft top and bottom edges, flat through the middle: a hard rectangle edge on
+            // a photograph looks like a mistake.
+            $edge = min($y - $panelTop, $panelBottom - $y);
+            $opacity = $edge < $pad ? 0.62 * ($edge / $pad) : 0.62;
+            imageline($img, 0, $y, SG_W, $y, imagecolorallocatealpha($img, 0, 0, 0, (int) round(127 - $opacity * 127)));
+        }
+    }
+
     if ($step > 0) {
         $badgeR = 46;
         $badgeY = $hookY - $lineHeight - 50;
