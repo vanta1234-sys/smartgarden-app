@@ -165,10 +165,16 @@ curl_close($uploadCh);
 $result = json_decode($uploadResponse, true);
 
 if ($httpCode >= 200 && $httpCode < 300 && !empty($result['id'])) {
+    // What we asked for vs. what YouTube actually stored — these can differ (a channel
+    // restriction, an audience-setting rule, a moderation hold) and the insert call still
+    // returns 200 with an id either way. Reporting both is what lets a caller notice a
+    // 'public' request that silently landed as 'private' instead of assuming it worked.
     echo json_encode([
         'success' => true,
         'videoId' => $result['id'],
         'url' => 'https://youtube.com/shorts/' . $result['id'],
+        'privacyStatusRequested' => $privacyStatus,
+        'privacyStatusActual' => $result['status']['privacyStatus'] ?? null,
     ]);
 } else {
     // Same reason as above — a 5xx here gets swallowed by Cloudflare and the actual

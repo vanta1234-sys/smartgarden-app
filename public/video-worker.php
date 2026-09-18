@@ -520,6 +520,23 @@ function sg_publish($job, $dir, $jobId) {
     );
     sg_log($dir, 'youtube: ' . json_encode($result['youtube'], JSON_UNESCAPED_UNICODE));
 
+    // A 'public' request that YouTube quietly stored as something else is the exact
+    // failure mode the visibility gate above was built to prevent — a good render that
+    // nobody can see, only this time silent instead of loud. It has to be checked here:
+    // youtube-publish.php's own 200/success response does not mean the request was honoured.
+    $ytActual = $yt['body']['privacyStatusActual'] ?? null;
+    if ($result['youtube']['ok'] && $visibility === 'public' && $ytActual && $ytActual !== 'public') {
+        sg_log($dir, 'privacy mismatch: asked public, YouTube stored ' . $ytActual);
+        require_once __DIR__ . '/notify.php';
+        sg_notify_failure('Το βίντεο ζητήθηκε public αλλά η YouTube το κράτησε ' . $ytActual, array(
+            'Job: ' . $jobId,
+            'Video ID: ' . $result['youtube']['videoId'],
+            'Πέρασε όλους τους ελέγχους ποιότητας — δεν είναι θέμα του render.',
+            'Πιθανός λόγος: περιορισμός καναλιού/λογαριασμού, όχι bug στο script.',
+            'Δες το στο YouTube Studio.',
+        ));
+    }
+
     $tt = sg_post_json('https://smartgarden.gr/tiktok-publish.php', array(
         'videoUrl' => 'https://smartgarden.gr/video-render.php?action=file&job=' . $jobId . '&key=' . rawurlencode($key),
         'caption' => $script['tiktokCaption'],
