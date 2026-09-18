@@ -358,8 +358,15 @@ function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
             // Our own photographs are chosen per article, not per sentence, so they are
             // scored against the article's subject as well: a video about peppers should
             // use our photograph of a pepper even in a scene that does not repeat the word.
-            $against = !empty($p['own']) ? ($text . ' ' . $articleTitle) : $text;
-            $s = sg_match_score($against, $p['keywords']);
+            $s = sg_match_score($text, $p['keywords']);
+
+            // A photo that agrees with what the article is about counts for more than one
+            // that merely shares a word with the sentence. Without this, a scene explaining
+            // that a ZZ plant stores water matched an irrigation photo on "πότισμα" and
+            // showed a field of rocket being hosed in a video about houseplants.
+            $subjectScore = sg_match_score($articleTitle . ' ' . $category, $p['keywords']);
+            $s += $subjectScore * 2;
+
             if ($s <= 0) continue;
             // Our own photographs carry one or two keywords where a stock entry carries
             // eight, so on raw score they lost every time. When ours matches the scene at
@@ -379,6 +386,11 @@ function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
         // known to match this subject, because every article is given one deliberately. A
         // field of rocket on a scene about a ZZ plant is worse than seeing the lead photo
         // twice — and that is exactly what the generic pool produced.
+        // An incidental one-word match on a subject the catalogue does not cover is how a
+        // houseplant video ends up in a vegetable field. Below that bar, the article's own
+        // photo — the one image chosen for this subject on purpose — wins.
+        if ($bestUrl !== null && $bestScore < 10 && $articleImage && $i > 1) $bestUrl = $articleImage;
+
         if ($bestUrl === null && $articleImage && $i > 1) $bestUrl = $articleImage;
 
         if ($bestUrl === null) {

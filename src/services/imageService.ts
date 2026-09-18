@@ -10,6 +10,38 @@ export interface CuratedPhoto {
 
 export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
   // ──────────────────────────────────────────
+  // 🪴 INDOOR PLANTS (ΦΥΤΑ ΕΣΩΤΕΡΙΚΟΥ)
+  //
+  // Added 2026-09-18 after watching a video about low-light houseplants: the catalogue had
+  // no keyword for σανσεβιέρια, ζαμιοκούλκας, πόθος or χαμηλό φως, so every scene fell
+  // through to the outdoor pool and a scene about a ZZ plant showed a field of rocket
+  // being hosed. Each URL below was downloaded and looked at, not checked for HTTP 200.
+  // ──────────────────────────────────────────
+  {
+    url: "https://images.unsplash.com/photo-1737043851462-be1020f20a9b?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["σανσεβιερια", "ζαμιοκουλκας", "φυτα εσωτερικου", "εσωτερικου χωρου", "χαμηλο φως", "σκιερο", "sansevieria", "zamioculcas"],
+    category: "plant_care",
+    alt: "Snake plant in a woven basket beside an armchair in a living room"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["μονστερα", "ficus", "φυτα εσωτερικου", "εσωτερικου χωρου", "γλαστρα εσωτερικου", "monstera"],
+    category: "plant_care",
+    alt: "Monstera deliciosa in a white pot held in both hands"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["παχυφυτα", "παχυφυτο", "αλοη", "κακτος", "κακτοι", "succulent", "aloe"],
+    category: "plant_care",
+    alt: "Aloe-type succulent with white-spotted leaves in a pale pot"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1759496330246-c2f8d23ae83d?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["αλεξανδρινο", "χριστουγεννιατικα", "poinsettia", "κυκλαμινο", "εορταστικα φυτα"],
+    category: "plant_care",
+    alt: "Poinsettias in terracotta pots in a festive interior"
+  },
+  // ──────────────────────────────────────────
   // 🍅 VEGETABLES & FRUITS (ΛΑΧΑΝΑ & ΦΡΟΥΤΑ)
   // ──────────────────────────────────────────
   {
