@@ -11,9 +11,6 @@
  *   inline: define SG_JOB_DIR, then require this file.
  */
 
-require_once __DIR__ . '/video-lib.php';
-require_once __DIR__ . '/notify.php';
-
 if (!defined('SG_JOB_DIR')) {
     if (PHP_SAPI !== 'cli' || !isset($argv[1])) {
         fwrite(STDERR, "Usage: php video-worker.php <job-dir>\n");
@@ -22,8 +19,19 @@ if (!defined('SG_JOB_DIR')) {
     define('SG_JOB_DIR', $argv[1]);
 }
 
+// The frame size is a constant in video-lib.php, so the job has to be peeked at before that
+// file is parsed. Reading it twice costs nothing and keeps the mode in one place.
+$sgPeek = @json_decode((string) @file_get_contents(SG_JOB_DIR . '/job.json'), true);
+$GLOBALS['SG_VIDEO_MODE'] = (is_array($sgPeek) && ($sgPeek['mode'] ?? '') === 'long') ? 'long' : 'short';
+
+require_once __DIR__ . '/video-lib.php';
+require_once __DIR__ . '/notify.php';
+
 @set_time_limit(0);
-@ini_set('memory_limit', '512M');
+// A long-form episode holds forty scene files and a concat list rather than six. The bytes
+// stay on disk, not in PHP, but the headroom costs nothing on a run that already spawns
+// ffmpeg forty times.
+@ini_set('memory_limit', SG_LONG ? '768M' : '512M');
 
 sg_run_job(SG_JOB_DIR);
 
@@ -132,16 +140,18 @@ function sg_run_job($dir) {
         $photoUrl = isset($images[$i]) ? $images[$i] : '';
         $bg = $base . '_bg.jpg';
         $haveBg = false;
-        // 1296x2304 is 1.2x the final frame, and that 20% margin is exactly the room the
-        // crop window has to travel through: 216px across, 384px down.
+        // 1.2x the final frame in both directions, and that 20% margin is exactly the room
+        // the crop window has to travel through as the camera drifts.
+        $srcW = (int) round(SG_W * 1.2);
+        $srcH = (int) round(SG_H * 1.2);
         if ($photoUrl && sg_fetch_to_file($photoUrl, $photoTmp, 45)) {
-            $haveBg = sg_render_background($photoTmp, $bg, 1296, 2304);
+            $haveBg = sg_render_background($photoTmp, $bg, $srcW, $srcH);
             @unlink($photoTmp);
         }
         if (!$haveBg) {
             sg_log($dir, 'scene ' . $i . ': photo failed (' . $photoUrl . '), using plain background');
-            $canvas = imagecreatetruecolor(1296, 2304);
-            imagefilledrectangle($canvas, 0, 0, 1296, 2304, imagecolorallocate($canvas, 6, 45, 34));
+            $canvas = imagecreatetruecolor($srcW, $srcH);
+            imagefilledrectangle($canvas, 0, 0, $srcW, $srcH, imagecolorallocate($canvas, 6, 45, 34));
             imagejpeg($canvas, $bg, 92);
             imagedestroy($canvas);
         }
@@ -155,7 +165,9 @@ function sg_run_job($dir) {
 
         // The CTA keeps its static caption: its narration says "Σμαρτ Γκάρντεν" phonetically
         // so the voice gets the brand right, and those words must never reach the screen.
-        $useWords = count($sceneWords) > 0 && empty($scene['captionDisplay']);
+        // Never in long form: forty scenes of per-word drawtext is a filter graph with
+        // thousands of entries, on the host that OOM-kills ffmpeg for far less.
+        $useWords = !SG_LONG && count($sceneWords) > 0 && empty($scene['captionDisplay']);
         $scene['wordMode'] = $useWords;
 
         // --- text overlay -----------------------------------------------------
@@ -175,7 +187,13 @@ function sg_run_job($dir) {
         } else {
             // Tail padding trimmed from 0.4s to 0.22s and the ceiling from 15s to 6s: six
             // scenes at 0.4s of dead air each was nearly 2.5s of the budget doing nothing.
-            $sceneDur = min(6.0, max(1.6, $audioDur + 0.22));
+            //
+            // The 6s ceiling is a Shorts rule and would be a bug in long form, where a
+            // scene carries a 420-character paragraph — about 25 seconds of speech. Capping
+            // it there would cut the narration off mid-sentence forty times over.
+            $cap = SG_LONG ? 40.0 : 6.0;
+            $tail = SG_LONG ? 0.45 : 0.22;
+            $sceneDur = min($cap, max(1.6, $audioDur + $tail));
         }
         sg_log($dir, 'scene ' . $i . ': engine=' . ($engine ?: 'none') . ' audio=' . round($audioDur, 2) . 's dur=' . round($sceneDur, 2) . 's');
 
@@ -261,8 +279,8 @@ function sg_run_job($dir) {
             $rise = "'18-18*min(t/" . sprintf('%.2f', $fadeT) . "\,1)'";
 
             $pic = $moving
-                ? "[0:v]crop=1080:1920:x='" . $x . "':y='" . $y . "',fps=30"
-                : '[0:v]crop=1080:1920,fps=30';
+                ? '[0:v]crop=' . SG_W . ':' . SG_H . ":x='" . $x . "':y='" . $y . "',fps=30"
+                : '[0:v]crop=' . SG_W . ':' . SG_H . ',fps=30';
             $pic .= ',fade=t=in:st=0:d=' . sprintf('%.2f', $fadeV)
                   . ',fade=t=out:st=' . sprintf('%.2f', $outV) . ':d=' . sprintf('%.2f', $fadeV) . '[kb]';
 
@@ -489,9 +507,14 @@ function sg_publish($job, $dir, $jobId) {
     // of these checks, and a video nobody can see earns nothing: the one public Short on
     // this channel has 277 views, the private ones have zero between them.
     $checks = array();
-    $checks['διάρκεια'] = ($duration >= 15 && $duration <= 60);
-    $checks['μέγεθος'] = (@filesize($final) > 1000000);
-    $checks['σκηνές'] = (count($script['scenes']) >= 4);
+    // A long-form episode is judged by a different ruler. Under three minutes YouTube may
+    // still file a video as a Short, which would put it back in the pool this format exists
+    // to leave — so that, not sixty seconds, is the floor here.
+    $checks['διάρκεια'] = SG_LONG
+        ? ($duration >= 180 && $duration <= 3600)
+        : ($duration >= 15 && $duration <= 60);
+    $checks['μέγεθος'] = (@filesize($final) > (SG_LONG ? 8000000 : 1000000));
+    $checks['σκηνές'] = (count($script['scenes']) >= (SG_LONG ? 10 : 4));
     $failed = array_keys(array_filter($checks, function ($ok) { return !$ok; }));
     $visibility = count($failed) ? 'private' : 'public';
     sg_log($dir, 'visibility: ' . $visibility . (count($failed) ? ' (απέτυχε: ' . implode(', ', $failed) . ')' : ''));
@@ -512,6 +535,10 @@ function sg_publish($job, $dir, $jobId) {
         'title' => $script['youtubeTitle'],
         'description' => $script['youtubeDescription'],
         'privacyStatus' => $visibility,
+        // Without this the uploader appends #Shorts to every description, which is exactly
+        // the wrong instruction for a twelve-minute video: the whole point of the format is
+        // to earn watch hours rather than Shorts views.
+        'isShort' => !SG_LONG,
     ));
     $result['youtube'] = array(
         'ok' => !empty($yt['body']['success']),
@@ -537,17 +564,25 @@ function sg_publish($job, $dir, $jobId) {
         ));
     }
 
-    $tt = sg_post_json('https://smartgarden.gr/tiktok-publish.php', array(
-        'videoUrl' => 'https://smartgarden.gr/video-render.php?action=file&job=' . $jobId . '&key=' . rawurlencode($key),
-        'caption' => $script['tiktokCaption'],
-        'title' => $script['youtubeTitle'],
-        'articleId' => $article['id'],
-    ));
-    $result['tiktok'] = array(
-        'ok' => !empty($tt['body']['success']),
-        'error' => isset($tt['body']['error']) ? $tt['body']['error'] : null,
-    );
-    sg_log($dir, 'tiktok: ' . json_encode($result['tiktok'], JSON_UNESCAPED_UNICODE));
+    // TikTok gets Shorts only. A twelve-minute landscape episode is the wrong shape for the
+    // platform, and Greece is not in the Creator Rewards Program's country list anyway, so
+    // there is nothing there for a long video to earn.
+    if (SG_LONG) {
+        $result['tiktok'] = array('ok' => false, 'error' => 'Παραλείπεται στα μεγάλα βίντεο');
+        sg_log($dir, 'tiktok: skipped (long form)');
+    } else {
+        $tt = sg_post_json('https://smartgarden.gr/tiktok-publish.php', array(
+            'videoUrl' => 'https://smartgarden.gr/video-render.php?action=file&job=' . $jobId . '&key=' . rawurlencode($key),
+            'caption' => $script['tiktokCaption'],
+            'title' => $script['youtubeTitle'],
+            'articleId' => $article['id'],
+        ));
+        $result['tiktok'] = array(
+            'ok' => !empty($tt['body']['success']),
+            'error' => isset($tt['body']['error']) ? $tt['body']['error'] : null,
+        );
+        sg_log($dir, 'tiktok: ' . json_encode($result['tiktok'], JSON_UNESCAPED_UNICODE));
+    }
 
     // Only YouTube is alerted on. TikTok has been failing on purpose since its production
     // app is still in review, and an alert that fires every single day is one nobody reads.

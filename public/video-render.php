@@ -308,25 +308,72 @@ if (!empty($_GET['articleId'])) {
 }
 if (!$article) sg_err('Article not found');
 
-$script = sg_build_script($article);
+// &mode=long renders the whole article as a landscape episode instead of a vertical Short.
+// Two different products from one article: the Short is a trailer, this is the thing it is
+// a trailer for, and only one of them earns watch hours.
+$mode = (isset($_GET['mode']) && $_GET['mode'] === 'long') ? 'long' : 'short';
+
+// The frame size is a constant inside video-lib.php, which indexing-lib may already have
+// loaded at 'short'. Refuse rather than silently render a long script into a 1080x1920
+// frame — the worker sets the mode itself and is the only thing that renders.
+if ($mode === 'long' && defined('SG_W') && SG_W !== 1920) {
+    // Not an error condition in practice: this endpoint only builds the job file, and the
+    // detached worker re-reads it with the right mode. Recorded so the log says as much.
+    $modeNote = 'script built under short-mode constants; worker re-renders at 1920x1080';
+}
+
+$script = $mode === 'long' ? sg_build_long_script($article) : sg_build_script($article);
 
 // Per-scene photos, matched to what each scene actually says.
 $sceneTexts = array();
 foreach ($script['scenes'] as $s) {
     $sceneTexts[] = trim(($s['onScreenText'] ?? '') . ' ' . ($s['voiceover'] ?? '') . ' ' . ($s['tag'] ?? ''));
 }
-$sceneImages = sg_scene_images(
-    $sceneTexts,
-    $article['image'] ?? '',
-    is_array($article['title'] ?? null) ? ($article['title']['el'] ?? '') : (string) ($article['title'] ?? ''),
-    (string) ($article['category'] ?? '')
-);
+$articleTitleEl = is_array($article['title'] ?? null) ? ($article['title']['el'] ?? '') : (string) ($article['title'] ?? '');
+$sceneImages = $mode === 'long'
+    ? sg_scene_images_long($sceneTexts, $article['image'] ?? '', $articleTitleEl, (string) ($article['category'] ?? ''))
+    : sg_scene_images($sceneTexts, $article['image'] ?? '', $articleTitleEl, (string) ($article['category'] ?? ''));
+
+// &dry=1 returns the script and the chosen photos without creating a job or spawning the
+// worker. A long-form render costs twenty minutes of CPU; being able to read the narration
+// it would speak, first, is worth the twelve lines.
+if (isset($_GET['dry'])) {
+    $spoken = 0;
+    $preview = array();
+    foreach ($script['scenes'] as $i => $s) {
+        $spoken += mb_strlen((string) $s['voiceover'], 'UTF-8');
+        $preview[] = array(
+            'tag' => $s['tag'],
+            'onScreen' => $s['onScreenText'],
+            'chars' => mb_strlen((string) $s['voiceover'], 'UTF-8'),
+            'voiceover' => mb_substr((string) $s['voiceover'], 0, 110, 'UTF-8'),
+            'photo' => isset($sceneImages[$i]) ? basename(parse_url($sceneImages[$i], PHP_URL_PATH)) : '',
+        );
+    }
+    sg_out(array(
+        'success' => true,
+        'dryRun' => true,
+        'mode' => $mode,
+        'article' => $article['slug'] ?? '',
+        'frame' => SG_W . 'x' . SG_H,
+        'scenes' => count($script['scenes']),
+        'spokenChars' => $spoken,
+        // Greek TTS runs at roughly 17 characters a second.
+        'estimatedSeconds' => (int) round($spoken / 17),
+        'distinctPhotos' => count(array_unique($sceneImages)),
+        'youtubeTitle' => $script['youtubeTitle'],
+        'preview' => $preview,
+    ));
+}
 
 $jobId = date('Ymd-His') . '-' . substr(preg_replace('/[^a-z0-9]/', '', strtolower($article['slug'] ?? 'job')), 0, 24);
 $dir = $JOBS_ROOT . '/' . $jobId;
 if (!is_dir($dir) && !@mkdir($dir, 0755, true)) sg_err('Could not create job dir: ' . $dir);
 
 $jobJson = json_encode(array(
+    // Read by the worker before it loads video-lib.php, because the frame size is a
+    // constant and has to be settled before that file is parsed.
+    'mode' => $mode,
     'article' => array(
         'id' => $article['id'] ?? '',
         'slug' => $article['slug'] ?? '',
@@ -357,6 +404,7 @@ file_put_contents($dir . '/status.json', json_encode(array(
 $response = array(
     'success' => true,
     'job' => $jobId,
+    'mode' => $mode,
     'article' => $article['slug'] ?? '',
     'scenes' => count($script['scenes']),
     'sceneImages' => $sceneImages,

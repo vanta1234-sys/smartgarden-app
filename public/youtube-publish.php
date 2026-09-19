@@ -5,7 +5,9 @@
  * POST JSON: { videoBase64: "data:video/mp4;base64,...", title, description }
  */
 header('Content-Type: application/json; charset=utf-8');
-set_time_limit(120);
+// A Short is 8-15MB and uploads in seconds. A twelve-minute episode is 100-200MB and needs
+// both the time and, further down, a transfer that never holds the file in memory.
+set_time_limit(900);
 
 $clientId = getenv('YOUTUBE_CLIENT_ID') ?: '';
 $clientSecret = getenv('YOUTUBE_CLIENT_SECRET') ?: '';
@@ -64,6 +66,9 @@ $description = trim($body['description'] ?? '');
 
 $videoBinary = null;
 $videoMimeType = 'video/mp4';
+// Set instead of $videoBinary when the source is a rendered job on disk and large enough
+// that reading it into a string would be reckless. Streamed straight off disk further down.
+$videoPath = null;
 
 // Two ways in. The browser posts the recording inline as base64; the server-side
 // renderer just names the render job it produced, because base64-ing a 15MB mp4 into a
@@ -85,7 +90,14 @@ if ($jobId !== '') {
         echo json_encode(['success' => false, 'error' => 'No rendered video for job ' . $jobId]);
         exit;
     }
-    $videoBinary = file_get_contents($videoPath);
+    // Under 20MB — every Short — keeps the multipart path that has been uploading fine all
+    // along. Above it, the file is left on disk and streamed, because a 200MB episode read
+    // into a string and then concatenated into a multipart body needs 400MB of PHP memory
+    // to say something curl could have read a block at a time.
+    if (filesize($videoPath) <= 20 * 1024 * 1024) {
+        $videoBinary = file_get_contents($videoPath);
+        $videoPath = null;
+    }
 } else {
     $videoDataUri = $body['videoBase64'] ?? '';
     if (!$videoDataUri || strpos($videoDataUri, 'base64,') === false) {
@@ -103,15 +115,18 @@ if ($jobId !== '') {
     $videoBinary = base64_decode($base64Data);
 }
 
-if ($videoBinary === false || strlen((string) $videoBinary) < 1000) {
+if ($videoPath === null && ($videoBinary === false || strlen((string) $videoBinary) < 1000)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Decoded video data looks invalid/too small']);
     exit;
 }
 
 // #Shorts in the title/description is what routes a vertical <=60s upload into
-// the Shorts shelf instead of regular long-form video.
-if (stripos($title . $description, '#shorts') === false) {
+// the Shorts shelf instead of regular long-form video — so it is exactly the wrong tag on
+// a long-form episode, whose whole purpose is to earn watch hours rather than Shorts views.
+// Callers that don't say are treated as Shorts, which is what every existing caller is.
+$isShort = !array_key_exists('isShort', (array) $body) || !empty($body['isShort']);
+if ($isShort && stripos($title . $description, '#shorts') === false) {
     $description = trim($description . "\n\n#Shorts #Κηπουρική #SmartGarden");
 }
 
@@ -136,6 +151,100 @@ $metadata = json_encode([
         'selfDeclaredMadeForKids' => false,
     ],
 ], JSON_UNESCAPED_UNICODE);
+
+// ---------------------------------------------------------------------------
+// Large file: resumable upload, streamed off disk.
+//
+// Google's resumable protocol is two calls — post the metadata, get back a URL, then PUT
+// the bytes at it. The PUT reads from a file handle, so a 200MB episode never exists as a
+// PHP string. The multipart path below stays exactly as it was for Shorts.
+// ---------------------------------------------------------------------------
+if ($videoPath !== null) {
+    $size = filesize($videoPath);
+
+    $initCh = curl_init('https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status');
+    curl_setopt_array($initCh, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HEADER => true,
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: application/json; charset=UTF-8',
+            'X-Upload-Content-Length: ' . $size,
+            'X-Upload-Content-Type: ' . $videoMimeType,
+        ],
+        CURLOPT_POSTFIELDS => $metadata,
+        CURLOPT_TIMEOUT => 60,
+    ]);
+    $initRaw = (string) curl_exec($initCh);
+    $initCode = curl_getinfo($initCh, CURLINFO_HTTP_CODE);
+    $headerLen = curl_getinfo($initCh, CURLINFO_HEADER_SIZE);
+    curl_close($initCh);
+
+    $uploadUrl = '';
+    if (preg_match('/^location:\s*(\S+)/mi', substr($initRaw, 0, $headerLen), $m)) $uploadUrl = trim($m[1]);
+
+    if ($initCode < 200 || $initCode >= 300 || $uploadUrl === '') {
+        http_response_code(200);
+        echo json_encode([
+            'success' => false,
+            'error' => 'YouTube resumable init failed',
+            'httpCode' => $initCode,
+            'detail' => substr($initRaw, $headerLen, 2000),
+        ]);
+        exit;
+    }
+
+    $fh = fopen($videoPath, 'rb');
+    if (!$fh) {
+        http_response_code(200);
+        echo json_encode(['success' => false, 'error' => 'Could not open rendered video for upload']);
+        exit;
+    }
+
+    $putCh = curl_init($uploadUrl);
+    curl_setopt_array($putCh, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_UPLOAD => true,
+        CURLOPT_INFILE => $fh,
+        CURLOPT_INFILESIZE => $size,
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: ' . $videoMimeType,
+        ],
+        // Generous, and paired with set_time_limit above: this is 200MB out of a shared
+        // host, and a stall here means a render that already cost twenty minutes is lost.
+        CURLOPT_TIMEOUT => 840,
+    ]);
+    $putRaw = (string) curl_exec($putCh);
+    $putCode = curl_getinfo($putCh, CURLINFO_HTTP_CODE);
+    $putErr = curl_error($putCh);
+    curl_close($putCh);
+    fclose($fh);
+
+    $putResult = json_decode($putRaw, true);
+    if ($putCode >= 200 && $putCode < 300 && !empty($putResult['id'])) {
+        echo json_encode([
+            'success' => true,
+            'videoId' => $putResult['id'],
+            'url' => 'https://youtube.com/watch?v=' . $putResult['id'],
+            'bytes' => $size,
+            'resumable' => true,
+            'privacyStatusRequested' => $privacyStatus,
+            'privacyStatusActual' => $putResult['status']['privacyStatus'] ?? null,
+        ]);
+    } else {
+        http_response_code(200);
+        echo json_encode([
+            'success' => false,
+            'error' => 'YouTube resumable upload failed',
+            'httpCode' => $putCode,
+            'curl' => $putErr,
+            'detail' => substr($putRaw, 0, 2000),
+        ]);
+    }
+    exit;
+}
 
 $boundary = 'smartgarden-' . bin2hex(random_bytes(8));
 $multipartBody = "--{$boundary}\r\n"

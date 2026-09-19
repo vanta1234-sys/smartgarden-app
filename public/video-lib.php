@@ -11,8 +11,19 @@
  * a photo added on the TypeScript side can't silently go missing on the PHP side.
  */
 
-define('SG_W', 1080);
-define('SG_H', 1920);
+// Two shapes, one pipeline. A Short is the vertical 1080x1920 this file was written for;
+// a long-form episode is 1920x1080, because it is watched on a desktop or a television and
+// because watch hours — not Shorts views — are the threshold that actually pays: YouTube
+// asks 4,000 hours over twelve months for long-form against 10,000,000 Shorts views over
+// ninety days, and the same article fills the first far sooner than the second.
+//
+// The mode has to be known before this file is parsed, since these are constants. The
+// worker reads its job.json first and sets the global; everything else gets 'short'.
+$sgVideoMode = isset($GLOBALS['SG_VIDEO_MODE']) && $GLOBALS['SG_VIDEO_MODE'] === 'long' ? 'long' : 'short';
+define('SG_MODE', $sgVideoMode);
+define('SG_LONG', $sgVideoMode === 'long');
+define('SG_W', SG_LONG ? 1920 : 1080);
+define('SG_H', SG_LONG ? 1080 : 1920);
 define('SG_FONT', __DIR__ . '/fonts/NotoSans-Variable.ttf');
 
 // ============================================================================
@@ -323,6 +334,183 @@ function sg_build_script($article) {
     );
 }
 
+/**
+ * Turn an article's markdown body into something worth listening to.
+ *
+ * Every pattern carries /u. Greek letters are two bytes and this site has been bitten
+ * three separate times by byte-wise string work silently shredding them — see the \R bug
+ * that turned every υ into a line break.
+ *
+ * Tables are dropped rather than flattened: "pH 6.0 pipe 6.5 pipe κάθε πότισμα" read aloud
+ * is noise, and the same numbers are always stated in the prose around them.
+ */
+function sg_speech_text($md) {
+    $s = (string) $md;
+    $s = str_replace(array("\r\n", "\r"), "\n", $s);
+
+    $out = array();
+    foreach (explode("\n", $s) as $line) {
+        $t = trim($line);
+        if ($t === '') continue;
+        // Table rows and their separator lines.
+        if (strpos($t, '|') === 0) continue;
+        if (preg_match('/^[\|\s:-]+$/u', $t)) continue;
+        // Headings are spoken, just without their hashes.
+        $t = preg_replace('/^#{1,6}\s*/u', '', $t);
+        // Emphasis, inline code, list bullets, link syntax.
+        $t = str_replace(array('**', '__', '`'), '', $t);
+        $t = preg_replace('/^[-*•]\s+/u', '', $t);
+        $t = preg_replace('/^\d+\.\s+/u', '', $t);
+        $t = preg_replace('/\[([^\]]*)\]\([^\)]*\)/u', '$1', $t);
+        $t = trim($t);
+        if ($t === '') continue;
+        // A heading with no full stop runs into the sentence after it when the chunker
+        // splits on punctuation, so give it one.
+        if (!preg_match('/[.!;:]$/u', $t)) $t .= '.';
+        $out[] = $t;
+    }
+    return implode(' ', $out);
+}
+
+/**
+ * Split narration into scene-sized pieces on sentence boundaries.
+ *
+ * Greek TTS runs at roughly 17 characters a second, so $max is really a duration cap:
+ * 420 characters is about 25 seconds, which is how long a single still photograph can
+ * hold the screen before it starts to feel like a slideshow that stopped.
+ */
+function sg_chunk_narration($text, $max = 420) {
+    $sentences = preg_split('/(?<=[.!;])\s+/u', trim((string) $text), -1, PREG_SPLIT_NO_EMPTY);
+    $chunks = array();
+    $cur = '';
+    foreach ((array) $sentences as $sentence) {
+        $sentence = trim($sentence);
+        if ($sentence === '') continue;
+        // A single sentence longer than the cap is broken at commas rather than mid-word.
+        if (mb_strlen($sentence, 'UTF-8') > $max) {
+            if ($cur !== '') { $chunks[] = $cur; $cur = ''; }
+            $parts = preg_split('/(?<=,)\s+/u', $sentence, -1, PREG_SPLIT_NO_EMPTY);
+            $piece = '';
+            foreach ((array) $parts as $part) {
+                if ($piece !== '' && mb_strlen($piece . ' ' . $part, 'UTF-8') > $max) {
+                    $chunks[] = $piece;
+                    $piece = $part;
+                } else {
+                    $piece = $piece === '' ? $part : $piece . ' ' . $part;
+                }
+            }
+            if ($piece !== '') $chunks[] = $piece;
+            continue;
+        }
+        if ($cur !== '' && mb_strlen($cur . ' ' . $sentence, 'UTF-8') > $max) {
+            $chunks[] = $cur;
+            $cur = $sentence;
+        } else {
+            $cur = $cur === '' ? $sentence : $cur . ' ' . $sentence;
+        }
+    }
+    if (trim($cur) !== '') $chunks[] = $cur;
+    return $chunks;
+}
+
+/**
+ * The long-form script: the whole article read out, section by section.
+ *
+ * Deliberately not the Short's script with more scenes bolted on. A Short sells one idea
+ * in twenty seconds and throws the article away to do it; this reads the article, which is
+ * the only reason the format is worth the render time at all.
+ *
+ * On screen each scene carries the heading of the section being read, not the sentence —
+ * per-word captions across forty scenes would be a filter graph thousands of entries long
+ * on a host that OOM-kills ffmpeg for far less.
+ */
+function sg_build_long_script($article) {
+    $title = isset($article['title']['el']) ? $article['title']['el'] : (string) ($article['title'] ?? '');
+    $summary = isset($article['summary']['el']) ? $article['summary']['el'] : (string) ($article['summary'] ?? '');
+    $bodyMd = isset($article['content']['el']) ? $article['content']['el'] : (string) ($article['content'] ?? '');
+    $cleanTitle = trim(preg_replace('/[\(\):]/u', '', $title));
+
+    $scenes = array();
+    $scenes[] = array(
+        'tag' => 'SMARTGARDEN.GR',
+        'voiceover' => 'Καλώς ήρθατε στο Σμαρτ Γκάρντεν. ' . sg_speech_text($title) . '.',
+        'onScreenText' => $cleanTitle,
+        'captionDisplay' => $cleanTitle,
+        'step' => 0,
+    );
+    if (trim($summary) !== '') {
+        $scenes[] = array(
+            'tag' => 'ΜΕ ΜΙΑ ΜΑΤΙΑ',
+            'voiceover' => sg_speech_text($summary),
+            'onScreenText' => 'Με μια ματιά',
+            'captionDisplay' => 'Με μια ματιά',
+            'step' => 0,
+        );
+    }
+
+    // Split the body on its own H2s so each section announces itself, exactly as a reader
+    // scanning the page would see it.
+    $body = str_replace(array("\r\n", "\r"), "\n", (string) $bodyMd);
+    $parts = preg_split('/^##\s+(.+)$/um', $body, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $sections = array();
+    if (is_array($parts) && count($parts) > 1) {
+        // parts[0] is whatever preceded the first heading.
+        $lead = trim((string) $parts[0]);
+        if ($lead !== '') $sections[] = array('heading' => '', 'body' => $lead);
+        for ($i = 1; $i < count($parts); $i += 2) {
+            $sections[] = array(
+                'heading' => trim((string) $parts[$i]),
+                'body' => isset($parts[$i + 1]) ? trim((string) $parts[$i + 1]) : '',
+            );
+        }
+    } else {
+        $sections[] = array('heading' => '', 'body' => trim($body));
+    }
+
+    foreach ($sections as $section) {
+        $heading = preg_replace('/^\d+\.\s*/u', '', $section['heading']);
+        $spoken = sg_speech_text($section['body']);
+        if (trim($spoken) === '' && trim($heading) === '') continue;
+        $onScreen = $heading !== '' ? $heading : $cleanTitle;
+        $intro = $heading !== '' ? sg_speech_text($heading) . ' ' : '';
+        foreach (sg_chunk_narration($spoken) as $k => $chunk) {
+            $scenes[] = array(
+                'tag' => $heading !== '' ? mb_strtoupper(sg_shorten($heading, 34), 'UTF-8') : 'SMARTGARDEN.GR',
+                'voiceover' => ($k === 0 ? $intro : '') . $chunk,
+                'onScreenText' => $onScreen,
+                'captionDisplay' => $onScreen,
+                'step' => 0,
+            );
+        }
+    }
+
+    $slug = (string) ($article['slug'] ?? '');
+    $scenes[] = array(
+        'tag' => 'SMARTGARDEN.GR',
+        'voiceover' => 'Ολόκληρος ο οδηγός, με τους πίνακες και τις μετρήσεις, είναι στο Σμαρτ Γκάρντεν τελεία τζι-αρ. '
+                     . 'Αν σας φάνηκε χρήσιμο, γραφτείτε στο κανάλι για έναν οδηγό κάθε μέρα.',
+        'onScreenText' => 'smartgarden.gr',
+        'captionDisplay' => 'smartgarden.gr',
+        'step' => 0,
+    );
+
+    $youtubeDescription = "{$cleanTitle}\n\n"
+        . sg_shorten(sg_speech_text($summary), 400) . "\n\n"
+        . "📖 Ολόκληρος ο οδηγός: https://smartgarden.gr/article/{$slug}\n"
+        . "🌱 Καθημερινοί οδηγοί κηπουρικής: https://smartgarden.gr\n\n"
+        . '#κηπουρικη #μπαλκονι #φυτα #gardening #smartgarden';
+
+    return array(
+        'title' => $title,
+        'cleanTitle' => $cleanTitle,
+        'mode' => 'long',
+        'scenes' => $scenes,
+        'tiktokCaption' => '',
+        'youtubeDescription' => $youtubeDescription,
+        'youtubeTitle' => sg_shorten($cleanTitle, 95),
+    );
+}
+
 // ============================================================================
 // Per-scene photo selection - port of getSceneImages() in imageService.ts
 // ============================================================================
@@ -471,6 +659,94 @@ function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
     return $result;
 }
 
+/**
+ * Photos for a forty-scene episode.
+ *
+ * sg_scene_images() is built for six scenes and spends a -100 penalty to make sure no
+ * photo is used twice. Across forty scenes that rule runs out of pictures by scene ten and
+ * every remaining scene falls through to the article's own lead photo — the same still for
+ * eight minutes, which is the one thing guaranteed to lose the watch time this format
+ * exists to earn.
+ *
+ * So the rule changes shape rather than being dropped: build a pool of everything that
+ * matches this article at all, ordered by how well, then never repeat within $gap scenes.
+ * A photo coming back after twelve others reads as a motif; back-to-back reads as a bug.
+ */
+function sg_scene_images_long($sceneTexts, $articleImage, $articleTitle, $category, $gap = 12) {
+    $cat = sg_load_catalogue();
+    $subject = $articleTitle . ' ' . $category;
+
+    $pool = array();
+    foreach ($cat['curated'] as $p) {
+        $score = sg_match_score($subject, $p['keywords']) * 3;
+        if (!empty($p['own']) && $score > 0) $score += 20;
+        if ($score > 0) $pool[$p['url']] = $score;
+    }
+    // Neutral gardening shots are not about this article, but they are about gardening, and
+    // they exist precisely so a long stretch of narration is not one photograph.
+    foreach ((array) $cat['neutral'] as $u) if (!isset($pool[$u])) $pool[$u] = 1;
+    foreach ((array) $cat['fallback'] as $u) if (!isset($pool[$u])) $pool[$u] = 0;
+    if ($articleImage) $pool[$articleImage] = isset($pool[$articleImage]) ? $pool[$articleImage] + 30 : 30;
+
+    arsort($pool);
+    $ordered = array_keys($pool);
+    if (!count($ordered)) return array_fill(0, count($sceneTexts), $articleImage);
+
+    $lastUsedAt = array();
+    $result = array();
+    $cursor = 0;
+
+    foreach ($sceneTexts as $i => $text) {
+        // The title card always carries the article's own photograph.
+        if ($i === 0 && $articleImage) {
+            $result[] = $articleImage;
+            $lastUsedAt[$articleImage] = $i;
+            continue;
+        }
+
+        // A strong, specific match for this particular sentence beats the rotation — but
+        // only if it has been off screen long enough to be a change rather than a stutter.
+        $best = null;
+        $bestScore = 0;
+        foreach ($cat['curated'] as $p) {
+            $s = sg_match_score($text, $p['keywords']);
+            if ($s <= 0) continue;
+            if (!empty($p['own'])) $s += 8;
+            if (isset($lastUsedAt[$p['url']]) && $i - $lastUsedAt[$p['url']] < $gap) continue;
+            if ($s > $bestScore) { $bestScore = $s; $best = $p['url']; }
+        }
+
+        if ($best === null) {
+            // Rotation: walk the pool until something has been off screen long enough.
+            $tries = 0;
+            while ($tries < count($ordered)) {
+                $candidate = $ordered[$cursor % count($ordered)];
+                $cursor++;
+                $tries++;
+                if (!isset($lastUsedAt[$candidate]) || $i - $lastUsedAt[$candidate] >= $gap) {
+                    $best = $candidate;
+                    break;
+                }
+            }
+            // Pool smaller than the gap: take the one that has been away longest.
+            if ($best === null) {
+                $oldest = null;
+                foreach ($ordered as $u) {
+                    $seenU = isset($lastUsedAt[$u]) ? $lastUsedAt[$u] : -999;
+                    $seenO = ($oldest !== null && isset($lastUsedAt[$oldest])) ? $lastUsedAt[$oldest] : -999;
+                    if ($oldest === null || $seenU < $seenO) $oldest = $u;
+                }
+                $best = $oldest ? $oldest : $ordered[0];
+            }
+        }
+
+        $lastUsedAt[$best] = $i;
+        $result[] = $best;
+    }
+
+    return $result;
+}
+
 // ============================================================================
 // Frame rendering with GD
 // ============================================================================
@@ -580,7 +856,76 @@ function sg_outlined_text($img, $text, $centerX, $y, $size, $white, $black, $spr
  * Kept separate from the background so ffmpeg can Ken-Burns the photo underneath while the
  * text stays pin-sharp and never drifts out of frame.
  */
+/**
+ * The landscape overlay: a lower third, not a Short's centre-punch caption.
+ *
+ * A Short is watched one-handed at arm's length with the sound off, so its text is huge and
+ * sits in the middle of the frame. A ten-minute episode is watched with the sound on, on a
+ * bigger screen, and the picture is the point — so the text retreats to the bottom left and
+ * says only which section is being read, the way a documentary names its chapter.
+ */
+function sg_render_overlay_long($scene, $dest) {
+    $img = imagecreatetruecolor(SG_W, SG_H);
+    imagesavealpha($img, true);
+    imagealphablending($img, false);
+    imagefilledrectangle($img, 0, 0, SG_W, SG_H, imagecolorallocatealpha($img, 0, 0, 0, 127));
+    imagealphablending($img, true);
+
+    // Bottom scrim only, and a shallow one: the photograph is doing the work here.
+    $bandH = 300;
+    $bandTop = SG_H - $bandH;
+    for ($y = $bandTop; $y < SG_H; $y++) {
+        $t = ($y - $bandTop) / $bandH;
+        $opacity = $t < 0.35 ? ($t / 0.35) * 0.55 : 0.55 + (($t - 0.35) / 0.65) * 0.25;
+        imageline($img, 0, $y, SG_W, $y, imagecolorallocatealpha($img, 0, 0, 0, (int) round(127 - $opacity * 127)));
+    }
+
+    $white = imagecolorallocate($img, 255, 255, 255);
+    $black = imagecolorallocatealpha($img, 0, 0, 0, 12);
+    $softWhite = imagecolorallocatealpha($img, 255, 255, 255, 30);
+    $accent = imagecolorallocate($img, 110, 231, 168);
+
+    $left = 96;
+
+    // Section heading, wrapped to at most two lines and shrunk only if it needs it.
+    $heading = sg_strip_emoji((string) ($scene['onScreenText'] ?? ''));
+    $size = 54;
+    $maxW = SG_W - $left * 2 - 120;
+    $lines = sg_wrap_lines($heading, $size, $maxW);
+    while (count($lines) > 2 && $size > 34) {
+        $size -= 4;
+        $lines = sg_wrap_lines($heading, $size, $maxW);
+    }
+    $lines = array_slice($lines, 0, 2);
+    $lineHeight = (int) round($size * 1.3);
+
+    $blockBottom = SG_H - 96;
+    $y = $blockBottom - ($lineHeight * (count($lines) - 1));
+
+    // A short accent rule above the heading, the one piece of brand colour in the frame.
+    imagesetthickness($img, 5);
+    imageline($img, $left, $y - $size - 34, $left + 90, $y - $size - 34, $accent);
+
+    foreach ($lines as $line) {
+        $w = sg_text_width($line, $size);
+        // Drawn left-aligned, so sg_outlined_text's centre-x contract is given the midpoint
+        // of where the line actually sits.
+        sg_outlined_text($img, $line, $left + $w / 2, $y, $size, $white, $black, 4);
+        $y += $lineHeight;
+    }
+
+    // Watermark, top right, out of the way of the picture's subject.
+    $mark = 'smartgarden.gr';
+    $mw = sg_text_width($mark, 30);
+    imagettftext($img, 30, 0, (int) (SG_W - $mw - 96), 96, $softWhite, SG_FONT, $mark);
+
+    $ok = imagepng($img, $dest, 6);
+    imagedestroy($img);
+    return $ok;
+}
+
 function sg_render_overlay($scene, $dest) {
+    if (SG_LONG) return sg_render_overlay_long($scene, $dest);
     $img = imagecreatetruecolor(SG_W, SG_H);
     imagesavealpha($img, true);
     imagealphablending($img, false);
