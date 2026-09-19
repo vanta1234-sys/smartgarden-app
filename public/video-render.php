@@ -216,6 +216,48 @@ if ($action === 'testalert') {
 // Failures were invisible: the admin page only lists jobs that produced an mp4, so a render
 // that died left the article with no video and nothing anywhere said so. This lists every
 // recent job with its state, newest first.
+// One photo through the real background renderer, reporting how bright it comes out. Exists
+// so a change to the exposure handling can be checked in two seconds instead of by sitting
+// through another seventy-minute render and measuring a frame afterwards.
+if ($action === 'bgtest') {
+    $url = isset($_GET['url']) ? $_GET['url'] : '';
+    if ($url === '') sg_err('bgtest needs &url=<photo>');
+    if (!is_dir($JOBS_ROOT)) @mkdir($JOBS_ROOT, 0755, true);
+    $t = $JOBS_ROOT . '/_bgtest';
+    if (!is_dir($t)) @mkdir($t, 0755, true);
+
+    $src = $t . '/src';
+    if (!sg_fetch_to_file($url, $src, 45)) sg_err('Could not fetch ' . $url);
+
+    $lum = function ($file) {
+        $im = sg_load_image($file);
+        if (!$im) return null;
+        $w = imagesx($im); $h = imagesy($im);
+        $sum = 0; $n = 0;
+        for ($y = 0; $y < $h; $y += 16) {
+            for ($x = 0; $x < $w; $x += 16) {
+                $rgb = imagecolorat($im, $x, $y);
+                $sum += 0.2126 * (($rgb >> 16) & 0xFF) + 0.7152 * (($rgb >> 8) & 0xFF) + 0.0722 * ($rgb & 0xFF);
+                $n++;
+            }
+        }
+        imagedestroy($im);
+        return $n ? round($sum / $n, 1) : null;
+    };
+
+    $out = $t . '/bg.jpg';
+    $ok = sg_render_background($src, $out, (int) round(SG_W * 1.2), (int) round(SG_H * 1.2));
+    sg_out(array(
+        'success' => true,
+        'mode' => SG_MODE,
+        'frame' => SG_W . 'x' . SG_H,
+        'rendered' => $ok,
+        'sourceLuminance' => $lum($src),
+        'renderedLuminance' => $ok ? $lum($out) : null,
+        'note' => 'Out of 255. Below about 60 reads as murky on a long video.',
+    ));
+}
+
 if ($action === 'disk') {
     $root = is_dir($JOBS_ROOT) ? $JOBS_ROOT : __DIR__;
     $used = 0;
@@ -293,10 +335,59 @@ if ($action === 'status' || $action === 'file') {
     if ($action === 'file') {
         $video = $dir . '/video.mp4';
         if (!file_exists($video)) sg_err('Video not ready');
+        $size = filesize($video);
+
+        // Range support, because a fifteen-minute file cannot be reviewed without it. A
+        // player that asks to jump to 8:20 sends a Range header; an endpoint that answers
+        // with the whole file from byte zero leaves the scrub bar dead and every seek
+        // silently ignored — which is exactly how this looked before. A Short was small
+        // enough that nobody noticed.
+        $start = 0;
+        $end = $size - 1;
+        $isRange = false;
+        $rangeHeader = isset($_SERVER['HTTP_RANGE']) ? $_SERVER['HTTP_RANGE'] : '';
+        if ($rangeHeader !== '' && preg_match('/bytes=(\d*)-(\d*)/', $rangeHeader, $m)) {
+            $isRange = true;
+            if ($m[1] !== '') {
+                $start = (int) $m[1];
+                if ($m[2] !== '') $end = (int) $m[2];
+            } elseif ($m[2] !== '') {
+                // "bytes=-500" means the last 500 bytes, not a range ending at 500.
+                $start = max(0, $size - (int) $m[2]);
+            }
+            if ($start > $end || $start >= $size) {
+                header('HTTP/1.1 416 Range Not Satisfiable');
+                header('Content-Range: bytes */' . $size);
+                exit;
+            }
+            $end = min($end, $size - 1);
+        }
+
+        $length = $end - $start + 1;
+        if ($isRange) {
+            header('HTTP/1.1 206 Partial Content');
+            header('Content-Range: bytes ' . $start . '-' . $end . '/' . $size);
+        }
         header('Content-Type: video/mp4');
-        header('Content-Length: ' . filesize($video));
+        header('Accept-Ranges: bytes');
+        header('Content-Length: ' . $length);
         header('Content-Disposition: inline; filename="smartgarden-' . $job . '.mp4"');
-        readfile($video);
+
+        // Streamed in blocks rather than readfile()'d whole: 169MB through PHP's output
+        // buffer is a memory spike for no reason.
+        $fh = fopen($video, 'rb');
+        if (!$fh) sg_err('Could not open the rendered video');
+        fseek($fh, $start);
+        $remaining = $length;
+        while ($remaining > 0 && !feof($fh)) {
+            $chunk = fread($fh, (int) min(262144, $remaining));
+            if ($chunk === false || $chunk === '') break;
+            echo $chunk;
+            $remaining -= strlen($chunk);
+            @ob_flush();
+            flush();
+        }
+        fclose($fh);
         exit;
     }
 

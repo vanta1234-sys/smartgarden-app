@@ -844,11 +844,41 @@ function sg_render_background($photoPath, $dest, $w = 1350, $h = 2400) {
     imagecopyresampled($canvas, $src, (int) (($w - $nw) / 2), (int) (($h - $nh) / 2), 0, 0, $nw, $nh, $sw, $sh);
     imagedestroy($src);
 
-    // The browser drew the photo at 0.85 alpha over the dark gradient; same effect here.
-    $shade = imagecreatetruecolor($w, $h);
-    imagefilledrectangle($shade, 0, 0, $w, $h, imagecolorallocate($shade, 3, 23, 16));
-    imagecopymerge($canvas, $shade, 0, 0, 0, 0, $w, $h, 15);
-    imagedestroy($shade);
+    if (SG_LONG) {
+        // No darkening layer in long form, and a lift for the photographs that arrive dark
+        // anyway. A Short is twenty seconds of backdrop behind big white type, so the
+        // browser's 0.85-alpha look costs nothing; fifteen minutes of it is a murky video
+        // where the picture is the thing the viewer is actually watching. One frame here
+        // measured 40 luminance out of 255 — under a fifth lit — and the caption sat on top
+        // of it barely legible.
+        $sum = 0;
+        $n = 0;
+        for ($y = 0; $y < $h; $y += 16) {
+            for ($x = 0; $x < $w; $x += 16) {
+                $rgb = imagecolorat($canvas, $x, $y);
+                $sum += 0.2126 * (($rgb >> 16) & 0xFF) + 0.7152 * (($rgb >> 8) & 0xFF) + 0.0722 * ($rgb & 0xFF);
+                $n++;
+            }
+        }
+        $avg = $n ? $sum / $n : 128;
+        if ($avg < 95) {
+            // Proportional, and capped: lifting a genuinely dark photograph all the way to
+            // mid-grey turns night into washed-out grey rather than into daylight.
+            // No contrast pass alongside it. One was tried, and measured: GD's
+            // IMG_FILTER_CONTRAST takes negative values to mean *more* contrast, which
+            // pushes darks down as fast as the brightness pass lifts them — a photo at 86.5
+            // came out at 86.7, a lift of nothing. Brightness alone moves the number it is
+            // supposed to move.
+            $lift = (int) min(55, round((95 - $avg) * 0.8));
+            imagefilter($canvas, IMG_FILTER_BRIGHTNESS, $lift);
+        }
+    } else {
+        // The browser drew the photo at 0.85 alpha over the dark gradient; same effect here.
+        $shade = imagecreatetruecolor($w, $h);
+        imagefilledrectangle($shade, 0, 0, $w, $h, imagecolorallocate($shade, 3, 23, 16));
+        imagecopymerge($canvas, $shade, 0, 0, 0, 0, $w, $h, 15);
+        imagedestroy($shade);
+    }
 
     $ok = imagejpeg($canvas, $dest, 92);
     imagedestroy($canvas);
