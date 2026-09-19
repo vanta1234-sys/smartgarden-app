@@ -428,14 +428,35 @@ function sg_run_job($dir) {
         $withMusic = $dir . '/video_music.mp4';
         $total = sg_duration($ffprobe, $final);
         $musicOut = max(0.5, $total - 1.6);
-        $bed = '[1:a]volume=0.20'
+
+        // These tracks are about thirty seconds each. Looping one of them under a
+        // twenty-second Short is unnoticeable; looping it under a fifteen-minute episode
+        // plays the same thirty seconds thirty times, which is worse than no music at all.
+        // Long form gets the whole library in a rotation instead, and quieter: fifteen
+        // minutes of bed at 0.20 fights the narration in a way twenty seconds never did.
+        $musicInput = ' -stream_loop -1 -i ' . escapeshellarg($track);
+        $bedVolume = '0.20';
+        if (SG_LONG && count($tracks) > 1) {
+            $rotation = array_merge(array_slice($tracks, $seed % count($tracks)), array_slice($tracks, 0, $seed % count($tracks)));
+            $playlist = $dir . '/music.txt';
+            $plLines = '';
+            foreach ($rotation as $t) $plLines .= "file '" . str_replace("'", "'\\''", $t) . "'\n";
+            file_put_contents($playlist, $plLines);
+            $musicInput = ' -stream_loop -1 -f concat -safe 0 -i ' . escapeshellarg($playlist);
+            $bedVolume = '0.13';
+            sg_log($dir, 'music: rotation of ' . count($rotation) . ' tracks at ' . $bedVolume);
+        }
+
+        // aresample is explicit here because the concat demuxer hands over whatever the
+        // first file's rate happens to be and the rest are assumed to match.
+        $bed = '[1:a]aresample=44100,volume=' . $bedVolume
              . ',afade=t=in:st=0:d=1.2'
              . ',afade=t=out:st=' . sprintf('%.2f', $musicOut) . ':d=1.6[bed]';
         $mix = '[0:a][bed]amix=inputs=2:duration=first:normalize=0[a]';
 
         $mcmd = escapeshellarg($ffmpeg) . ' -y -hide_banner -loglevel error'
               . ' -i ' . escapeshellarg($final)
-              . ' -stream_loop -1 -i ' . escapeshellarg($track)
+              . $musicInput
               . ' -filter_complex ' . escapeshellarg($bed . ';' . $mix)
               . ' -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 128k -ar 44100 -ac 2'
               . ' -shortest -movflags +faststart ' . escapeshellarg($withMusic) . ' 2>&1';

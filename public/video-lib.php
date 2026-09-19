@@ -48,6 +48,17 @@ function sg_strip_accents($str) {
  * ship, and Noto Sans has no emoji glyphs, so anything left in would render as empty boxes.
  * Step numbers get a drawn badge instead (see sg_render_scene), which reads better anyway.
  */
+/**
+ * Greek in capitals, spelled the way Greek spells it.
+ *
+ * Greek drops its accents when a word is set in capitals: ΣΥΝΤΟΜΗ ΑΠΑΝΤΗΣΗ, never ΣΎΝΤΟΜΗ
+ * ΑΠΆΝΤΗΣΗ — which is exactly what mb_strtoupper returns on its own, and which reads to a
+ * Greek eye as a typo. sg_strip_accents lowercases on the way through, so it runs first.
+ */
+function sg_greek_caps($text) {
+    return mb_strtoupper(sg_strip_accents($text), 'UTF-8');
+}
+
 function sg_strip_emoji($text) {
     $text = preg_replace('/[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{2B00}-\x{2BFF}\x{FE00}-\x{FE0F}\x{20E3}\x{2190}-\x{21FF}\x{2300}-\x{23FF}]/u', '', (string) $text);
     return trim(preg_replace('/\s{2,}/u', ' ', $text));
@@ -357,10 +368,19 @@ function sg_speech_text($md) {
         if (preg_match('/^[\|\s:-]+$/u', $t)) continue;
         // Headings are spoken, just without their hashes.
         $t = preg_replace('/^#{1,6}\s*/u', '', $t);
-        // Emphasis, inline code, list bullets, link syntax.
-        $t = str_replace(array('**', '__', '`'), '', $t);
+        // The list bullet goes first, and the order is the whole point. These articles write
+        // "* *Σημείωση:* Το κιτρικό οξύ…" — a bullet and an italic run, both spelled with an
+        // asterisk. Strip emphasis before the bullet and the pattern pairs the bullet's
+        // asterisk with the opening one of the italic, eats the space between them, and
+        // leaves the closing asterisk stranded mid-sentence for the synthesiser to read.
         $t = preg_replace('/^[-*•]\s+/u', '', $t);
         $t = preg_replace('/^\d+\.\s+/u', '', $t);
+        // Emphasis and inline code. Single asterisks matter as much as double here.
+        $t = str_replace(array('**', '__', '`'), '', $t);
+        $t = preg_replace('/\*([^*]+)\*/u', '$1', $t);
+        $t = preg_replace('/(?<![\p{L}\p{N}])_([^_]+)_(?![\p{L}\p{N}])/u', '$1', $t);
+        // Anything still holding a stray asterisk was unbalanced in the source.
+        $t = str_replace('*', '', $t);
         $t = preg_replace('/\[([^\]]*)\]\([^\)]*\)/u', '$1', $t);
         $t = trim($t);
         if ($t === '') continue;
@@ -475,7 +495,7 @@ function sg_build_long_script($article) {
         $intro = $heading !== '' ? sg_speech_text($heading) . ' ' : '';
         foreach (sg_chunk_narration($spoken) as $k => $chunk) {
             $scenes[] = array(
-                'tag' => $heading !== '' ? mb_strtoupper(sg_shorten($heading, 34), 'UTF-8') : 'SMARTGARDEN.GR',
+                'tag' => $heading !== '' ? sg_greek_caps(sg_shorten($heading, 34)) : 'SMARTGARDEN.GR',
                 'voiceover' => ($k === 0 ? $intro : '') . $chunk,
                 'onScreenText' => $onScreen,
                 'captionDisplay' => $onScreen,

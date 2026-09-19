@@ -17,6 +17,11 @@
  * no CLI binary, ?inline=1 runs it in-process instead.
  */
 
+// Before the require, not after: the frame size is a constant inside that file. The worker
+// does the same thing from job.json — this is so &dry=1 reports the shape it would render
+// rather than the default.
+$GLOBALS['SG_VIDEO_MODE'] = (isset($_GET['mode']) && $_GET['mode'] === 'long') ? 'long' : 'short';
+
 require_once __DIR__ . '/video-lib.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -211,6 +216,26 @@ if ($action === 'testalert') {
 // Failures were invisible: the admin page only lists jobs that produced an mp4, so a render
 // that died left the article with no video and nothing anywhere said so. This lists every
 // recent job with its state, newest first.
+if ($action === 'disk') {
+    $root = is_dir($JOBS_ROOT) ? $JOBS_ROOT : __DIR__;
+    $used = 0;
+    $perJob = array();
+    foreach ((array) glob($JOBS_ROOT . '/*', GLOB_ONLYDIR) as $d) {
+        $s = 0;
+        foreach ((array) glob($d . '/*') as $f) $s += (int) @filesize($f);
+        $used += $s;
+        $perJob[basename($d)] = (int) round($s / 1048576) . 'MB';
+    }
+    arsort($perJob);
+    sg_out(array(
+        'success' => true,
+        'freeMB' => (int) round((float) @disk_free_space($root) / 1048576),
+        'totalMB' => (int) round((float) @disk_total_space($root) / 1048576),
+        'jobsUsedMB' => (int) round($used / 1048576),
+        'jobs' => array_slice($perJob, 0, 15, true),
+    ));
+}
+
 if ($action === 'jobs') {
     $rows = array();
     foreach ((array) glob($JOBS_ROOT . '/*', GLOB_ONLYDIR) as $d) {
@@ -294,6 +319,21 @@ if ($action === 'status' || $action === 'file') {
 if ($action !== 'start') sg_err('Unknown action: ' . $action);
 
 if (!is_file($FFMPEG)) sg_err('ffmpeg is not installed on this server', array('expected' => $FFMPEG));
+
+// A Short is 8-15MB. A fifteen-minute episode is around 300MB, and it exists twice at once
+// — every scene file plus the stitched result during concat, then the stitched result plus
+// the music-mixed copy. Running the host out of disk mid-render would take the website down
+// with it, which is a far worse outcome than not making a video today.
+if ($mode === 'long') {
+    $freeBytes = @disk_free_space(is_dir($JOBS_ROOT) ? $JOBS_ROOT : __DIR__);
+    if ($freeBytes !== false && $freeBytes < 1500 * 1024 * 1024) {
+        sg_err('Not enough free disk for a long render', array(
+            'freeMB' => (int) round($freeBytes / 1048576),
+            'needMB' => 1500,
+            'hint' => 'video-render.php?action=cleanup clears finished jobs',
+        ));
+    }
+}
 
 $articles = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true);
 if (!is_array($articles) || !count($articles)) sg_err('No articles available');
@@ -404,7 +444,9 @@ file_put_contents($dir . '/status.json', json_encode(array(
 $response = array(
     'success' => true,
     'job' => $jobId,
-    'mode' => $mode,
+    // Not 'mode': the spawn path below sets that to background/inline, and the two would
+    // shadow each other in the response.
+    'renderMode' => $mode,
     'article' => $article['slug'] ?? '',
     'scenes' => count($script['scenes']),
     'sceneImages' => $sceneImages,
