@@ -129,6 +129,15 @@ function sg_run_job($dir) {
     }
 
     $sceneFiles = array();
+    // Chapter marks for long form. YouTube builds a chapter list out of timestamps in the
+    // description — first one at 0:00, at least three of them, none shorter than ten
+    // seconds — and on a fifteen-minute video they are the difference between a viewer
+    // who bounces because they cannot find the part they came for and one who jumps to it.
+    // Only the render knows where the sections land, because only the render knows how long
+    // each piece of narration turned out to be.
+    $chapters = array();
+    $elapsed = 0.0;
+    $lastChapter = null;
 
     foreach ($scenes as $i => $scene) {
         $base = $dir . '/scene' . $i;
@@ -376,6 +385,18 @@ function sg_run_job($dir) {
         }
         if ($res !== '') sg_log($dir, 'scene ' . $i . ' ffmpeg: ' . $res);
 
+        // Recorded from the measured output, not the requested duration: concat -c copy
+        // keeps exactly what each scene encoder produced, and a chapter mark that drifts
+        // from the picture is worse than no chapter at all.
+        if (SG_LONG) {
+            $label = trim((string) ($scene['onScreenText'] ?? ''));
+            if ($label !== '' && $label !== $lastChapter) {
+                $chapters[] = array('at' => $elapsed, 'label' => $label);
+                $lastChapter = $label;
+            }
+            $elapsed += $outDur > 0 ? $outDur : $sceneDur;
+        }
+
         $sceneFiles[] = $out;
         @unlink($bg);
         @unlink($ov);
@@ -477,7 +498,7 @@ function sg_run_job($dir) {
     $duration = sg_duration($ffprobe, $final);
     sg_log($dir, 'done: ' . filesize($final) . ' bytes, ' . round($duration, 2) . 's');
 
-    $publish = !empty($job['autoPublish']) ? sg_publish($job, $dir, basename($dir)) : null;
+    $publish = !empty($job['autoPublish']) ? sg_publish($job, $dir, basename($dir), $chapters, $duration, $final) : null;
 
     sg_status($dir, 'done', 100, 'Το βίντεο είναι έτοιμο', array(
         'video' => $final,
@@ -515,7 +536,56 @@ function sg_post_json($url, $payload, $timeout = 180) {
  * YouTube gets the job id and reads the file off disk (a 15MB mp4 as base64 JSON would
  * exceed post_max_size); TikTok is handed the job's own file URL, which it fetches itself.
  */
-function sg_publish($job, $dir, $jobId) {
+/**
+ * Format chapter marks the way YouTube parses them out of a description.
+ *
+ * Its rules, and all three have to hold or the whole list is ignored rather than partly
+ * applied: the first mark is at 0:00, there are at least three, and none is shorter than
+ * ten seconds. Sections that came out too short are folded into the one before them, which
+ * is also the right editorial answer — a chapter worth eight seconds is not a chapter.
+ */
+function sg_format_chapters($chapters, $total) {
+    if (!is_array($chapters) || count($chapters) < 3) return '';
+
+    $kept = array();
+    foreach ($chapters as $c) {
+        $at = (float) $c['at'];
+        if (!count($kept)) {
+            // The first one is pinned to zero: YouTube requires it, and the title card is
+            // always the opening scene anyway.
+            $kept[] = array('at' => 0.0, 'label' => $c['label']);
+            continue;
+        }
+        if ($at - $kept[count($kept) - 1]['at'] < 10.0) continue;
+        $kept[] = array('at' => $at, 'label' => $c['label']);
+    }
+    // The last one needs ten seconds of video after it too.
+    while (count($kept) > 3 && $total - $kept[count($kept) - 1]['at'] < 10.0) array_pop($kept);
+    if (count($kept) < 3) return '';
+
+    $lines = array();
+    foreach ($kept as $c) {
+        $s = (int) floor($c['at']);
+        $stamp = $s >= 3600
+            ? sprintf('%d:%02d:%02d', (int) floor($s / 3600), (int) floor(($s % 3600) / 60), $s % 60)
+            : sprintf('%d:%02d', (int) floor($s / 60), $s % 60);
+        $label = trim(preg_replace('/\s+/u', ' ', $c['label']));
+        $lines[] = $stamp . ' ' . mb_substr($label, 0, 90, 'UTF-8');
+    }
+    return implode("\n", $lines);
+}
+
+/**
+ * $duration and $final are parameters, and that is the whole point.
+ *
+ * They were neither — the visibility gate below read them straight out of thin air, and PHP
+ * functions do not inherit their caller's scope. So $duration was null on every call,
+ * null >= 15 is false, @filesize(null) is false, and the gate that was supposed to let a
+ * good render go public could never pass: two of two videos rendered under it went up
+ * private with every check failing, including the checks they plainly met at 26.82s and
+ * 10.5MB. The email even said which ones failed, which is how it was found.
+ */
+function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $final = '') {
     $key = $job['key'];
     $script = $job['script'];
     $article = $job['article'];
@@ -550,11 +620,22 @@ function sg_publish($job, $dir, $jobId) {
         ));
     }
 
+    $description = $script['youtubeDescription'];
+    if (SG_LONG) {
+        $marks = sg_format_chapters($chapters, $duration);
+        if ($marks !== '') {
+            $description .= "\n\nΠεριεχόμενα:\n" . $marks;
+            sg_log($dir, 'chapters: ' . substr_count($marks, "\n") + 1 . ' marks');
+        } else {
+            sg_log($dir, 'chapters: none usable');
+        }
+    }
+
     $yt = sg_post_json('https://smartgarden.gr/youtube-publish.php', array(
         'job' => $jobId,
         'key' => $key,
         'title' => $script['youtubeTitle'],
-        'description' => $script['youtubeDescription'],
+        'description' => $description,
         'privacyStatus' => $visibility,
         // Without this the uploader appends #Shorts to every description, which is exactly
         // the wrong instruction for a twelve-minute video: the whole point of the format is
