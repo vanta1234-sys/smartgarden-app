@@ -625,7 +625,10 @@ function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $f
         $marks = sg_format_chapters($chapters, $duration);
         if ($marks !== '') {
             $description .= "\n\nΠεριεχόμενα:\n" . $marks;
-            sg_log($dir, 'chapters: ' . substr_count($marks, "\n") + 1 . ' marks');
+            // Parenthesised deliberately: PHP 8 gives + higher precedence than . while PHP 7
+            // treats them as equal and left-associative, so without these the same line is a
+            // correct count on one version and a string-plus-int on the other.
+            sg_log($dir, 'chapters: ' . (substr_count($marks, "\n") + 1) . ' marks');
         } else {
             sg_log($dir, 'chapters: none usable');
         }
