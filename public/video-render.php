@@ -333,8 +333,11 @@ if ($action === 'status' || $action === 'file') {
     if ($job === '' || !is_dir($dir)) sg_err('Unknown job: ' . $job);
 
     if ($action === 'file') {
-        $video = $dir . '/video.mp4';
-        if (!file_exists($video)) sg_err('Video not ready');
+        // &variant=slides serves the copy video-inserts.php made with the presentation
+        // slides laid over it, so both versions of one render stay addressable.
+        $variant = isset($_GET['variant']) ? preg_replace('/[^a-z]/', '', $_GET['variant']) : '';
+        $video = $dir . ($variant === 'slides' ? '/video-slides.mp4' : '/video.mp4');
+        if (!file_exists($video)) sg_err('Video not ready' . ($variant ? ' (variant ' . $variant . ')' : ''));
         $size = filesize($video);
 
         // Range support, because a fifteen-minute file cannot be reviewed without it. A
