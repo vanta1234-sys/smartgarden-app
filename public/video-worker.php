@@ -28,10 +28,11 @@ require_once __DIR__ . '/video-lib.php';
 require_once __DIR__ . '/notify.php';
 
 @set_time_limit(0);
-// A long-form episode holds forty scene files and a concat list rather than six. The bytes
-// stay on disk, not in PHP, but the headroom costs nothing on a run that already spawns
-// ffmpeg forty times.
-@ini_set('memory_limit', SG_LONG ? '768M' : '512M');
+// Back to 512M for both. Raising long form to 768M was speculative headroom it never
+// needed — the scene loop handles one scene at a time and the bytes live on disk — and
+// PHP's allocator does not hand freed chunks back to the OS, so the only real effect was
+// to let this process sit on memory that the ffmpeg it spawns is then killed for wanting.
+@ini_set('memory_limit', '512M');
 
 sg_run_job(SG_JOB_DIR);
 
@@ -293,14 +294,35 @@ function sg_run_job($dir) {
             $pic .= ',fade=t=in:st=0:d=' . sprintf('%.2f', $fadeV)
                   . ',fade=t=out:st=' . sprintf('%.2f', $outV) . ':d=' . sprintf('%.2f', $fadeV) . '[kb]';
 
-            $txt = '[1:v]format=rgba,fade=t=in:st=0.10:d=' . sprintf('%.2f', $fadeT) . ':alpha=1'
-                 . ',fade=t=out:st=' . sprintf('%.2f', $outT) . ':d=0.24:alpha=1[ov]';
+            // The overlay is fed as ONE frame in long form, not as a looped 30fps stream.
+            //
+            // Both inputs looping at 30fps means a twenty-second scene generates 600 frames
+            // of picture and 600 of caption, and ffmpeg buffers them to keep the overlay
+            // filter fed. Measured across the first long render: scenes under 10s failed
+            // their first encode half the time, 10-15s two thirds, and every single scene
+            // over 15s was SIGKILLed by the OOM killer — 41 of 47 needed a second attempt,
+            // which is why it took seventy minutes rather than thirty-five. The Shorts path
+            // never showed it because its scenes are capped at six seconds.
+            //
+            // eof_action=repeat holds that single frame for the rest of the scene. The cost
+            // is the caption's own fade, which a static lower third does not need; the
+            // picture still fades at both edges.
+            if (SG_LONG) {
+                $txt = '[1:v]format=rgba[ov]';
+                $vf = $pic . ';' . $txt . ';[kb][ov]overlay=0:0:eof_action=repeat[v]';
+            } else {
+                $txt = '[1:v]format=rgba,fade=t=in:st=0.10:d=' . sprintf('%.2f', $fadeT) . ':alpha=1'
+                     . ',fade=t=out:st=' . sprintf('%.2f', $outT) . ':d=0.24:alpha=1[ov]';
+                $vf = $pic . ';' . $txt . ';[kb][ov]overlay=0:' . $rise . '[base];[base]' . $wordChain . '[v]';
+            }
 
-            $vf = $pic . ';' . $txt . ';[kb][ov]overlay=0:' . $rise . '[base];[base]' . $wordChain . '[v]';
+            $ovInput = SG_LONG
+                ? ' -i ' . escapeshellarg($ov)
+                : ' -framerate 30 -loop 1 -t ' . sprintf('%.3f', $sceneDur) . ' -i ' . escapeshellarg($ov);
 
             $cmd = escapeshellarg($ffmpeg) . ' -y -hide_banner -loglevel error'
                  . ' -framerate 30 -loop 1 -t ' . sprintf('%.3f', $sceneDur) . ' -i ' . escapeshellarg($bg)
-                 . ' -framerate 30 -loop 1 -t ' . sprintf('%.3f', $sceneDur) . ' -i ' . escapeshellarg($ov);
+                 . $ovInput;
 
             if ($audio) {
                 $cmd .= ' -i ' . escapeshellarg($audio)
