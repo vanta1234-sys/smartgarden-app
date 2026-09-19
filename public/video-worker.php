@@ -629,8 +629,15 @@ function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $f
     $checks['μέγεθος'] = (@filesize($final) > (SG_LONG ? 8000000 : 1000000));
     $checks['σκηνές'] = (count($script['scenes']) >= (SG_LONG ? 10 : 4));
     $failed = array_keys(array_filter($checks, function ($ok) { return !$ok; }));
-    $visibility = count($failed) ? 'private' : 'public';
-    sg_log($dir, 'visibility: ' . $visibility . (count($failed) ? ' (απέτυχε: ' . implode(', ', $failed) . ')' : ''));
+    $gateSays = count($failed) ? 'private' : 'public';
+    // An explicit override wins, but never upward: a render that failed its checks cannot be
+    // talked into going public by a query parameter. It exists so a verification upload can
+    // be pinned private while the gate still reports what it would have decided.
+    $override = isset($job['privacyOverride']) ? $job['privacyOverride'] : null;
+    $visibility = ($override && !($gateSays === 'private' && $override === 'public')) ? $override : $gateSays;
+    sg_log($dir, 'visibility: ' . $visibility
+        . ($override ? ' (override, gate said ' . $gateSays . ')' : '')
+        . (count($failed) ? ' (απέτυχε: ' . implode(', ', $failed) . ')' : ''));
 
     if (count($failed)) {
         require_once __DIR__ . '/notify.php';

@@ -519,6 +519,12 @@ $jobJson = json_encode(array(
     // With &publish=1 the worker uploads to YouTube and TikTok once the render finishes.
     // The cron that queues the job is long gone by then, so it can't do this itself.
     'autoPublish' => isset($_GET['publish']),
+    // &privacy=private|unlisted|public overrides what the quality gate would have asked
+    // for. The gate still runs, still logs and still alerts — this only decides what is
+    // sent to YouTube, so a verification upload can be pinned private even though the
+    // render is good enough to have gone public on its own.
+    'privacyOverride' => (isset($_GET['privacy']) && in_array($_GET['privacy'], array('private', 'unlisted', 'public'), true))
+        ? $_GET['privacy'] : null,
     'key' => $_GET['key'],
     'created' => date('c'),
 ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
