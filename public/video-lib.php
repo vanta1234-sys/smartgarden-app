@@ -1207,7 +1207,10 @@ function sg_thumb_headline($title) {
     $title = (string) $title;
     if (preg_match('/\(([^)]{8,60})\)/u', $title, $m)) {
         $inner = trim($m[1]);
-        $inner = preg_replace('/^(και|κι)\s+(το|τα|η|ο|οι)?\s*/u', '', $inner);
+        $inner = preg_replace('/^(και|κι)\s+/u', '', $inner);
+        // A trailing adverb is dead weight on a thumbnail — «...ΣΚΟΤΩΝΕΙ ΤΟ ΦΥΤΟ ΜΕΤΑ»
+        // ends on a word that promises nothing, and costs a line of its own at this size.
+        $inner = preg_replace('/\s+(μετά|πλέον|τελικά|ξανά|σήμερα)$/u', '', $inner);
         if (mb_strlen($inner, 'UTF-8') >= 8) return sg_greek_caps($inner);
     }
     $head = trim(preg_split('/[:(]/u', $title)[0]);
@@ -1253,6 +1256,19 @@ function sg_thumb_kicker($article) {
  */
 function sg_render_thumbnail($article, $dest, $photoPath = '') {
     $W = 1280; $H = 720;
+
+    // A job.json carries only id/slug/title/image/category, so a thumbnail built from it
+    // alone silently loses the category pill and the figure. Fetch the rest by slug.
+    if (!isset($article['keyTakeaways']) && !empty($article['slug'])) {
+        $all = @json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true);
+        foreach ((array) $all as $a) {
+            if (isset($a['slug']) && $a['slug'] === $article['slug']) {
+                $article = array_merge($a, array_filter($article, 'strlen'));
+                break;
+            }
+        }
+    }
+
     $canvas = imagecreatetruecolor($W, $H);
 
     $src = $photoPath !== '' && is_file($photoPath) ? sg_load_image($photoPath) : null;
@@ -1273,7 +1289,7 @@ function sg_render_thumbnail($article, $dest, $photoPath = '') {
     for ($x = 0; $x < $W; $x++) {
         $t = 1.0 - $x / 1120.0;
         if ($t <= 0) break;
-        $a = (int) round(127 - 125 * sqrt($t));
+        $a = (int) round(127 - 127 * sqrt($t));
         if ($a >= 127) continue;
         $c = imagecolorallocatealpha($canvas, 8, 22, 12, $a);
         imagefilledrectangle($canvas, $x, 0, $x, $H, $c);
@@ -1310,13 +1326,19 @@ function sg_render_thumbnail($article, $dest, $photoPath = '') {
     $lineH = (int) round($size * 1.16);
     $y = (int) round(196 + $size);
     foreach ($lines as $ln) {
-        for ($ox = -3; $ox <= 3; $ox += 3) {
-            for ($oy = -3; $oy <= 3; $oy += 3) {
-                if ($ox === 0 && $oy === 0) continue;
+        // Dark halo first, then the letter drawn several times a pixel or two apart.
+        // NotoSans-Variable only ever renders at its default weight through GD — there is
+        // no way to ask FreeType for the Bold instance here — and the default is too light
+        // to hold a thumbnail. Overprinting is what makes it read as bold.
+        for ($ox = -4; $ox <= 4; $ox += 2) {
+            for ($oy = -4; $oy <= 4; $oy += 2) {
+                if (abs($ox) + abs($oy) < 3) continue;
                 imagettftext($canvas, $size, 0, 56 + $ox, $y + $oy, $ink, $font, $ln);
             }
         }
-        imagettftext($canvas, $size, 0, 56, $y, $white, $font, $ln);
+        foreach (array(array(0,0), array(1,0), array(2,0), array(0,1), array(1,1), array(2,1)) as $o) {
+            imagettftext($canvas, $size, 0, 56 + $o[0], $y + $o[1], $white, $font, $ln);
+        }
         $y += $lineH;
     }
 
