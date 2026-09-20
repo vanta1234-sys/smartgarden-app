@@ -54,10 +54,42 @@ async function deploy() {
   const client = new Client();
   client.ftp.verbose = true;
 
-  const FTP_HOST = process.env.FTP_HOST || "smartgarden.gr";
-  const FTP_USER = process.env.FTP_USER || "smartgarden.gr_8p3lo1vph0t";
-  const FTP_PASSWORD = process.env.FTP_PASSWORD || "Uc0Lptjan_j47Eg~";
-  const FTP_REMOTE_DIR = process.env.FTP_REMOTE_DIR || "/httpdocs";
+  // The FTP user and password were string literals here, in a repository that is public
+  // on GitHub — the pair that can write to the document root was readable by anyone, from
+  // the initial commit onwards. They come from the environment or from .env.deploy
+  // (covered by the .env* rule in .gitignore) now, and there is deliberately no fallback:
+  // a deploy that cannot find credentials has to stop, not reach for a published pair.
+  //
+  // Removing them from the file does not make the old pair safe — it stays in every clone
+  // and in the commit history. It has to be changed at the host.
+  const dotEnvDeploy = (): Record<string, string> => {
+    const out: Record<string, string> = {};
+    try {
+      const raw = fs.readFileSync(path.join(process.cwd(), ".env.deploy"), "utf8");
+      for (const line of raw.split(/\r?\n/)) {
+        const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
+        if (m && !line.trim().startsWith("#")) out[m[1]] = m[2].replace(/^["']|["']$/g, "");
+      }
+    } catch {
+      // No file is fine; the environment may carry them instead.
+    }
+    return out;
+  };
+  const deployEnv = dotEnvDeploy();
+
+  const FTP_HOST = process.env.FTP_HOST || deployEnv.FTP_HOST || "smartgarden.gr";
+  const FTP_USER = process.env.FTP_USER || deployEnv.FTP_USER || "";
+  const FTP_PASSWORD = process.env.FTP_PASSWORD || deployEnv.FTP_PASSWORD || "";
+  const FTP_REMOTE_DIR = process.env.FTP_REMOTE_DIR || deployEnv.FTP_REMOTE_DIR || "/httpdocs";
+
+  if (!FTP_USER || !FTP_PASSWORD) {
+    console.error("❌ FTP_USER and FTP_PASSWORD are not set.");
+    console.error("   Put them in .env.deploy in the project root (it is git-ignored):");
+    console.error("     FTP_USER=...");
+    console.error("     FTP_PASSWORD=...");
+    console.error("   or export them in the environment before running the deploy.");
+    process.exit(1);
+  }
 
   const hosts = [FTP_HOST, "185.29.24.7", "ftp.smartgarden.gr"];
   let connected = false;

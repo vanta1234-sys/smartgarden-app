@@ -745,9 +745,15 @@ app.post("/api/deploy", async (req, res) => {
     client.ftp.verbose = false;
 
     const FTP_HOST = process.env.FTP_HOST || "smartgarden.gr";
-    const FTP_USER = process.env.FTP_USER || "smartgarden.gr_8p3lo1vph0t";
-    const FTP_PASSWORD = process.env.FTP_PASSWORD || "Uc0Lptjan_j47Eg~";
+    const FTP_USER = process.env.FTP_USER || "";
+    const FTP_PASSWORD = process.env.FTP_PASSWORD || "";
     const FTP_REMOTE_DIR = process.env.FTP_REMOTE_DIR || "/httpdocs";
+
+    // These were literals in a public repository until 2026-09-20. No fallback: a
+    // deploy without credentials has to stop rather than use a published pair.
+    if (!FTP_USER || !FTP_PASSWORD) {
+      throw new Error("FTP_USER and FTP_PASSWORD are not set; set them in the environment or .env.deploy.");
+    }
 
     const candidateHosts = [FTP_HOST, "185.29.24.7", "ftp.smartgarden.gr"];
     let connected = false;
@@ -891,9 +897,15 @@ app.all("/api/cron-publish", async (req, res) => {
     client.ftp.verbose = false;
 
     const FTP_HOST = process.env.FTP_HOST || "smartgarden.gr";
-    const FTP_USER = process.env.FTP_USER || "smartgarden.gr_8p3lo1vph0t";
-    const FTP_PASSWORD = process.env.FTP_PASSWORD || "Uc0Lptjan_j47Eg~";
+    const FTP_USER = process.env.FTP_USER || "";
+    const FTP_PASSWORD = process.env.FTP_PASSWORD || "";
     const FTP_REMOTE_DIR = process.env.FTP_REMOTE_DIR || "/httpdocs";
+
+    // These were literals in a public repository until 2026-09-20. No fallback: a
+    // deploy without credentials has to stop rather than use a published pair.
+    if (!FTP_USER || !FTP_PASSWORD) {
+      throw new Error("FTP_USER and FTP_PASSWORD are not set; set them in the environment or .env.deploy.");
+    }
 
     const candidateHosts = [FTP_HOST, "185.29.24.7", "ftp.smartgarden.gr"];
     let connected = false;
