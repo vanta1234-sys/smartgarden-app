@@ -307,6 +307,12 @@ if ($action === 'thumb') {
     header('Content-Length: ' . filesize($dest));
     if (isset($_GET['dl'])) header('Content-Disposition: attachment; filename="thumb-' . ($job !== '' ? $job : $article['slug']) . '.jpg"');
     header('X-SG-Photo: ' . ($photo === '' ? 'none' : basename($photo)));
+    // What the two text rules actually produced, so a blank headline can be told apart
+    // from a headline that rendered off-canvas.
+    $dbgTitle = isset($article['title']['el']) ? $article['title']['el']
+        : (isset($article['title']) && is_string($article['title']) ? $article['title'] : '');
+    header('X-SG-Headline: ' . rawurlencode(sg_thumb_headline($dbgTitle)));
+    header('X-SG-Kicker: ' . rawurlencode(sg_thumb_kicker($article)));
     readfile($dest);
     exit;
 }
