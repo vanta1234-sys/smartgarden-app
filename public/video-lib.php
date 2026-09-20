@@ -1189,3 +1189,146 @@ function sg_render_overlay($scene, $dest) {
     imagedestroy($img);
     return $ok;
 }
+
+// ============================================================================
+// YouTube thumbnail
+// ============================================================================
+
+/**
+ * The line that goes on the thumbnail, taken from the article's own title.
+ *
+ * Titles are written as hooks — «Πότε χρειάζεται αλλαγή γλάστρας (και το λάθος που
+ * σκοτώνει το φυτό μετά)» — and the parenthesis is almost always the sharper half, because
+ * that is where the rewrite put the consequence. Prefer it, fall back to the part before
+ * the colon, and never to the whole title: a thumbnail is about three centimetres wide on
+ * a phone and a sentence disappears at that size.
+ */
+function sg_thumb_headline($title) {
+    $title = (string) $title;
+    if (preg_match('/\(([^)]{8,60})\)/u', $title, $m)) {
+        $inner = trim($m[1]);
+        $inner = preg_replace('/^(και|κι)\s+(το|τα|η|ο|οι)?\s*/u', '', $inner);
+        if (mb_strlen($inner, 'UTF-8') >= 8) return sg_greek_caps($inner);
+    }
+    $head = trim(preg_split('/[:(]/u', $title)[0]);
+    return sg_greek_caps($head !== '' ? $head : $title);
+}
+
+/**
+ * One concrete figure to sit under the headline.
+ *
+ * A number is the difference between a thumbnail that promises a topic and one that
+ * promises an answer, and the key takeaways are already written as rules with numbers in
+ * them. Returns '' when there is genuinely no figure — an invented one would be worse than
+ * none, and this text is a claim about the article's content.
+ */
+function sg_thumb_kicker($article) {
+    $pool = array();
+    $kt = isset($article['keyTakeaways']) ? $article['keyTakeaways'] : array();
+    if (isset($kt['el'])) $kt = $kt['el'];
+    foreach ((array) $kt as $k) $pool[] = (string) $k;
+    $sum = isset($article['summary']) ? $article['summary'] : '';
+    if (is_array($sum)) $sum = isset($sum['el']) ? $sum['el'] : '';
+    $pool[] = (string) $sum;
+
+    // A number, optionally a range, followed by a unit we actually use in these articles.
+    $unit = '(?:cm|εκατοστ\p{L}*|mm|m²|λίτρ\p{L}*|ml|°C|%|ημέρ\p{L}*|εβδομάδ\p{L}*|μήν\p{L}*|ώρ\p{L}*|φορ\p{L}*)';
+    foreach ($pool as $text) {
+        if (preg_match('/(\d+(?:[.,]\d+)?(?:\s*[-–]\s*\d+(?:[.,]\d+)?)?)\s*(' . $unit . ')/u', $text, $m)) {
+            return trim($m[1] . ' ' . $m[2]);
+        }
+    }
+    return '';
+}
+
+/**
+ * Render a 1280x720 YouTube thumbnail.
+ *
+ * The background is one of our own garden photographs wherever the article has a matching
+ * one — it is the only genuinely unique material the site has, and a stock plant photo
+ * behind our own headline would be the opposite of the point. Cover-cropped towards the
+ * right so the subject sits opposite the type, under a left-hand scrim dark enough that
+ * white letters survive whatever the photograph does underneath. A weak gradient put the
+ * first headline over a sunlit leaf and it was unreadable at thumbnail size.
+ */
+function sg_render_thumbnail($article, $dest, $photoPath = '') {
+    $W = 1280; $H = 720;
+    $canvas = imagecreatetruecolor($W, $H);
+
+    $src = $photoPath !== '' && is_file($photoPath) ? sg_load_image($photoPath) : null;
+    if ($src) {
+        $sw = imagesx($src); $sh = imagesy($src);
+        $scale = max($W / $sw, $H / $sh);
+        $nw = (int) ceil($sw * $scale); $nh = (int) ceil($sh * $scale);
+        $dx = (int) round(($nw - $W) * 0.72);
+        $dy = (int) round(($nh - $H) * 0.40);
+        imagecopyresampled($canvas, $src, -$dx, -$dy, 0, 0, $nw, $nh, $sw, $sh);
+        imagedestroy($src);
+    } else {
+        // No photograph: a flat dark green still reads, and says nothing untrue.
+        imagefilledrectangle($canvas, 0, 0, $W, $H, imagecolorallocate($canvas, 12, 38, 20));
+    }
+
+    // Left-hand scrim. Drawn column by column because GD has no gradient.
+    for ($x = 0; $x < $W; $x++) {
+        $t = 1.0 - $x / 1120.0;
+        if ($t <= 0) break;
+        $a = (int) round(127 - 125 * sqrt($t));
+        if ($a >= 127) continue;
+        $c = imagecolorallocatealpha($canvas, 8, 22, 12, $a);
+        imagefilledrectangle($canvas, $x, 0, $x, $H, $c);
+    }
+
+    $white = imagecolorallocate($canvas, 255, 255, 255);
+    $ink   = imagecolorallocate($canvas, 4, 16, 8);
+    $green = imagecolorallocate($canvas, 47, 143, 62);
+    $lime  = imagecolorallocate($canvas, 134, 185, 63);
+    $font  = SG_FONT;
+
+    // Category pill.
+    $label = isset($article['categoryLabel']) ? $article['categoryLabel'] : '';
+    if (is_array($label)) $label = isset($label['el']) ? $label['el'] : '';
+    $label = sg_greek_caps(sg_shorten((string) $label, 26));
+    if ($label !== '') {
+        $ls = 28;
+        $lw = sg_text_width($label, $ls);
+        imagefilledrectangle($canvas, 56, 84, 56 + $lw + 34, 84 + 54, $green);
+        imagettftext($canvas, $ls, 0, 56 + 17, 84 + 38, $white, $font, $label);
+    }
+
+    // Headline, wrapped to at most three lines and shrunk until it fits.
+    $headline = sg_thumb_headline(isset($article['title']['el']) ? $article['title']['el']
+        : (isset($article['title']) && is_string($article['title']) ? $article['title'] : ''));
+    $size = 92;
+    $lines = array();
+    for (; $size >= 54; $size -= 4) {
+        $lines = sg_wrap_lines($headline, $size, 720);
+        if (count($lines) <= 3) break;
+    }
+    if (count($lines) > 3) $lines = array_slice($lines, 0, 3);
+
+    $lineH = (int) round($size * 1.16);
+    $y = (int) round(196 + $size);
+    foreach ($lines as $ln) {
+        for ($ox = -3; $ox <= 3; $ox += 3) {
+            for ($oy = -3; $oy <= 3; $oy += 3) {
+                if ($ox === 0 && $oy === 0) continue;
+                imagettftext($canvas, $size, 0, 56 + $ox, $y + $oy, $ink, $font, $ln);
+            }
+        }
+        imagettftext($canvas, $size, 0, 56, $y, $white, $font, $ln);
+        $y += $lineH;
+    }
+
+    // The figure, in accented lower case — only capitals drop their accents in Greek.
+    $kicker = sg_thumb_kicker($article);
+    if ($kicker !== '') {
+        $kicker = 'μόνο ' . $kicker;
+        imagettftext($canvas, 44, 0, 58 + 2, $y + 26 + 2, $ink, $font, $kicker);
+        imagettftext($canvas, 44, 0, 58, $y + 26, $lime, $font, $kicker);
+    }
+
+    $ok = imagejpeg($canvas, $dest, 88);
+    imagedestroy($canvas);
+    return $ok && is_file($dest);
+}

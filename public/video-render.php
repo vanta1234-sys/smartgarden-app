@@ -258,6 +258,44 @@ if ($action === 'bgtest') {
     ));
 }
 
+// ============================================================================
+// thumb — render the YouTube thumbnail for a finished job and serve it
+// ============================================================================
+// Separate from the upload so the picture can be judged before anyone publishes it.
+// &dl=1 offers it as a download instead of displaying it inline.
+if ($action === 'thumb') {
+    $job = isset($_GET['job']) ? basename((string) $_GET['job']) : '';
+    $dir = $JOBS_ROOT . '/' . $job;
+    if ($job === '' || !is_dir($dir)) sg_err('Unknown job ' . $job);
+
+    $meta = @json_decode((string) @file_get_contents($dir . '/job.json'), true);
+    $article = is_array($meta) && isset($meta['article']) ? $meta['article'] : null;
+    if (!is_array($article)) sg_err('No article metadata in job ' . $job);
+
+    require_once __DIR__ . '/ssr-lib.php';
+    $own = sg_pick_real_photo($article);
+    $photo = '';
+    if (is_array($own) && !empty($own['file'])) {
+        $candidate = __DIR__ . '/' . ltrim((string) $own['file'], '/');
+        if (is_file($candidate)) $photo = $candidate;
+    }
+    // Nothing of ours matches this subject, so fall back to a still the render already
+    // downloaded — it is at least the picture the video itself opens on.
+    if ($photo === '') {
+        foreach ((array) glob($dir . '/scene*.jpg') as $f) { $photo = $f; break; }
+    }
+
+    $dest = $dir . '/thumb.jpg';
+    if (!sg_render_thumbnail($article, $dest, $photo)) sg_err('Could not render thumbnail');
+
+    header('Content-Type: image/jpeg');
+    header('Content-Length: ' . filesize($dest));
+    if (isset($_GET['dl'])) header('Content-Disposition: attachment; filename="thumb-' . $job . '.jpg"');
+    header('X-SG-Photo: ' . ($photo === '' ? 'none' : basename($photo)));
+    readfile($dest);
+    exit;
+}
+
 if ($action === 'disk') {
     $root = is_dir($JOBS_ROOT) ? $JOBS_ROOT : __DIR__;
     $used = 0;
