@@ -106,7 +106,7 @@ if ($article) {
 "; $listOpen = false; }
                 $out .= '<figure><img src="' . $esc($m[2]) . '" alt="' . $esc($m[1])
                       . '" width="900" height="675" loading="lazy" decoding="async">'
-                      . '<figcaption>' . $esc($m[1]) . ' — δική μας φωτογραφία, Σεπτέμβριος 2026.</figcaption>'
+                      . '<figcaption>' . $esc($m[1]) . ' — δική μας φωτογραφία από τον κήπο μας, Σεπτέμβριος 2026.</figcaption>'
                       . "</figure>
 ";
             } elseif (preg_match('/^###\s+(.*)$/u', $line, $m)) {

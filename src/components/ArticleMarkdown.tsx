@@ -36,7 +36,7 @@ export const ArticleMarkdown: React.FC<ArticleMarkdownProps> = ({ content }) => 
                 className="w-full rounded-xl border border-slate-800"
               />
               <figcaption className="text-[11px] text-slate-500 mt-1.5">
-                {alt} — δική μας φωτογραφία, Σεπτέμβριος 2026.
+                {alt} — δική μας φωτογραφία από τον κήπο μας, Σεπτέμβριος 2026.
               </figcaption>
             </figure>
           ),
