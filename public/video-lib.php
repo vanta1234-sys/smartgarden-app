@@ -1262,10 +1262,16 @@ function sg_render_thumbnail($article, $dest, $photoPath = '') {
     if (!isset($article['keyTakeaways']) && !empty($article['slug'])) {
         $all = @json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true);
         foreach ((array) $all as $a) {
-            if (isset($a['slug']) && $a['slug'] === $article['slug']) {
-                $article = array_merge($a, array_filter($article, 'strlen'));
-                break;
+            if (!isset($a['slug']) || $a['slug'] !== $article['slug']) continue;
+            // Written out rather than array_filter($article, 'strlen'): title and summary
+            // are arrays keyed by language, and strlen() on an array is a TypeError in
+            // PHP 8 — which is a 500 with an empty body from behind Cloudflare.
+            foreach ($article as $k => $v) {
+                if ($v === '' || $v === null || $v === array()) continue;
+                $a[$k] = $v;
             }
+            $article = $a;
+            break;
         }
     }
 
