@@ -1234,14 +1234,21 @@ function sg_thumb_headline($title) {
     // meaning. Cutting at 40 characters left «...ΚΙΤΡΙΝΙΖΕΙ ΤΑ» and «...ΝΕΚΡΟ ΜΕΤΑ ΤΟΝ»,
     // and a dangling article reads as a typo rather than a promise. Repeated because
     // removing one can expose another.
+    //
+    // Trimmed with preg_replace and not rtrim: rtrim's character list is a list of BYTES,
+    // and «·» is two of them — 0xC2 0xB7. 0xB7 is also the second byte of «η», so
+    // rtrim('...μόνη', ' ,·-&') removed half a letter, left a dangling 0xCE, and every
+    // preg_replace with /u after that returned null on the invalid UTF-8. The headline
+    // came out empty and the thumbnail rendered with no title at all.
     $tail = '/\s+(το|τα|τη|την|τον|της|του|των|οι|και|κι|με|σε|για|από|να|που|στο|στη|στην|στον|μετά|πλέον|τελικά|ξανά|σήμερα)$/ui';
+    $edge = '/[\s,·\-&]+$/u';
     for ($i = 0; $i < 4; $i++) {
-        $next = preg_replace($tail, '', rtrim($head, " ,·-&"));
-        if ($next === $head) break;
+        $next = preg_replace($tail, '', preg_replace($edge, '', $head));
+        if ($next === null || $next === $head) break;
         $head = $next;
     }
 
-    return sg_greek_caps(rtrim($head, " ,·-&"));
+    return sg_greek_caps((string) preg_replace($edge, '', $head));
 }
 
 /**
