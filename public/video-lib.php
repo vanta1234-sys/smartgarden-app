@@ -292,7 +292,9 @@ function sg_build_script($article) {
             // Greek TTS runs at roughly 17 characters a second, so these caps are really
             // duration caps. The whole video targets ~20s: past that, watch-through on a
             // Short falls off a cliff and the payoff never gets seen.
-            'voiceover' => sg_scene_line($summary, 95),
+            // Spoken only. The caption keeps "3-5", which reads correctly on screen; it is
+            // just the synthesiser that needs the word.
+            'voiceover' => sg_speak_ranges(sg_scene_line($summary, 95)),
             'onScreenText' => $angle['problemText'],
             'step' => 0,
         ),
@@ -305,7 +307,7 @@ function sg_build_script($article) {
             'tag' => 'ΒΗΜΑ ' . ($i + 1),
             // No spoken "Πρώτον/Δεύτερον" any more: the numbered badge on screen already
             // says which step this is, and the word cost most of a second each time.
-            'voiceover' => sg_scene_line($bullet, 95),
+            'voiceover' => sg_speak_ranges(sg_scene_line($bullet, 95)),
             // Generous, because the renderer wraps to four lines and shrinks the type to fit.
             // Cutting at 95 chars put an ellipsis in the middle of most takeaways.
             'onScreenText' => sg_scene_line($bullet, 95),
@@ -342,6 +344,29 @@ function sg_build_script($article) {
         'tiktokCaption' => $tiktokCaption,
         'youtubeDescription' => $youtubeDescription,
         'youtubeTitle' => sg_shorten($cleanTitle, 95),
+    );
+}
+
+/**
+ * Say a numeric range as a range.
+ *
+ * "3-5 εκατοστά" was being read aloud as «τρία πέντε» — the hyphen is silent, so a
+ * measurement with a lower and an upper bound came out as two unrelated numbers. Spelling
+ * the dash as «έως» is the only way the synthesiser can say what the text means.
+ *
+ * What must NOT be touched, and why the lookarounds are there:
+ *   NPK 20-20-20        a fertiliser ratio, not a range — the lookahead refuses a dash or
+ *                       digit after the second number, and the lookbehind one before the
+ *                       first, so no pair inside a chain of three ever matches
+ *   ινδολο-3-βουτυρικό  a hyphenated word that happens to contain a digit
+ *   Βήμα-προς-Βήμα      a hyphenated word with no digits at all
+ *   2026-09-19          a date, for the same reason as the NPK ratio
+ */
+function sg_speak_ranges($text) {
+    return preg_replace(
+        '/(?<![\d.,\-–—])(\d+(?:[.,]\d+)?)\s*[-–—]\s*(\d+(?:[.,]\d+)?)(?![\d\-–—])/u',
+        '$1 έως $2',
+        (string) $text
     );
 }
 
@@ -389,7 +414,7 @@ function sg_speech_text($md) {
         if (!preg_match('/[.!;:]$/u', $t)) $t .= '.';
         $out[] = $t;
     }
-    return implode(' ', $out);
+    return sg_speak_ranges(implode(' ', $out));
 }
 
 /**
