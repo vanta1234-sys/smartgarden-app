@@ -1720,6 +1720,160 @@ if (file_exists($latestFile)) {
     }
 }
 
+// ==========================================
+// 4b. DEEPEN AN EXISTING THIN ARTICLE
+// ==========================================
+// AdSense refused the site for "Low value content". Measured against the 66 published
+// articles on 2026-09-20, the corpus splits cleanly in two: the 50 inherited from
+// master50Articles.ts have a median of 1,174 words and not one reaches 1,450, while every
+// article this cron has written since the floor went in lands between 1,881 and 2,318.
+// Three quarters of the site is the old set, so that is what a reviewer opens.
+//
+// Publishing more new articles cannot lift a corpus that is 76% thin. This rewrites one
+// that already exists, in place: same slug, same date, same image, a body that meets the
+// floor for its own shape. One per run, so it can share the daily schedule.
+//
+//   &deepen=audit           list everything below its floor, generate nothing
+//   &deepen=1|<slug>        generate a replacement and return it WITHOUT writing
+//   &deepen=...&confirm=1   write it, after taking a dated backup
+if (isset($_GET['deepen'])) {
+    header('Content-Type: application/json; charset=utf-8');
+
+    $elOf = function ($v) {
+        if (is_array($v)) return isset($v['el']) ? (string) $v['el'] : '';
+        return is_string($v) ? $v : '';
+    };
+
+    $thin = array();
+    foreach ($existingArticles as $i => $a) {
+        $title = $elOf(isset($a['title']) ? $a['title'] : '');
+        if ($title === '') continue;
+        // Shape is read off the article's own title, exactly as it would be for a new one,
+        // so a diagnosis piece is not held to the floor meant for a species guide.
+        $asTopic = array(
+            'title' => $title,
+            'slug' => isset($a['slug']) ? (string) $a['slug'] : '',
+            'category_slug' => isset($a['category']) ? (string) $a['category'] : 'garden',
+            'prompt_focus' => $elOf(isset($a['summary']) ? $a['summary'] : ''),
+        );
+        $words = articleWordCount($elOf(isset($a['content']) ? $a['content'] : ''));
+        $floor = sg_word_floor($asTopic);
+        if ($words >= $floor) continue;
+        $thin[] = array(
+            'index' => $i,
+            'slug' => $asTopic['slug'],
+            'title' => mb_substr($title, 0, 70, 'UTF-8'),
+            'shape' => sg_article_shape($asTopic),
+            'words' => $words,
+            'floor' => $floor,
+            'short_by' => $floor - $words,
+            'topic' => $asTopic,
+        );
+    }
+    // Worst first: the thinnest article is the one a reviewer is most likely to be shown.
+    usort($thin, function ($x, $y) { return $y['short_by'] - $x['short_by']; });
+
+    $want = (string) $_GET['deepen'];
+    if ($want === 'audit') {
+        $rows = array();
+        foreach ($thin as $t) {
+            unset($t['topic'], $t['index']);
+            $rows[] = $t;
+        }
+        echo json_encode(array(
+            'success' => true,
+            'articlesTotal' => count($existingArticles),
+            'belowFloor' => count($thin),
+            'queue' => $rows,
+        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    $target = null;
+    foreach ($thin as $t) {
+        if ($want === '1' || $t['slug'] === $want) { $target = $t; break; }
+    }
+    if ($target === null) {
+        http_response_code(404);
+        echo json_encode(array(
+            'success' => false,
+            'error' => $want === '1' ? 'Nothing is below its floor.' : 'No article below its floor with slug ' . $want,
+            'belowFloor' => count($thin),
+        ), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $fresh = generateScientificAgronomyArticle($target['topic'], $GEMINI_API_KEY, $OPENAI_API_KEY);
+    $freshWords = articleWordCount($fresh);
+
+    // Never trade a thin article for a thinner one. When every model misses, the generator
+    // returns a ~94-word stub, and that stub landing on top of a real article would be far
+    // worse than the article was.
+    if ($freshWords < $target['floor'] || $freshWords <= $target['words']) {
+        http_response_code(422);
+        echo json_encode(array(
+            'success' => false,
+            'error' => 'Replacement did not beat the original; nothing was written.',
+            'slug' => $target['slug'],
+            'wordsBefore' => $target['words'],
+            'wordsGenerated' => $freshWords,
+            'floor' => $target['floor'],
+        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if (!isset($_GET['confirm']) || $_GET['confirm'] !== '1') {
+        echo json_encode(array(
+            'success' => true,
+            'written' => false,
+            'note' => 'Dry run. Add &confirm=1 to replace the stored body.',
+            'slug' => $target['slug'],
+            'shape' => $target['shape'],
+            'wordsBefore' => $target['words'],
+            'wordsAfter' => $freshWords,
+            'preview' => mb_substr($fresh, 0, 600, 'UTF-8'),
+        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    // One dated backup before the first rewrite of the day. Overwriting this file is how
+    // five days of published articles disappeared once already.
+    $backup = __DIR__ . '/latest_articles.backup-' . date('Y-m-d') . '.json';
+    if (!file_exists($backup)) @copy($latestFile, $backup);
+
+    $at = $target['index'];
+    if (isset($existingArticles[$at]['content']) && is_array($existingArticles[$at]['content'])) {
+        $existingArticles[$at]['content']['el'] = $fresh;
+    } else {
+        $existingArticles[$at]['content'] = array('el' => $fresh, 'en' => '');
+    }
+    $existingArticles[$at]['readTime'] = max(8, (int) round($freshWords / 180)) . ' min';
+    $existingArticles[$at]['deepenedAt'] = date('Y-m-d');
+    $existingArticles[$at]['wordsBefore'] = $target['words'];
+
+    $encoded = json_encode($existingArticles, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $tmp = $latestFile . '.tmp';
+    $ok = $encoded !== false && @file_put_contents($tmp, $encoded) !== false && @rename($tmp, $latestFile);
+    if (!$ok) {
+        @unlink($tmp);
+        http_response_code(500);
+        echo json_encode(array('success' => false, 'error' => 'Could not write latest_articles.json; the article is unchanged.'), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    echo json_encode(array(
+        'success' => true,
+        'written' => true,
+        'slug' => $target['slug'],
+        'shape' => $target['shape'],
+        'wordsBefore' => $target['words'],
+        'wordsAfter' => $freshWords,
+        'backup' => basename($backup),
+        'remainingBelowFloor' => count($thin) - 1,
+    ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
 // Cap publishing at one article per day. Google's March 2026 core update explicitly
 // targeted "scaled content abuse" — sites publishing AI-written articles in volume with
 // no human editorial review lost 50-80% of their traffic. This site was on a 3x/day
@@ -1824,6 +1978,7 @@ if (isset($_GET['shapes'])) {
         JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
+
 
 // This topic already has at least one prior version — give this one a distinct angle
 // (based on how many versions THIS topic has, not a global counter) so it reads as a
