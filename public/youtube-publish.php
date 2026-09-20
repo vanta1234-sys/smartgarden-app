@@ -84,10 +84,16 @@ if ($jobId !== '') {
         exit;
     }
     $jobsRoot = is_dir(dirname(__DIR__) . '/video-jobs') ? dirname(__DIR__) . '/video-jobs' : __DIR__ . '/video-jobs';
-    $videoPath = $jobsRoot . '/' . $jobId . '/video.mp4';
+    // "variant":"slides" picks the copy video-inserts.php wrote beside the render, the one
+    // with the presentation cut into it. Without this the only uploadable file is the
+    // original video.mp4, so the version worth publishing could not be published.
+    $variant = isset($body['variant']) ? preg_replace('/[^a-z]/', '', (string) $body['variant']) : '';
+    $videoFile = $variant === 'slides' ? '/video-slides.mp4' : '/video.mp4';
+    $videoPath = $jobsRoot . '/' . $jobId . $videoFile;
     if (!is_file($videoPath)) {
         http_response_code(200);
-        echo json_encode(['success' => false, 'error' => 'No rendered video for job ' . $jobId]);
+        echo json_encode(['success' => false, 'error' => 'No rendered video for job ' . $jobId
+                                                        . ($variant !== '' ? ' (variant ' . $variant . ')' : '')]);
         exit;
     }
     // Under 20MB — every Short — keeps the multipart path that has been uploading fine all
