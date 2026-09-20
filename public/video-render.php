@@ -331,8 +331,9 @@ if ($action === 'cleanup') {
         'success' => true,
         'removed' => $removed,
         'freedMB' => (int) round(($before - $after) / 1048576),
-        'usedMB' => (int) round($after / 1048576),
-        'budgetMB' => SG_JOBS_BUDGET_MB,
+        'jobsUsedMB' => (int) round($after / 1048576),
+        'accountUsedMB' => (int) round(sg_dirsize(dirname(__DIR__)) / 1048576),
+        'quotaMB' => SG_ACCOUNT_QUOTA_MB,
     ));
 }
 
@@ -438,23 +439,26 @@ if (!is_file($FFMPEG)) sg_err('ffmpeg is not installed on this server', array('e
 // and both are things this code can know. A Short is checked too: it is small, but it is
 // not small enough to be waved through once the budget is nearly gone.
 $needMB = $mode === 'long' ? 450 : 40;
-$budgetBytes = SG_JOBS_BUDGET_MB * 1048576;
-$usedBytes = is_dir($JOBS_ROOT) ? sg_dirsize($JOBS_ROOT) : 0;
+$ceilingBytes = (SG_ACCOUNT_QUOTA_MB - SG_ACCOUNT_HEADROOM_MB) * 1048576;
+$accountRoot = dirname(__DIR__);
+$usedBytes = sg_dirsize($accountRoot);
 
-if ($usedBytes + $needMB * 1048576 > $budgetBytes) {
+if ($usedBytes + $needMB * 1048576 > $ceilingBytes) {
     // Earn the room back before refusing: anything finished six hours ago is published.
     foreach ((array) glob($JOBS_ROOT . '/*', GLOB_ONLYDIR) as $old) {
         if (@filemtime($old) < time() - 21600) sg_rmtree($old);
     }
-    $usedBytes = is_dir($JOBS_ROOT) ? sg_dirsize($JOBS_ROOT) : 0;
+    $usedBytes = sg_dirsize($accountRoot);
 }
 
-if ($usedBytes + $needMB * 1048576 > $budgetBytes) {
-    sg_err('Not enough room in the disk budget for this render', array(
-        'usedMB' => (int) round($usedBytes / 1048576),
+if ($usedBytes + $needMB * 1048576 > $ceilingBytes) {
+    sg_err('Not enough room in the account quota for this render', array(
+        'accountUsedMB' => (int) round($usedBytes / 1048576),
+        'jobsUsedMB' => is_dir($JOBS_ROOT) ? (int) round(sg_dirsize($JOBS_ROOT) / 1048576) : 0,
         'needMB' => $needMB,
-        'budgetMB' => SG_JOBS_BUDGET_MB,
-        'hint' => 'video-render.php?action=cleanup, or raise SG_JOBS_BUDGET_MB in video-lib.php if the plan has grown',
+        'quotaMB' => SG_ACCOUNT_QUOTA_MB,
+        'headroomMB' => SG_ACCOUNT_HEADROOM_MB,
+        'hint' => 'video-render.php?action=cleanup&all=1 clears every job; raise SG_ACCOUNT_QUOTA_MB in video-lib.php if the hosting plan has grown',
     ));
 }
 

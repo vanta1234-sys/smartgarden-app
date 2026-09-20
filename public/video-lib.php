@@ -32,11 +32,18 @@ define('SG_FONT', __DIR__ . '/fonts/NotoSans-Variable.ttf');
 // fifteen-minute 1080p video is a few hundred MB before the thirty-odd intermediate pieces
 // the slide pass writes beside it.
 //
-// So the budget is stated here, in the account's terms, and everything that writes into
-// video-jobs is measured against it. disk_free_space() cannot do this job — on shared
-// hosting it reports the server's filesystem, which had hundreds of gigabytes free the
-// whole time the account was over quota.
-define('SG_JOBS_BUDGET_MB', 300);
+// So the quota is stated here, and a render is measured against the whole account — not
+// against video-jobs, and not against disk_free_space(), which on shared hosting reports
+// the server's filesystem and had hundreds of gigabytes free the whole time the account
+// was over quota. The site's own files count towards the same 1 GB, so they have to be in
+// the sum; measuring only our own folder is how a budget looks fine while the account is
+// being suspended.
+//
+// The headroom is what is left for the site to write to while a render is running — the
+// article JSON, logs, an upload. Raise the quota here if the plan grows; it is the number
+// the host enforces, not a guess.
+define('SG_ACCOUNT_QUOTA_MB', 1024);
+define('SG_ACCOUNT_HEADROOM_MB', 120);
 
 // ============================================================================
 // Disk

@@ -538,8 +538,10 @@ function sg_run_job($dir) {
     // and get suspended. Freed now, while we are certain the render succeeded.
     $freed = sg_strip_intermediates($dir, $final);
     sg_log($dir, 'freed ' . round($freed / 1048576, 1) . 'MB of intermediates; kept '
-                . round($videoBytes / 1048576, 1) . 'MB of video. video-jobs now at '
-                . round(sg_dirsize(dirname($dir)) / 1048576, 1) . 'MB of ' . SG_JOBS_BUDGET_MB . 'MB.');
+                . round($videoBytes / 1048576, 1) . 'MB of video. video-jobs at '
+                . round(sg_dirsize(dirname($dir)) / 1048576, 1) . 'MB, account at '
+                . round(sg_dirsize(dirname(dirname($dir))) / 1048576, 1)
+                . 'MB of ' . SG_ACCOUNT_QUOTA_MB . 'MB.');
 }
 
 /** POST a JSON body to one of our own endpoints and decode the reply. */
