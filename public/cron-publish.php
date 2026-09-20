@@ -1803,6 +1803,28 @@ if ($selectedTopic === null) {
     exit;
 }
 
+// &shapes=1 reports which shape every topic in the pool would be written to, and stops.
+// Changing the skeleton without a way to see the result would mean finding out by reading
+// tomorrow's published article.
+if (isset($_GET['shapes'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    $rows = array();
+    $tally = array();
+    foreach ($topicPool as $t) {
+        $shape = sg_article_shape($t);
+        $tally[$shape] = (isset($tally[$shape]) ? $tally[$shape] : 0) + 1;
+        $rows[] = array(
+            'title' => mb_substr($t['title'], 0, 70, 'UTF-8'),
+            'shape' => $shape,
+            'floorWords' => sg_word_floor($t),
+            'sections' => array_map(function ($s) { return $s[0]; }, sg_shape_sections($shape, $t)),
+        );
+    }
+    echo json_encode(array('success' => true, 'tally' => $tally, 'topics' => $rows),
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
 // This topic already has at least one prior version — give this one a distinct angle
 // (based on how many versions THIS topic has, not a global counter) so it reads as a
 // genuinely different article instead of a near-clone.
@@ -1841,6 +1863,132 @@ function extractGeminiText($result, $httpCode) {
 
 $GLOBALS['cronDebug'] = array();
 
+/**
+ * Which shape of article this topic wants.
+ *
+ * Every article used to be written to one hardcoded skeleton — Σύντομη Απάντηση, then
+ * "1. Επιστημονικό Υπόβαθρο & Βοτανική Φυσιολογία", "2. Τεχνικές Προδιαγραφές & Πίνακας
+ * Παραμέτρων", and four more, identical across all 73 of them. A guide to a beginner's
+ * hand tools got a section on cell physiology and a parameter table with pH and EC, because
+ * the template said so. On 2026-09-19 AdSense rejected the site for "Low value content",
+ * citing its spam policy on scaled content; 73 pages sharing one skeleton is exactly the
+ * shape that policy describes, whoever or whatever wrote them.
+ *
+ * The shape is chosen from the topic itself and is deterministic, so re-running an article
+ * produces the same structure rather than a random one.
+ */
+function sg_article_shape($topic) {
+    // Scored, not first-match. An ordered if-chain lets one incidental word decide: the
+    // lemon-tree piece is a diagnosis of yellow leaves, but its brief happens to mention
+    // "διαφορά EDDHA vs EDTA" and a choice-first chain filed it as a comparison. The title
+    // says what an article IS, so it counts triple; the brief only breaks ties.
+    $title = mb_strtolower((string) ($topic['title'] ?? ''), 'UTF-8');
+    $focus = mb_strtolower((string) ($topic['prompt_focus'] ?? ''), 'UTF-8');
+
+    $keywords = array(
+        'list'      => array('λάθη', 'σφάλματα', 'μύθοι', 'τα 10 ', 'τα 7 ', 'τα 5 ', 'λίστα'),
+        'choice'    => array('εργαλεί', 'σύγκρισ', ' vs ', 'ποιο ', 'επιλογή', 'μάρκ', 'αγοράσ', 'διαλέξ'),
+        'diagnosis' => array('γιατί', 'κιτριν', 'μαραίν', 'σήψη', 'ασθέν', 'προσβολ', 'αποκατάστασ', 'τροφοπεν', 'δεν φταίει', 'νεκρό', 'ξεραίν'),
+        'howto'     => array('πώς ', 'βήμα', 'μεταφύτευσ', 'φύτευσ', 'πολλαπλασιασμ', 'εγκατάστασ', 'κλάδεμα', 'κομποστ', 'τεστ', 'φτιάχν'),
+        'species'   => array('καλλιέργεια', 'φροντίδα', 'ποικιλί', 'σπορά', 'ημερολόγιο'),
+    );
+
+    $best = 'species';
+    $bestScore = 0;
+    foreach ($keywords as $shape => $needles) {
+        $score = 0;
+        foreach ($needles as $n) {
+            if (mb_strpos($title, $n, 0, 'UTF-8') !== false) $score += 3;
+            if (mb_strpos($focus, $n, 0, 'UTF-8') !== false) $score += 1;
+        }
+        if ($score > $bestScore) { $bestScore = $score; $best = $shape; }
+    }
+    return $best;
+}
+
+/**
+ * The sections for a shape: heading plus the brief the model is given for it.
+ *
+ * A parameter table appears only where the topic actually has parameters — a topic whose
+ * temp is "N/A" is a tools or technique piece, and a table of pH and EC on it is noise that
+ * announces the template.
+ */
+function sg_shape_sections($shape, $topic) {
+    $hasParams = !empty($topic['temp']) && $topic['temp'] !== 'N/A'
+              && !empty($topic['ph']) && $topic['ph'] !== 'N/A';
+
+
+    // Read defensively: a topic added later without these keys must not emit warnings into
+    // the response body, which is JSON the scheduler parses.
+    $ph = isset($topic['ph']) ? $topic['ph'] : 'N/A';
+    $ec = isset($topic['ec']) ? $topic['ec'] : 'N/A';
+    $temp = isset($topic['temp']) ? $topic['temp'] : 'N/A';
+
+    $table = "Δημιούργησε έναν πλήρη πίνακα Markdown με τις στήλες: Παράμετρος | Βέλτιστη Τιμή | Μονάδα | Παρατηρήσεις. "
+           . "Συμπερίλαβε pH υποστρώματος {$ph}, EC {$ec}, θερμοκρασία {$temp}°C "
+           . "και όσες ακόμη παραμέτρους έχουν νόημα για το συγκεκριμένο θέμα.";
+
+    switch ($shape) {
+        case 'diagnosis':
+            return array(
+                array('Σύντομη Απάντηση', ''),
+                array('Τι ακριβώς βλέπεις', 'Περίγραψε τα ορατά συμπτώματα με λεπτομέρεια, ώστε ο αναγνώστης να αναγνωρίσει αν αυτό έχει. Ξεχώρισέ τα από παρόμοια συμπτώματα με άλλη αιτία.'),
+                array('Γιατί συμβαίνει', 'Ο μηχανισμός πίσω από το σύμπτωμα: τι κάνει το φυτό και γιατί. Συγκεκριμένα, όχι γενικόλογα.'),
+                array('Τι κάνεις τώρα', 'Άμεσες ενέργειες με σειρά προτεραιότητας, δοσολογίες και χρόνους. Τι κάνεις σήμερα, τι την επόμενη εβδομάδα.'),
+                array('Πώς δεν θα ξανασυμβεί', 'Η πρακτική αλλαγή που κλείνει το θέμα μόνιμα.'),
+            );
+        case 'howto':
+            return array(
+                array('Σύντομη Απάντηση', ''),
+                array('Πότε είναι η σωστή στιγμή', 'Εποχή, στάδιο του φυτού, καιρικές συνθήκες — και πότε ΔΕΝ πρέπει να γίνει.'),
+                array('Τι χρειάζεσαι', 'Υλικά και εργαλεία με συγκεκριμένες προδιαγραφές και ποσότητες.'),
+                array('Η διαδικασία, βήμα προς βήμα', 'Αριθμημένα βήματα με ακρίβεια: μετρήσεις, χρόνοι, τεχνική. Το πιο εκτενές τμήμα του άρθρου.'),
+                array('Οι πρώτες εβδομάδες μετά', 'Πρόγραμμα φροντίδας με χρονοδιάγραμμα, και τι είναι φυσιολογικό να δεις.'),
+                array('Τι πάει στραβά και πώς το αποφεύγεις', 'Τα κρίσιμα σφάλματα σε αυτή τη συγκεκριμένη διαδικασία.'),
+            );
+        case 'choice':
+            return array(
+                array('Σύντομη Απάντηση', ''),
+                array('Το ερώτημα πίσω από την επιλογή', 'Τι πραγματικά διαφοροποιεί τις επιλογές, πέρα από την τιμή.'),
+                array('Οι επιλογές, μία προς μία', 'Κάθε επιλογή με τα πραγματικά της πλεονεκτήματα και μειονεκτήματα, με τεχνικά στοιχεία.'),
+                array('Πίνακας σύγκρισης', 'Πίνακας Markdown που συγκρίνει τις επιλογές στα κριτήρια που μετράνε.'),
+                array('Τι διαλέγεις για κάθε περίπτωση', 'Συγκεκριμένες συστάσεις ανά σενάριο χρήσης, με ονόματα και μεγέθη.'),
+                array('Τι ΔΕΝ χρειάζεσαι', 'Τι είναι περιττό ή υπερτιμημένο, και γιατί.'),
+            );
+        case 'list':
+            return array(
+                array('Σύντομη Απάντηση', ''),
+                array('Γιατί έχει σημασία', 'Το πλαίσιο: τι διακυβεύεται αν αγνοηθούν αυτά.'),
+                array('Ένα προς ένα', 'Το κύριο σώμα. Για κάθε σημείο: τι είναι, γιατί συμβαίνει, τι κάνεις αντ αυτού. Αριθμημένο, εκτενές, με συγκεκριμένα νούμερα.'),
+                array('Τι κρατάς από όλα', 'Η μία πρακτική αλλαγή που αξίζει περισσότερο από τις υπόλοιπες.'),
+            );
+        default: // species
+            return array_values(array_filter(array(
+                array('Σύντομη Απάντηση', ''),
+                array('Τι θέλει πραγματικά αυτό το φυτό', 'Φως, νερό, υπόστρωμα και θερμοκρασία με πραγματικά νούμερα, και η φυσιολογία που τα εξηγεί.'),
+                $hasParams ? array('Πίνακας προδιαγραφών', $table) : null,
+                array('Η χρονιά, μήνα με μήνα', 'Ημερολόγιο εργασιών ανά εποχή για το ελληνικό κλίμα.'),
+                array('Προβλήματα και αντιμετώπιση', 'Οι πραγματικές απειλές για αυτό το είδος, με βιολογικές λύσεις και δοσολογίες.'),
+                array('Συχνά λάθη', 'Τι κάνουν λάθος οι περισσότεροι με αυτό το συγκεκριμένο φυτό.'),
+            )));
+    }
+}
+
+/**
+ * The shortest this shape of article may be and still publish.
+ *
+ * A single hardcoded 2,000-word floor was the other half of the template problem: it made
+ * every piece the same length as well as the same shape, and a diagnosis that has said
+ * everything worth saying in 1,600 words had to be padded to clear it. Padding is what
+ * "low value" looks like from the outside. The floor is about 85% of the shape's target,
+ * never below 1,400 — under that it genuinely is thin.
+ */
+function sg_word_floor($topic) {
+    $floors = array('diagnosis' => 1450, 'howto' => 1800, 'choice' => 1600, 'list' => 1550, 'species' => 1900);
+    $shape = sg_article_shape($topic);
+    return isset($floors[$shape]) ? $floors[$shape] : 1700;
+}
+
 function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
     // 1. Try Gemini API if key is present
     if (!empty($geminiKey)) {
@@ -1853,37 +2001,56 @@ function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
         $sharedIntro = "Είσαι ο κορυφαίος Έλληνας καθηγητής Γεωπονίας και συντάκτης του SmartGarden.gr. Γράφεις ένα επιστημονικά άρτιο άρθρο στα Ελληνικά με τίτλο: '{$topic['title']}'.\n"
             . "Εστίαση θέματος:\n{$topic['prompt_focus']}\n\n";
 
+        // The skeleton now comes from the topic, not from this file. See sg_article_shape().
+        $shape = sg_article_shape($topic);
+        $sections = sg_shape_sections($shape, $topic);
+
+        // The answer-first block is the one section every shape keeps. AI search engines
+        // (ChatGPT, Perplexity, Google AI Overviews) cite self-contained blocks that open
+        // with the direct answer and concrete numbers; human readers otherwise hit 450
+        // words of botany before the practical answer.
+        $answerBrief = "3-5 προτάσεις που απαντούν ΑΜΕΣΑ και αυτοτελώς στο βασικό ερώτημα του τίτλου, "
+            . "ΠΡΙΝ από κάθε θεωρία. Ξεκίνα με την απάντηση, όχι με εισαγωγή. Χρησιμοποίησε συγκεκριμένους "
+            . "αριθμούς αντί για γενικόλογες διατυπώσεις όπως «αρκετό» ή «τακτικά». Πρέπει να στέκει μόνη της.";
+
+        $render = function ($slice) use ($answerBrief) {
+            $out = '';
+            foreach ($slice as $s) {
+                $out .= '## ' . $s[0] . "\n" . ($s[1] !== '' ? $s[1] : $answerBrief) . "\n\n";
+            }
+            return $out;
+        };
+
+        // Split the sections across the two parallel requests, keeping the answer block and
+        // the opening sections together in the first.
+        $half = (int) ceil(count($sections) / 2);
+        $firstHalf = array_slice($sections, 0, $half);
+        $secondHalf = array_slice($sections, $half);
+
+        // Length varies by shape too — a diagnosis piece that runs as long as a full species
+        // guide is padding, and padding is what "low value" means.
+        $targets = array('diagnosis' => 1700, 'howto' => 2100, 'choice' => 1900, 'list' => 1800, 'species' => 2200);
+        $target = isset($targets[$shape]) ? $targets[$shape] : 2000;
+        $halfTarget = (int) round($target / 2 / 50) * 50;
+
+        $rules = "Γράψε σε δεύτερο πρόσωπο, απευθυνόμενος στον αναγνώστη. Απόφυγε τις φράσεις «είναι σημαντικό», "
+            . "«παίζει καθοριστικό ρόλο» και «αποτελεί κρίσιμο παράγοντα» — πες τι συμβαίνει και τι να κάνει. "
+            . "Κάθε ισχυρισμός με νούμερο: δόση, θερμοκρασία, ημέρες, εκατοστά.";
+
         $promptA = $sharedIntro
-            . "Γράψε ΜΟΝΟ τις εξής ενότητες σε Markdown (##). Οι αριθμημένες ενότητες 1-3 πρέπει να έχουν ΤΟΥΛΑΧΙΣΤΟΝ 450 λέξεις η καθεμία, με πολλές τεχνικές λεπτομέρειες, δοσολογίες, παραδείγματα και αριθμημένες λίστες. Μην συνοψίζεις, ανάπτυξε διεξοδικά:\n\n"
-            // Answer-first block for Answer Engine Optimization. AI search engines
-            // (ChatGPT, Perplexity, Google AI Overviews) cite self-contained blocks that
-            // open with the direct answer and use concrete numbers instead of hedged
-            // prose. Keeping it short and putting it first also serves human readers,
-            // who otherwise hit 450 words of botany before the practical answer.
-            . "## Σύντομη Απάντηση\n"
-            . "3-5 προτάσεις που απαντούν ΑΜΕΣΑ και αυτοτελώς στο βασικό ερώτημα του τίτλου, ΠΡΙΝ από κάθε θεωρία. Ξεκίνα με την απάντηση, όχι με εισαγωγή. Χρησιμοποίησε συγκεκριμένους αριθμούς (θερμοκρασίες, δοσολογίες, ημέρες, εποχές, μεγέθη) αντί για γενικόλογες διατυπώσεις όπως «αρκετό» ή «τακτικά». Πρέπει να στέκει μόνη της, χωρίς να προϋποθέτει ότι ο αναγνώστης διάβασε κάτι άλλο.\n\n"
-            . "## 1. Επιστημονικό Υπόβαθρο & Βοτανική Φυσιολογία\n"
-            . "Αναλυτική περιγραφή φυσιολογίας, κυτταρικών μηχανισμών και ιδιαιτεροτήτων του θέματος/τεχνολογίας.\n\n"
-            . "## 2. Τεχνικές Προδιαγραφές & Πίνακας Παραμέτρων\n"
-            . "Δημιούργησε έναν πλήρη πίνακα Markdown με:\n"
-            . "| Παράμετρος Εφαρμογής | Βέλτιστη Τιμή | Μονάδα Μέτρησης | Παρατηρήσεις |\n"
-            . "| **Βοτανική Ταξινόμηση** | *{$topic['botanical']}* | - | Επιστημονική ονομασία |\n"
-            . "| **Εύρος pH Υποστρώματος** | {$topic['ph']} | pH | Βέλτιστη διαθεσιμότητα θρεπτικών |\n"
-            . "| **Ηλεκτρική Αγωγιμότητα (EC)** | {$topic['ec']} | mS/cm | Αποφυγή τοξικότητας αλάτων |\n"
-            . "| **Θερμοκρασία Ανάπτυξης** | {$topic['temp']} | °C | Μέγιστος μεταβολικός ρυθμός |\n\n"
-            . "## 3. Βήμα-προς-Βήμα Μεθοδολογία & Εφαρμογή\n"
-            . "Εξαντλητικά πρακτικά βήματα, δοσολογίες, χρόνοι εφαρμογής και εργαλεία.\n\n"
-            . "Το συνολικό κείμενο των 3 ενοτήτων πρέπει να έχει ΤΟΥΛΑΧΙΣΤΟΝ 2.000 λέξεις. Γράψε ΜΟΝΟ το κείμενο, χωρίς εισαγωγικά μετα-σχόλια.";
+            . "Γράψε ΜΟΝΟ τις εξής ενότητες σε Markdown (##), με αυτούς ακριβώς τους τίτλους και με αυτή τη σειρά. "
+            . "Ανάπτυξε διεξοδικά, μη συνοψίζεις.\n\n"
+            . $render($firstHalf)
+            . $rules . "\n"
+            . "Συνολικά τουλάχιστον {$halfTarget} λέξεις. Γράψε ΜΟΝΟ το κείμενο, χωρίς μετα-σχόλια.";
 
         $promptB = $sharedIntro
-            . "Συνεχίζεις το ΙΔΙΟ άρθρο. ΜΗΝ επαναλάβεις τίτλο, εισαγωγή ή τις ενότητες 1-3. Γράψε ΜΟΝΟ τις εξής 3 ενότητες σε Markdown (##), ξεκινώντας κατευθείαν από την ενότητα 4. ΚΑΘΕ ενότητα πρέπει να έχει ΤΟΥΛΑΧΙΣΤΟΝ 450 λέξεις, με πολλές τεχνικές λεπτομέρειες, δοσολογίες και αριθμημένες λίστες. Μην συνοψίζεις, ανάπτυξε διεξοδικά:\n\n"
-            . "## 4. Ολοκληρωμένη Βιολογική Φυτοπροστασία / Τεχνολογική Διάταξη\n"
-            . "Συγκεκριμένες οικολογικές δραστικές ουσίες ή τεχνικές λεπτομέρειες με ακριβείς δοσολογίες.\n\n"
-            . "## 5. Πρόγραμμα Θρέψης, Άρδευσης & Συντήρησης\n"
-            . "Αναλυτικό πρόγραμμα συντήρησης και εφαρμογής.\n\n"
-            . "## 6. Συχνότερα Λάθη & Οδηγίες Αποφυγής\n"
-            . "Αριθμημένη λίστα με τα πιο κρίσιμα σφάλματα και πώς αποτρέπονται για το συγκεκριμένο θέμα.\n\n"
-            . "Το συνολικό κείμενο των 3 ενοτήτων πρέπει να έχει ΤΟΥΛΑΧΙΣΤΟΝ 2.000 λέξεις. Γράψε ΜΟΝΟ το κείμενο, χωρίς εισαγωγικά μετα-σχόλια.";
+            . "Συνεχίζεις το ΙΔΙΟ άρθρο. ΜΗΝ επαναλάβεις τίτλο, εισαγωγή ή τις προηγούμενες ενότητες. "
+            . "Γράψε ΜΟΝΟ τις εξής ενότητες σε Markdown (##), με αυτούς ακριβώς τους τίτλους και με αυτή τη σειρά. "
+            . "Ανάπτυξε διεξοδικά, μη συνοψίζεις.\n\n"
+            . $render($secondHalf)
+            . $rules . "\n"
+            . "Συνολικά τουλάχιστον {$halfTarget} λέξεις. Γράψε ΜΟΝΟ το κείμενο, χωρίς μετα-σχόλια.";
 
         $genConfig = array("temperature" => 0.7, "maxOutputTokens" => 8192);
         $postA = json_encode(array("contents" => array(array("parts" => array(array("text" => $promptA)))), "generationConfig" => $genConfig));
@@ -1965,7 +2132,7 @@ function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
                 // output naturally lands in the ~2,000-2,300 range, and a solid ~2,000-word
                 // AI article beats discarding good content over a ~100-word technicality
                 // and falling back to the ~94-word generic stub (2026-09-04).
-                if (articleWordCount($combined) >= 2000) {
+                if (articleWordCount($combined) >= sg_word_floor($topic)) {
                     return $combined;
                 }
             }
@@ -1996,7 +2163,7 @@ function generateScientificAgronomyArticle($topic, $geminiKey, $openAiKey) {
                 curl_close($ch);
 
                 $content = extractGeminiText($result, $httpCode);
-                if (!empty($content) && articleWordCount($content) >= 2000) {
+                if (!empty($content) && articleWordCount($content) >= sg_word_floor($topic)) {
                     return $content;
                 }
             }
@@ -2037,11 +2204,12 @@ if (isset($_GET['debug'])) {
 // response means the scheduler can report the failed generation and retry later.
 // Floor is 2,000, not 2,200 — matches the acceptance floor inside
 // generateScientificAgronomyArticle() (see 2026-09-04 notes there).
-if ($generatedWordCount < 2000) {
+if ($generatedWordCount < sg_word_floor($selectedTopic)) {
     http_response_code(422);
     echo json_encode(array(
         'status' => 'error',
-        'message' => 'Article was not published because it did not reach the 2,000-word minimum.',
+        'message' => 'Article was not published because it did not reach the minimum for its shape ('
+                   . sg_article_shape($selectedTopic) . ': ' . sg_word_floor($selectedTopic) . ' words).',
         'topic_slug' => $selectedTopic['slug'],
         'word_count' => $generatedWordCount
     ), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
