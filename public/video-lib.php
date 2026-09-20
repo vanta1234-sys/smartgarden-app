@@ -1272,7 +1272,10 @@ function sg_thumb_kicker($article) {
     $unit = '(?:cm|εκατοστ\p{L}*|mm|m²|λίτρ\p{L}*|ml|°C|%|ημέρ\p{L}*|εβδομάδ\p{L}*|μήν\p{L}*|ώρ\p{L}*|φορ\p{L}*)';
     foreach ($pool as $text) {
         if (preg_match('/(\d+(?:[.,]\d+)?(?:\s*[-–]\s*\d+(?:[.,]\d+)?)?)\s*(' . $unit . ')/u', $text, $m)) {
-            return trim($m[1] . ' ' . $m[2]);
+            // «10 %» is not how a percentage is written; «10%» and «22°C» close up, a word
+            // like «λίτρα» takes its space.
+            $glue = ($m[2] === '%' || $m[2] === '°C') ? '' : ' ';
+            return trim($m[1] . $glue . $m[2]);
         }
     }
     return '';
