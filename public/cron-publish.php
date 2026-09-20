@@ -1723,29 +1723,31 @@ if (file_exists($latestFile)) {
 // ==========================================
 // 4b. DEEPEN AN EXISTING THIN ARTICLE
 // ==========================================
-// AdSense refused the site for "Low value content". Measured against the 66 published
+// AdSense refused the site for "Low value content". Measured against the 74 published
 // articles on 2026-09-20, the corpus splits cleanly in two: the 50 inherited from
-// master50Articles.ts have a median of 1,174 words and not one reaches 1,450, while every
-// article this cron has written since the floor went in lands between 1,881 and 2,318.
-// Three quarters of the site is the old set, so that is what a reviewer opens.
+// master50Articles.ts have a median of 1,174 words and not one reaches 1,450, while all 24
+// this cron has written since the floor went in land between 1,881 and 2,318. Two thirds
+// of the site is the old set, so that is what a reviewer opens.
 //
-// Publishing more new articles cannot lift a corpus that is 76% thin. This rewrites one
-// that already exists, in place: same slug, same date, same image, a body that meets the
-// floor for its own shape. One per run, so it can share the daily schedule.
+// Publishing more new articles cannot lift a corpus that is 68% thin — it adds volume,
+// which is the pattern that got the site flagged. This rewrites one that already exists,
+// in place: same slug, same date, same image, a body that meets the floor for its own
+// shape. One per run.
 //
 //   &deepen=audit           list everything below its floor, generate nothing
 //   &deepen=1|<slug>        generate a replacement and return it WITHOUT writing
 //   &deepen=...&confirm=1   write it, after taking a dated backup
-if (isset($_GET['deepen'])) {
-    header('Content-Type: application/json; charset=utf-8');
+//
+// A plain cron run does it too once the topic pool is exhausted — see section 5.
 
+/** Every published article short of the word floor its own title implies, worst first. */
+function sg_deepen_queue(array $articles) {
     $elOf = function ($v) {
         if (is_array($v)) return isset($v['el']) ? (string) $v['el'] : '';
         return is_string($v) ? $v : '';
     };
-
     $thin = array();
-    foreach ($existingArticles as $i => $a) {
+    foreach ($articles as $i => $a) {
         $title = $elOf(isset($a['title']) ? $a['title'] : '');
         if ($title === '') continue;
         // Shape is read off the article's own title, exactly as it would be for a new one,
@@ -1772,21 +1774,31 @@ if (isset($_GET['deepen'])) {
     }
     // Worst first: the thinnest article is the one a reviewer is most likely to be shown.
     usort($thin, function ($x, $y) { return $y['short_by'] - $x['short_by']; });
+    return $thin;
+}
 
-    $want = (string) $_GET['deepen'];
+/**
+ * Rewrite one thin article in place. Returns array($httpStatus, $payload).
+ *
+ * $articles is taken by reference because a successful write has to be visible to whatever
+ * runs next in the same request — section 5 falls through to here and must not then save a
+ * copy of the array from before the rewrite.
+ */
+function sg_deepen_run(array &$articles, $latestFile, $gemini, $openAi, $want, $confirm) {
+    $thin = sg_deepen_queue($articles);
+
     if ($want === 'audit') {
         $rows = array();
         foreach ($thin as $t) {
             unset($t['topic'], $t['index']);
             $rows[] = $t;
         }
-        echo json_encode(array(
+        return array(200, array(
             'success' => true,
-            'articlesTotal' => count($existingArticles),
+            'articlesTotal' => count($articles),
             'belowFloor' => count($thin),
             'queue' => $rows,
-        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+        ));
     }
 
     $target = null;
@@ -1794,36 +1806,32 @@ if (isset($_GET['deepen'])) {
         if ($want === '1' || $t['slug'] === $want) { $target = $t; break; }
     }
     if ($target === null) {
-        http_response_code(404);
-        echo json_encode(array(
+        return array(404, array(
             'success' => false,
             'error' => $want === '1' ? 'Nothing is below its floor.' : 'No article below its floor with slug ' . $want,
             'belowFloor' => count($thin),
-        ), JSON_UNESCAPED_UNICODE);
-        exit;
+        ));
     }
 
-    $fresh = generateScientificAgronomyArticle($target['topic'], $GEMINI_API_KEY, $OPENAI_API_KEY);
+    $fresh = generateScientificAgronomyArticle($target['topic'], $gemini, $openAi);
     $freshWords = articleWordCount($fresh);
 
     // Never trade a thin article for a thinner one. When every model misses, the generator
     // returns a ~94-word stub, and that stub landing on top of a real article would be far
     // worse than the article was.
     if ($freshWords < $target['floor'] || $freshWords <= $target['words']) {
-        http_response_code(422);
-        echo json_encode(array(
+        return array(422, array(
             'success' => false,
             'error' => 'Replacement did not beat the original; nothing was written.',
             'slug' => $target['slug'],
             'wordsBefore' => $target['words'],
             'wordsGenerated' => $freshWords,
             'floor' => $target['floor'],
-        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        exit;
+        ));
     }
 
-    if (!isset($_GET['confirm']) || $_GET['confirm'] !== '1') {
-        echo json_encode(array(
+    if (!$confirm) {
+        return array(200, array(
             'success' => true,
             'written' => false,
             'note' => 'Dry run. Add &confirm=1 to replace the stored body.',
@@ -1832,36 +1840,33 @@ if (isset($_GET['deepen'])) {
             'wordsBefore' => $target['words'],
             'wordsAfter' => $freshWords,
             'preview' => mb_substr($fresh, 0, 600, 'UTF-8'),
-        ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+        ));
     }
 
     // One dated backup before the first rewrite of the day. Overwriting this file is how
     // five days of published articles disappeared once already.
-    $backup = __DIR__ . '/latest_articles.backup-' . date('Y-m-d') . '.json';
+    $backup = dirname($latestFile) . '/latest_articles.backup-' . date('Y-m-d') . '.json';
     if (!file_exists($backup)) @copy($latestFile, $backup);
 
     $at = $target['index'];
-    if (isset($existingArticles[$at]['content']) && is_array($existingArticles[$at]['content'])) {
-        $existingArticles[$at]['content']['el'] = $fresh;
+    if (isset($articles[$at]['content']) && is_array($articles[$at]['content'])) {
+        $articles[$at]['content']['el'] = $fresh;
     } else {
-        $existingArticles[$at]['content'] = array('el' => $fresh, 'en' => '');
+        $articles[$at]['content'] = array('el' => $fresh, 'en' => '');
     }
-    $existingArticles[$at]['readTime'] = max(8, (int) round($freshWords / 180)) . ' min';
-    $existingArticles[$at]['deepenedAt'] = date('Y-m-d');
-    $existingArticles[$at]['wordsBefore'] = $target['words'];
+    $articles[$at]['readTime'] = max(8, (int) round($freshWords / 180)) . ' min';
+    $articles[$at]['deepenedAt'] = date('Y-m-d');
+    $articles[$at]['wordsBefore'] = $target['words'];
 
-    $encoded = json_encode($existingArticles, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $encoded = json_encode($articles, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     $tmp = $latestFile . '.tmp';
     $ok = $encoded !== false && @file_put_contents($tmp, $encoded) !== false && @rename($tmp, $latestFile);
     if (!$ok) {
         @unlink($tmp);
-        http_response_code(500);
-        echo json_encode(array('success' => false, 'error' => 'Could not write latest_articles.json; the article is unchanged.'), JSON_UNESCAPED_UNICODE);
-        exit;
+        return array(500, array('success' => false, 'error' => 'Could not write latest_articles.json; the article is unchanged.'));
     }
 
-    echo json_encode(array(
+    return array(200, array(
         'success' => true,
         'written' => true,
         'slug' => $target['slug'],
@@ -1870,7 +1875,18 @@ if (isset($_GET['deepen'])) {
         'wordsAfter' => $freshWords,
         'backup' => basename($backup),
         'remainingBelowFloor' => count($thin) - 1,
-    ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    ));
+}
+
+if (isset($_GET['deepen'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    list($code, $payload) = sg_deepen_run(
+        $existingArticles, $latestFile, $GEMINI_API_KEY, $OPENAI_API_KEY,
+        (string) $_GET['deepen'],
+        isset($_GET['confirm']) && $_GET['confirm'] === '1'
+    );
+    if ($code !== 200) http_response_code($code);
+    echo json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 
@@ -1950,17 +1966,36 @@ foreach ($topicPool as $t) {
 }
 
 if ($selectedTopic === null) {
-    // Every topic in the pool has hit the republish cap — publishing another one would
-    // only recreate the near-duplicate problem this fix exists to prevent. Skip today's
-    // run cleanly rather than force it; the pool needs new topics added, not more
-    // rewrites of the same 9.
+    // Every topic in the pool has been published, so there is no new article to write —
+    // and measured against the live set on 2026-09-20 that is true of all 22 of them from
+    // the first run onwards. Rather than skip the day, the slot goes to rewriting one of
+    // the articles that is below the floor for its shape: 50 of the 74 are, and that is
+    // what AdSense read the site as being.
+    //
+    // This is deliberately the *only* automatic writer of existing articles. It refuses a
+    // replacement that misses the floor or fails to beat what it would overwrite, and it
+    // copies latest_articles.json to a dated backup before the first rewrite of any day.
+    // &nodeepen=1 turns it off for a run, and the pool getting new topics ends it.
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(array(
-        'success' => false,
-        'skipped' => true,
-        'reason' => 'Every topic in topicPool has been published (cap ' . $MAX_VERSIONS_PER_TOPIC . '). Add topics to keep publishing new articles, or spend the slot on &deepen=1, which rewrites an existing article that is below the word floor for its shape.',
-        'topicVersionCounts' => $topicVersionCounts,
-    ), JSON_UNESCAPED_UNICODE);
+
+    if (isset($_GET['nodeepen']) && $_GET['nodeepen'] === '1') {
+        echo json_encode(array(
+            'success' => false,
+            'skipped' => true,
+            'reason' => 'Every topic in topicPool has been published (cap ' . $MAX_VERSIONS_PER_TOPIC . ') and &nodeepen=1 was given.',
+            'topicVersionCounts' => $topicVersionCounts,
+        ), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    list($deepenCode, $deepenPayload) = sg_deepen_run(
+        $existingArticles, $latestFile, $GEMINI_API_KEY, $OPENAI_API_KEY, '1', true
+    );
+    if ($deepenCode !== 200) http_response_code($deepenCode);
+    echo json_encode(array_merge(array(
+        'mode' => 'deepen',
+        'reason' => 'Topic pool exhausted (cap ' . $MAX_VERSIONS_PER_TOPIC . '); the daily slot rewrote an existing article instead of publishing a new one.',
+    ), $deepenPayload), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 
