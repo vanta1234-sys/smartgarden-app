@@ -2039,7 +2039,7 @@ $GLOBALS['cronDebug'] = array();
  * The shape is chosen from the topic itself and is deterministic, so re-running an article
  * produces the same structure rather than a random one.
  */
-function sg_article_shape($topic) {
+function sg_article_shape($topic, &$score = null) {
     // Scored, not first-match. An ordered if-chain lets one incidental word decide: the
     // lemon-tree piece is a diagnosis of yellow leaves, but its brief happens to mention
     // "διαφορά EDDHA vs EDTA" and a choice-first chain filed it as a comparison. The title
@@ -2065,6 +2065,9 @@ function sg_article_shape($topic) {
         }
         if ($score > $bestScore) { $bestScore = $score; $best = $shape; }
     }
+    // Reported so a caller can tell a real classification from the fallback: 'species' is
+    // both a genuine shape and what an unrecognised title lands on.
+    $score = $bestScore;
     return $best;
 }
 
@@ -2147,7 +2150,12 @@ function sg_shape_sections($shape, $topic) {
  */
 function sg_word_floor($topic) {
     $floors = array('diagnosis' => 1450, 'howto' => 1800, 'choice' => 1600, 'list' => 1550, 'species' => 1900);
-    $shape = sg_article_shape($topic);
+    $score = 0;
+    $shape = sg_article_shape($topic, $score);
+    // Nothing in the title said what this article is, so it defaulted to 'species' — which
+    // carries the highest floor of the five. Holding an unclassifiable subject to the
+    // strictest bar is backwards; it gets the neutral middle instead.
+    if ($score === 0) return 1700;
     return isset($floors[$shape]) ? $floors[$shape] : 1700;
 }
 
