@@ -265,12 +265,27 @@ if ($action === 'bgtest') {
 // &dl=1 offers it as a download instead of displaying it inline.
 if ($action === 'thumb') {
     $job = isset($_GET['job']) ? basename((string) $_GET['job']) : '';
-    $dir = $JOBS_ROOT . '/' . $job;
-    if ($job === '' || !is_dir($dir)) sg_err('Unknown job ' . $job);
+    $dir = $job !== '' ? $JOBS_ROOT . '/' . $job : '';
+    $article = null;
 
-    $meta = @json_decode((string) @file_get_contents($dir . '/job.json'), true);
-    $article = is_array($meta) && isset($meta['article']) ? $meta['article'] : null;
-    if (!is_array($article)) sg_err('No article metadata in job ' . $job);
+    if ($job !== '') {
+        if (!is_dir($dir)) sg_err('Unknown job ' . $job);
+        $meta = @json_decode((string) @file_get_contents($dir . '/job.json'), true);
+        $article = is_array($meta) && isset($meta['article']) ? $meta['article'] : null;
+        if (!is_array($article)) sg_err('No article metadata in job ' . $job);
+    } elseif (isset($_GET['slug'])) {
+        // Any published article, with no render behind it. This is how the picture gets
+        // checked against titles that have no parenthesis and articles that contain no
+        // number — the two cases where the headline and the figure have nothing to use —
+        // without waiting for a fifteen-minute render of each.
+        $want = (string) $_GET['slug'];
+        foreach ((array) @json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true) as $a) {
+            if (isset($a['slug']) && $a['slug'] === $want) { $article = $a; break; }
+        }
+        if (!is_array($article)) sg_err('No published article with slug ' . $want);
+    } else {
+        sg_err('Give &job=<id> or &slug=<article slug>');
+    }
 
     require_once __DIR__ . '/ssr-lib.php';
     $own = sg_pick_real_photo($article);
@@ -281,16 +296,16 @@ if ($action === 'thumb') {
     }
     // Nothing of ours matches this subject, so fall back to a still the render already
     // downloaded — it is at least the picture the video itself opens on.
-    if ($photo === '') {
+    if ($photo === '' && $dir !== '' && is_dir($dir)) {
         foreach ((array) glob($dir . '/scene*.jpg') as $f) { $photo = $f; break; }
     }
 
-    $dest = $dir . '/thumb.jpg';
+    $dest = ($dir !== '' && is_dir($dir) ? $dir : sys_get_temp_dir()) . '/thumb.jpg';
     if (!sg_render_thumbnail($article, $dest, $photo)) sg_err('Could not render thumbnail');
 
     header('Content-Type: image/jpeg');
     header('Content-Length: ' . filesize($dest));
-    if (isset($_GET['dl'])) header('Content-Disposition: attachment; filename="thumb-' . $job . '.jpg"');
+    if (isset($_GET['dl'])) header('Content-Disposition: attachment; filename="thumb-' . ($job !== '' ? $job : $article['slug']) . '.jpg"');
     header('X-SG-Photo: ' . ($photo === '' ? 'none' : basename($photo)));
     readfile($dest);
     exit;
