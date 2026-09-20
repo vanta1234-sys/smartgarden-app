@@ -1906,7 +1906,14 @@ if (!$forcePublish) {
 // near-duplicates of just 9 topics). Counting real existing versions per topic and
 // capping how many times any one topic can be republished fixes this at the root,
 // instead of just deleting the duplicates it produces after the fact.
-$MAX_VERSIONS_PER_TOPIC = 3;
+// One version per topic. At 3 this produced four pairs that differ only in the suffix
+// after the colon — «Εσπεριδοειδή σε Γλάστρα …: Προχωρημένος Οδηγός» beside
+// «…: Ερωτήσεις & Απαντήσεις», same base title, same subject, and all four second
+// versions went out on 2026-09-09 in a burst of eleven. The bodies are genuinely
+// different; a reader scanning a category listing, and a reviewer deciding whether this
+// is scaled content, sees the same article twice. There is better work for the daily slot
+// now: &deepen rewrites one of the 50 thin inherited articles instead.
+$MAX_VERSIONS_PER_TOPIC = 1;
 // Suffixes read as a natural continuation of the (now hook-style) base title rather
 // than a flat format label — "...: Προχωρημένος Οδηγός" read like a filing category,
 // not a reason to click, which defeats the point of rewriting the base titles at all.
@@ -1951,7 +1958,7 @@ if ($selectedTopic === null) {
     echo json_encode(array(
         'success' => false,
         'skipped' => true,
-        'reason' => 'All topics in topicPool have reached MAX_VERSIONS_PER_TOPIC (' . $MAX_VERSIONS_PER_TOPIC . '). Add new topics to topicPool to keep publishing.',
+        'reason' => 'Every topic in topicPool has been published (cap ' . $MAX_VERSIONS_PER_TOPIC . '). Add topics to keep publishing new articles, or spend the slot on &deepen=1, which rewrites an existing article that is below the word floor for its shape.',
         'topicVersionCounts' => $topicVersionCounts,
     ), JSON_UNESCAPED_UNICODE);
     exit;
