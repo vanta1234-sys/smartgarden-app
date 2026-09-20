@@ -1878,6 +1878,28 @@ function sg_deepen_run(array &$articles, $latestFile, $gemini, $openAi, $want, $
     ));
 }
 
+// &shapes=1 reports which shape every topic in the pool would be written to, and stops.
+// Changing the skeleton without a way to see the result would mean finding out by reading
+// tomorrow's published article.
+if (isset($_GET['shapes'])) {
+    header('Content-Type: application/json; charset=utf-8');
+    $rows = array();
+    $tally = array();
+    foreach ($topicPool as $t) {
+        $shape = sg_article_shape($t);
+        $tally[$shape] = (isset($tally[$shape]) ? $tally[$shape] : 0) + 1;
+        $rows[] = array(
+            'title' => mb_substr($t['title'], 0, 70, 'UTF-8'),
+            'shape' => $shape,
+            'floorWords' => sg_word_floor($t),
+            'sections' => array_map(function ($s) { return $s[0]; }, sg_shape_sections($shape, $t)),
+        );
+    }
+    echo json_encode(array('success' => true, 'tally' => $tally, 'topics' => $rows),
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
 if (isset($_GET['deepen'])) {
     header('Content-Type: application/json; charset=utf-8');
     list($code, $payload) = sg_deepen_run(
@@ -1999,27 +2021,6 @@ if ($selectedTopic === null) {
     exit;
 }
 
-// &shapes=1 reports which shape every topic in the pool would be written to, and stops.
-// Changing the skeleton without a way to see the result would mean finding out by reading
-// tomorrow's published article.
-if (isset($_GET['shapes'])) {
-    header('Content-Type: application/json; charset=utf-8');
-    $rows = array();
-    $tally = array();
-    foreach ($topicPool as $t) {
-        $shape = sg_article_shape($t);
-        $tally[$shape] = (isset($tally[$shape]) ? $tally[$shape] : 0) + 1;
-        $rows[] = array(
-            'title' => mb_substr($t['title'], 0, 70, 'UTF-8'),
-            'shape' => $shape,
-            'floorWords' => sg_word_floor($t),
-            'sections' => array_map(function ($s) { return $s[0]; }, sg_shape_sections($shape, $t)),
-        );
-    }
-    echo json_encode(array('success' => true, 'tally' => $tally, 'topics' => $rows),
-        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    exit;
-}
 
 
 // This topic already has at least one prior version — give this one a distinct angle
