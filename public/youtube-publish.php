@@ -75,6 +75,54 @@ $videoPath = null;
 // JSON body would sail past this host's post_max_size. Only a job id is accepted, never
 // a path — it is basename()d and resolved under the jobs root, so it can't address
 // anything but a rendered video.
+/**
+ * Set the thumbnail on a video we have just uploaded.
+ *
+ * thumbnails.set accepts the youtube.upload scope, which is the one this token holds —
+ * unlike videos.update, which needs a wider scope and answers 403 here. So the picture can
+ * be set automatically even though the privacy of an existing video cannot be changed.
+ *
+ * A failure is reported and never fatal: a video with YouTube's own frame grab is worth
+ * far more than no video.
+ */
+function sg_yt_thumbnail($accessToken, $videoId, $article, $jobDir) {
+    if (!is_array($article) || $videoId === '') return array('ok' => false, 'error' => 'no article metadata');
+    require_once __DIR__ . '/video-lib.php';
+    require_once __DIR__ . '/ssr-lib.php';
+
+    $photo = '';
+    $own = sg_pick_real_photo($article);
+    if (is_array($own) && !empty($own['file'])) {
+        $candidate = __DIR__ . '/' . ltrim((string) $own['file'], '/');
+        if (is_file($candidate)) $photo = $candidate;
+    }
+    if ($photo === '' && $jobDir !== '' && is_dir($jobDir)) {
+        foreach ((array) glob($jobDir . '/scene*.jpg') as $f) { $photo = $f; break; }
+    }
+
+    $dest = ($jobDir !== '' && is_dir($jobDir) ? $jobDir : sys_get_temp_dir()) . '/thumb.jpg';
+    if (!sg_render_thumbnail($article, $dest, $photo)) return array('ok' => false, 'error' => 'render failed');
+
+    $ch = curl_init('https://www.googleapis.com/upload/youtube/v3/thumbnails/set?uploadType=media&videoId=' . rawurlencode($videoId));
+    curl_setopt_array($ch, array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => array('Authorization: Bearer ' . $accessToken, 'Content-Type: image/jpeg'),
+        CURLOPT_POSTFIELDS => (string) file_get_contents($dest),
+        CURLOPT_TIMEOUT => 120,
+    ));
+    $raw = (string) curl_exec($ch);
+    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    return array(
+        'ok' => $code >= 200 && $code < 300,
+        'httpCode' => $code,
+        'photo' => $photo === '' ? null : basename($photo),
+        'detail' => $code >= 300 ? mb_substr($raw, 0, 300, 'UTF-8') : null,
+    );
+}
+
 $jobId = isset($body['job']) ? basename((string) $body['job']) : '';
 if ($jobId !== '') {
     $cronKeys = ['smartgarden_cron_x7K9pQ2026', 'smartgarden_cron_secret_2026'];
@@ -87,6 +135,9 @@ if ($jobId !== '') {
     // "variant":"slides" picks the copy video-inserts.php wrote beside the render, the one
     // with the presentation cut into it. Without this the only uploadable file is the
     // original video.mp4, so the version worth publishing could not be published.
+    $jobDir = $jobsRoot . '/' . $jobId;
+    $jobMeta = @json_decode((string) @file_get_contents($jobDir . '/job.json'), true);
+    $thumbArticle = is_array($jobMeta) && isset($jobMeta['article']) ? $jobMeta['article'] : null;
     $variant = isset($body['variant']) ? preg_replace('/[^a-z]/', '', (string) $body['variant']) : '';
     $videoFile = $variant === 'slides' ? '/video-slides.mp4' : '/video.mp4';
     $videoPath = $jobsRoot . '/' . $jobId . $videoFile;
@@ -238,6 +289,7 @@ if ($videoPath !== null) {
             'resumable' => true,
             'privacyStatusRequested' => $privacyStatus,
             'privacyStatusActual' => $putResult['status']['privacyStatus'] ?? null,
+            'thumbnail' => sg_yt_thumbnail($accessToken, $putResult['id'], $thumbArticle ?? null, $jobDir ?? ''),
         ]);
     } else {
         http_response_code(200);

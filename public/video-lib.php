@@ -1205,16 +1205,43 @@ function sg_render_overlay($scene, $dest) {
  */
 function sg_thumb_headline($title) {
     $title = (string) $title;
+    $head = '';
+
     if (preg_match('/\(([^)]{8,60})\)/u', $title, $m)) {
-        $inner = trim($m[1]);
-        $inner = preg_replace('/^(και|κι)\s+/u', '', $inner);
-        // A trailing adverb is dead weight on a thumbnail — «...ΣΚΟΤΩΝΕΙ ΤΟ ΦΥΤΟ ΜΕΤΑ»
-        // ends on a word that promises nothing, and costs a line of its own at this size.
-        $inner = preg_replace('/\s+(μετά|πλέον|τελικά|ξανά|σήμερα)$/u', '', $inner);
-        if (mb_strlen($inner, 'UTF-8') >= 8) return sg_greek_caps($inner);
+        $inner = preg_replace('/^(και|κι)\s+/u', '', trim($m[1]));
+        if (mb_strlen($inner, 'UTF-8') >= 8) $head = $inner;
     }
-    $head = trim(preg_split('/[:(]/u', $title)[0]);
-    return sg_greek_caps($head !== '' ? $head : $title);
+
+    if ($head === '') {
+        // 46 of the 74 published titles have no parenthesis: the newer hook style puts the
+        // promise before an em dash instead — «Το νερό της βρύσης μπορεί να κιτρινίζει τα
+        // φυτά σας — πώς να το διορθώσεις». Everything after the dash is the follow-up, so
+        // cut there as well as at a colon.
+        $head = trim(preg_split('/[:(\x{2014}\x{2013}]/u', $title)[0]);
+        if ($head === '') $head = $title;
+        // A leading article costs a word at 92px and carries no meaning on a thumbnail.
+        $head = preg_replace('/^(Ο|Η|Το|Τα|Οι)\s+/u', '', $head);
+        // Still long: cut at the last word that fits rather than shrinking the type away.
+        if (mb_strlen($head, 'UTF-8') > 40) {
+            $cut = mb_substr($head, 0, 40, 'UTF-8');
+            $sp = mb_strrpos($cut, ' ', 0, 'UTF-8');
+            if ($sp !== false && $sp > 18) $cut = mb_substr($cut, 0, $sp, 'UTF-8');
+            $head = $cut;
+        }
+    }
+
+    // Whichever branch produced it, a headline must not end on a word that carries no
+    // meaning. Cutting at 40 characters left «...ΚΙΤΡΙΝΙΖΕΙ ΤΑ» and «...ΝΕΚΡΟ ΜΕΤΑ ΤΟΝ»,
+    // and a dangling article reads as a typo rather than a promise. Repeated because
+    // removing one can expose another.
+    $tail = '/\s+(το|τα|τη|την|τον|της|του|των|οι|και|κι|με|σε|για|από|να|που|στο|στη|στην|στον|μετά|πλέον|τελικά|ξανά|σήμερα)$/ui';
+    for ($i = 0; $i < 4; $i++) {
+        $next = preg_replace($tail, '', rtrim($head, " ,·-&"));
+        if ($next === $head) break;
+        $head = $next;
+    }
+
+    return sg_greek_caps(rtrim($head, " ,·-&"));
 }
 
 /**
