@@ -318,7 +318,16 @@ if ($exit === 0 && $dur > 1) {
     ));
 } else {
     @unlink($out);
+    // The success path cleared the work directory and the failure path did not, so every
+    // run that OOM-ed left thirty-odd encoded pieces on disk permanently — on an account
+    // with 1 GB in total. A failed pass has nothing worth keeping either: the ffmpeg output
+    // is in the status file below, and the pieces are reproducible.
+    $freed = 0;
+    foreach ((array) glob($work . '/*') as $f) { $freed += (int) @filesize($f); @unlink($f); }
+    @rmdir($work);
     vi_status($statusFile, 'error', 'Απέτυχε το μπόλιασμα', array(
-        'exit' => $exit, 'ffmpeg' => $res === '' ? '(καμία έξοδος — πιθανό OOM kill)' : mb_substr($res, 0, 800, 'UTF-8'),
+        'exit' => $exit,
+        'freedMB' => (int) round($freed / 1048576),
+        'ffmpeg' => $res === '' ? '(καμία έξοδος — πιθανό OOM kill)' : mb_substr($res, 0, 800, 'UTF-8'),
     ));
 }

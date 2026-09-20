@@ -26,6 +26,66 @@ define('SG_W', SG_LONG ? 1920 : 1080);
 define('SG_H', SG_LONG ? 1080 : 1920);
 define('SG_FONT', __DIR__ . '/fonts/NotoSans-Variable.ttf');
 
+// The whole hosting account is 1 GB. Not the filesystem — the account. On 2026-09-19 it
+// reached 1435.3 MB, 140% of the quota, and DNHOST suspended it automatically; the site
+// answered 503 on every URL for the next seventeen hours. Renders are what filled it: a
+// fifteen-minute 1080p video is a few hundred MB before the thirty-odd intermediate pieces
+// the slide pass writes beside it.
+//
+// So the budget is stated here, in the account's terms, and everything that writes into
+// video-jobs is measured against it. disk_free_space() cannot do this job — on shared
+// hosting it reports the server's filesystem, which had hundreds of gigabytes free the
+// whole time the account was over quota.
+define('SG_JOBS_BUDGET_MB', 300);
+
+// ============================================================================
+// Disk
+// ============================================================================
+
+/** Bytes under a directory, following subdirectories. */
+function sg_dirsize($dir) {
+    $total = 0;
+    foreach ((array) glob(rtrim($dir, '/') . '/*') as $p) {
+        if (is_dir($p)) $total += sg_dirsize($p);
+        elseif (is_file($p)) $total += (int) @filesize($p);
+    }
+    return $total;
+}
+
+/**
+ * Delete a directory and everything under it.
+ *
+ * The old cleanup unlinked `$dir/*` and called rmdir. glob() does not descend, and rmdir
+ * refuses a directory that still holds anything, so a job with any subdirectory survived
+ * every pass — silently, because both calls were prefixed with @.
+ */
+function sg_rmtree($dir) {
+    if (!is_dir($dir)) return false;
+    foreach ((array) glob(rtrim($dir, '/') . '/*') as $p) {
+        if (is_dir($p)) sg_rmtree($p);
+        else @unlink($p);
+    }
+    return @rmdir($dir);
+}
+
+/**
+ * Drop a finished job down to what is worth keeping: the video itself and the small
+ * bookkeeping files. Scene stills, per-scene clips, narration fragments and overlay frames
+ * are worthless the moment the final file exists, and they are the bulk of the megabytes.
+ */
+function sg_strip_intermediates($dir, $keepFinal = '') {
+    $keep = array('job.json', 'status.json', 'log.txt', 'chapters.txt');
+    if ($keepFinal !== '') $keep[] = basename($keepFinal);
+    $freed = 0;
+    foreach ((array) glob(rtrim($dir, '/') . '/*') as $p) {
+        if (is_dir($p)) { $freed += sg_dirsize($p); sg_rmtree($p); continue; }
+        if (in_array(basename($p), $keep, true)) continue;
+        $freed += (int) @filesize($p);
+        @unlink($p);
+    }
+    return $freed;
+}
+
 // ============================================================================
 // Text helpers
 // ============================================================================

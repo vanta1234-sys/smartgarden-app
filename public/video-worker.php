@@ -121,12 +121,13 @@ function sg_run_job($dir) {
     sg_status($dir, 'running', 3, 'Ξεκινά η δημιουργία βίντεο');
     sg_log($dir, 'job start: ' . ($job['article']['slug'] ?? '?') . ' (' . $n . ' scenes)');
 
-    // Each finished job leaves ~15MB behind. Uploads happen minutes after the render, so
-    // anything three days old is long since published and only costing disk.
+    // "~15MB behind" was written for a twenty-second Short. A long-form render leaves a
+    // few hundred, and at three days' retention that is more than the entire 1 GB account.
+    // Six hours is still far longer than the minutes an upload needs, and the delete now
+    // descends into subdirectories, which the old glob+rmdir pair never did.
     foreach ((array) glob(dirname($dir) . '/*', GLOB_ONLYDIR) as $old) {
-        if ($old === $dir || filemtime($old) > time() - 259200) continue;
-        foreach ((array) glob($old . '/*') as $f) @unlink($f);
-        @rmdir($old);
+        if ($old === $dir || filemtime($old) > time() - 21600) continue;
+        sg_rmtree($old);
     }
 
     $sceneFiles = array();
@@ -522,13 +523,23 @@ function sg_run_job($dir) {
 
     $publish = !empty($job['autoPublish']) ? sg_publish($job, $dir, basename($dir), $chapters, $duration, $final) : null;
 
+    $videoBytes = filesize($final);
+
     sg_status($dir, 'done', 100, 'Το βίντεο είναι έτοιμο', array(
         'video' => $final,
-        'bytes' => filesize($final),
+        'bytes' => $videoBytes,
         'duration' => round($duration, 2),
         'scenes' => $n,
         'publish' => $publish,
     ));
+
+    // Everything except the finished video is dead weight from this point on, and waiting
+    // for the next job to clear it is what let the account reach 140% of its 1 GB quota
+    // and get suspended. Freed now, while we are certain the render succeeded.
+    $freed = sg_strip_intermediates($dir, $final);
+    sg_log($dir, 'freed ' . round($freed / 1048576, 1) . 'MB of intermediates; kept '
+                . round($videoBytes / 1048576, 1) . 'MB of video. video-jobs now at '
+                . round(sg_dirsize(dirname($dir)) / 1048576, 1) . 'MB of ' . SG_JOBS_BUDGET_MB . 'MB.');
 }
 
 /** POST a JSON body to one of our own endpoints and decode the reply. */

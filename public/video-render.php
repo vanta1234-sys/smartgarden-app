@@ -314,14 +314,26 @@ if ($action === 'jobs') {
 // cleanup
 // ============================================================================
 if ($action === 'cleanup') {
+    // &hours= lowers the retention for a one-off sweep; &all=1 takes everything, for when
+    // the account is over quota and the site is down until it is not.
+    $hours = isset($_GET['hours']) ? max(0, (int) $_GET['hours']) : 6;
+    $cutoff = isset($_GET['all']) && $_GET['all'] === '1' ? time() + 60 : time() - $hours * 3600;
+
+    $before = sg_dirsize($JOBS_ROOT);
     $removed = 0;
     foreach ((array) glob($JOBS_ROOT . '/*', GLOB_ONLYDIR) as $d) {
-        if (filemtime($d) < time() - 86400) {
-            foreach ((array) glob($d . '/*') as $f) @unlink($f);
-            if (@rmdir($d)) $removed++;
-        }
+        // sg_rmtree, not glob+rmdir: the old pair could not delete a job that had any
+        // subdirectory, and said nothing when it failed.
+        if (@filemtime($d) < $cutoff && sg_rmtree($d)) $removed++;
     }
-    sg_out(array('success' => true, 'removed' => $removed));
+    $after = sg_dirsize($JOBS_ROOT);
+    sg_out(array(
+        'success' => true,
+        'removed' => $removed,
+        'freedMB' => (int) round(($before - $after) / 1048576),
+        'usedMB' => (int) round($after / 1048576),
+        'budgetMB' => SG_JOBS_BUDGET_MB,
+    ));
 }
 
 // ============================================================================
@@ -418,15 +430,32 @@ if (!is_file($FFMPEG)) sg_err('ffmpeg is not installed on this server', array('e
 // — every scene file plus the stitched result during concat, then the stitched result plus
 // the music-mixed copy. Running the host out of disk mid-render would take the website down
 // with it, which is a far worse outcome than not making a video today.
-if ($mode === 'long') {
-    $freeBytes = @disk_free_space(is_dir($JOBS_ROOT) ? $JOBS_ROOT : __DIR__);
-    if ($freeBytes !== false && $freeBytes < 1500 * 1024 * 1024) {
-        sg_err('Not enough free disk for a long render', array(
-            'freeMB' => (int) round($freeBytes / 1048576),
-            'needMB' => 1500,
-            'hint' => 'video-render.php?action=cleanup clears finished jobs',
-        ));
+//
+// Which is exactly what happened on 2026-09-19, with this guard in place and passing. It
+// asked disk_free_space(), and on shared hosting that answers for the server's filesystem,
+// which had hundreds of gigabytes spare while the 1 GB account sat at 1435 MB and was
+// suspended. The number that matters is what WE are using, against the account's quota,
+// and both are things this code can know. A Short is checked too: it is small, but it is
+// not small enough to be waved through once the budget is nearly gone.
+$needMB = $mode === 'long' ? 450 : 40;
+$budgetBytes = SG_JOBS_BUDGET_MB * 1048576;
+$usedBytes = is_dir($JOBS_ROOT) ? sg_dirsize($JOBS_ROOT) : 0;
+
+if ($usedBytes + $needMB * 1048576 > $budgetBytes) {
+    // Earn the room back before refusing: anything finished six hours ago is published.
+    foreach ((array) glob($JOBS_ROOT . '/*', GLOB_ONLYDIR) as $old) {
+        if (@filemtime($old) < time() - 21600) sg_rmtree($old);
     }
+    $usedBytes = is_dir($JOBS_ROOT) ? sg_dirsize($JOBS_ROOT) : 0;
+}
+
+if ($usedBytes + $needMB * 1048576 > $budgetBytes) {
+    sg_err('Not enough room in the disk budget for this render', array(
+        'usedMB' => (int) round($usedBytes / 1048576),
+        'needMB' => $needMB,
+        'budgetMB' => SG_JOBS_BUDGET_MB,
+        'hint' => 'video-render.php?action=cleanup, or raise SG_JOBS_BUDGET_MB in video-lib.php if the plan has grown',
+    ));
 }
 
 $articles = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true);
