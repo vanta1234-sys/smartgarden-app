@@ -827,6 +827,16 @@ function sg_scene_images_long($sceneTexts, $articleImage, $articleTitle, $catego
         foreach ($cat['curated'] as $p) {
             $s = sg_match_score($text, $p['keywords']);
             if ($s <= 0) continue;
+            // A photograph earns its place by being about the article, not by sharing a
+            // word with one sentence of it. Matching per sentence alone put, on a video
+            // about brining table olives: oyster mushrooms against «ανάπτυξη επιφανειακών
+            // μυκήτων», a houseplant for a shaded room against «σκοτεινό μέρος», our own
+            // drip line over a vegetable bed against «Θρέψης, Άρδευσης & Συντήρησης», and a
+            // heat-struck lemon tree against «καύσωνας». Every one a correct keyword match
+            // and the wrong subject on screen. $pool holds what scored against the article
+            // itself; a sentence now chooses within that, and when nothing there fits, the
+            // rotation falls to neutral garden imagery, which is generic but never wrong.
+            if (!isset($pool[$p['url']])) continue;
             if (!empty($p['own'])) $s += 8;
             if (isset($lastUsedAt[$p['url']]) && $i - $lastUsedAt[$p['url']] < $gap) continue;
             if ($s > $bestScore) { $bestScore = $s; $best = $p['url']; }
