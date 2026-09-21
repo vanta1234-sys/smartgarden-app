@@ -235,7 +235,15 @@ foreach ($strip as $i => $p) {
             $ov .= ',fade=t=out:st=' . sprintf('%.2f', $len - $FADE_OUT)
                  . ':d=' . sprintf('%.2f', $FADE_OUT) . ':alpha=1';
         }
-        $fc = '[0:v]scale=1920:1080,setsar=1[bg];' . $ov . '[ov];[bg][ov]overlay=0:0:format=auto';
+        // setpts=PTS-STARTPTS is the whole trick. -ss before -i leaves the background's
+        // timestamps starting at $from, while the looped PNG starts at zero, and overlay
+        // syncs its two inputs by timestamp — so they never coincided and it held the
+        // first video frame for the entire piece. The output was the right length, the
+        // audio was right, and the picture was frozen: 41MB instead of 148, and two frames
+        // 110 seconds apart identical to the byte. Rebasing the background to zero makes
+        // the two streams share a clock. A single input never needed this, which is why
+        // replace mode was always fine.
+        $fc = '[0:v]scale=1920:1080,setsar=1,setpts=PTS-STARTPTS[bg];' . $ov . '[ov];[bg][ov]overlay=0:0:format=auto';
         $cmd = escapeshellarg($FFMPEG) . ' -y -hide_banner -loglevel error -threads 1'
              . ' -ss ' . sprintf('%.3f', $p['from']) . ' -t ' . sprintf('%.3f', $len)
              . ' -i ' . escapeshellarg($src)
