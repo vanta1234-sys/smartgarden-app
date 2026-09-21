@@ -215,10 +215,25 @@ $strip = array();
 $cursor = 0.0;
 foreach ($items as $it) {
     if ($it['start'] > $cursor + 0.05) $strip[] = array('kind' => 'src', 'from' => $cursor, 'to' => $it['start']);
-    $strip[] = $overlay
-        ? array('kind' => 'over', 'png' => $it['png'], 'name' => $it['name'],
-                'from' => $it['start'], 'to' => $it['start'] + $it['dur'], 'dur' => $it['dur'])
-        : array('kind' => 'slide', 'png' => $it['png'], 'name' => $it['name'], 'dur' => $it['dur']);
+    if ($overlay) {
+        // Long holds are cut into chunks of at most OVERLAY_CHUNK seconds. A hold can run
+        // over two minutes, and a single ffmpeg compositing that much 1080p inside a 2GB
+        // address space is killed — piece 4 died at 37s before the YUV change, piece 13 at
+        // 132s after it. The renderer never meets this because it works one short scene at
+        // a time. The overlay image is identical across the chunks of one hold, so the
+        // lettering is unbroken on screen; only the encoder sees a seam.
+        $OVERLAY_CHUNK = 30.0;
+        $t0 = $it['start'];
+        $end = $it['start'] + $it['dur'];
+        while ($t0 < $end - 0.05) {
+            $t1 = min($end, $t0 + $OVERLAY_CHUNK);
+            $strip[] = array('kind' => 'over', 'png' => $it['png'], 'name' => $it['name'],
+                             'from' => $t0, 'to' => $t1, 'dur' => $t1 - $t0);
+            $t0 = $t1;
+        }
+    } else {
+        $strip[] = array('kind' => 'slide', 'png' => $it['png'], 'name' => $it['name'], 'dur' => $it['dur']);
+    }
     $cursor = $it['start'] + $it['dur'];
 }
 if ($cursor < $total - 0.05) $strip[] = array('kind' => 'src', 'from' => $cursor, 'to' => $total);
