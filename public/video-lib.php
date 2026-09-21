@@ -81,8 +81,12 @@ function sg_rmtree($dir) {
  * are worthless the moment the final file exists, and they are the bulk of the megabytes.
  */
 function sg_strip_intermediates($dir, $keepFinal = '') {
-    $keep = array('job.json', 'status.json', 'log.txt', 'chapters.txt');
+    $keep = array('job.json', 'status.json', 'log.txt', 'chapters.txt', 'render.log');
     if ($keepFinal !== '') $keep[] = basename($keepFinal);
+    // One still survives, ~200KB, so action=thumb can still find a picture of the subject
+    // after the fact. Without it the first thumbnail rebuilt for an article we have no
+    // photograph of came out as a flat green field.
+    foreach ((array) glob(rtrim($dir, '/') . '/scene*_bg.jpg') as $f) { $keep[] = basename($f); break; }
     $freed = 0;
     foreach ((array) glob(rtrim($dir, '/') . '/*') as $p) {
         if (is_dir($p)) { $freed += sg_dirsize($p); sg_rmtree($p); continue; }

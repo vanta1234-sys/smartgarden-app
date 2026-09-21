@@ -309,10 +309,23 @@ if ($action === 'thumb') {
     header('X-SG-Photo: ' . ($photo === '' ? 'none' : basename($photo)));
     // What the two text rules actually produced, so a blank headline can be told apart
     // from a headline that rendered off-canvas.
-    $dbgTitle = isset($article['title']['el']) ? $article['title']['el']
-        : (isset($article['title']) && is_string($article['title']) ? $article['title'] : '');
+    // Against the merged article, the way the renderer sees it. Reporting the raw job
+    // metadata here said the kicker was empty while the picture plainly had «μόνο 10%» on
+    // it — a debug header that disagrees with the thing it describes is worse than none.
+    $dbg = $article;
+    if (!isset($dbg['keyTakeaways']) && !empty($dbg['slug'])) {
+        foreach ((array) @json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true) as $a) {
+            if (isset($a['slug']) && $a['slug'] === $dbg['slug']) {
+                foreach ($dbg as $k => $v) { if ($v !== '' && $v !== null && $v !== array()) $a[$k] = $v; }
+                $dbg = $a;
+                break;
+            }
+        }
+    }
+    $dbgTitle = isset($dbg['title']['el']) ? $dbg['title']['el']
+        : (isset($dbg['title']) && is_string($dbg['title']) ? $dbg['title'] : '');
     header('X-SG-Headline: ' . rawurlencode(sg_thumb_headline($dbgTitle)));
-    header('X-SG-Kicker: ' . rawurlencode(sg_thumb_kicker($article)));
+    header('X-SG-Kicker: ' . rawurlencode(sg_thumb_kicker($dbg)));
     readfile($dest);
     exit;
 }

@@ -692,6 +692,10 @@ function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $f
         'ok' => !empty($yt['body']['success']),
         'videoId' => isset($yt['body']['videoId']) ? $yt['body']['videoId'] : null,
         'error' => isset($yt['body']['error']) ? $yt['body']['error'] : null,
+        // youtube-publish.php reports whether thumbnails.set was accepted; dropping it here
+        // meant the only way to find out was to open Studio, and a private video serves no
+        // thumbnail over i.ytimg.com to check against.
+        'thumbnail' => isset($yt['body']['thumbnail']) ? $yt['body']['thumbnail'] : null,
     );
     sg_log($dir, 'youtube: ' . json_encode($result['youtube'], JSON_UNESCAPED_UNICODE));
 
