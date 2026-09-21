@@ -101,8 +101,17 @@ function sg_fetch_tts($text, $dest, $dir, &$words = null) {
     }
     sg_log($dir, 'edge TTS failed, falling back to Google for: ' . mb_substr($clean, 0, 40));
     @unlink($dest);
-    $google = 'https://smartgarden.gr/tts-greek.php?text=' . rawurlencode(mb_substr($clean, 0, 190));
-    if (sg_fetch_to_file($google, $dest, 45) && filesize($dest) > 2000) return 'google';
+    // The whole line, not the first 190 characters of it. Google's own endpoint caps a
+    // request at ~200 chars, but tts-greek.php already splits on clause boundaries and
+    // concatenates the audio, so truncating here threw away what it would have read.
+    // Long-form scenes average ~330 characters: every scene that fell back lost about 40%
+    // of its words, mid-sentence, with no error. One render came out 581s instead of 910s
+    // — five and a half minutes of narration gone, and it still reported success.
+    $google = 'https://smartgarden.gr/tts-greek.php?text=' . rawurlencode($clean);
+    if (sg_fetch_to_file($google, $dest, 90) && filesize($dest) > 2000) {
+        sg_log($dir, 'google TTS: ' . mb_strlen($clean, 'UTF-8') . ' chars -> ' . filesize($dest) . ' bytes');
+        return 'google';
+    }
     return null;
 }
 
@@ -521,6 +530,27 @@ function sg_run_job($dir) {
 
     $duration = sg_duration($ffprobe, $final);
     sg_log($dir, 'done: ' . filesize($final) . ' bytes, ' . round($duration, 2) . 's');
+
+    // Greek TTS speaks at about 17 characters a second, and that number is stable enough
+    // to audit the render with. A rate far above it means narration went missing: scenes
+    // that fell back to the Google voice used to be truncated, and one 910-second video
+    // came out at 581 with sentences stopping mid-clause — no error anywhere, status
+    // 'done', file plays. Duration alone looks plausible either way, so this ratio is the
+    // only signal there is. Reported rather than fatal: a short video still beats none.
+    $spokenChars = 0;
+    foreach ($scenes as $sc) $spokenChars += mb_strlen((string) ($sc['voiceover'] ?? ''), 'UTF-8');
+    $charRate = $duration > 0 ? $spokenChars / $duration : 0;
+    $narrationOk = $charRate > 0 && $charRate < 22;
+    sg_log($dir, sprintf('narration: %d chars in %.1fs = %.1f chars/sec%s',
+        $spokenChars, $duration, $charRate, $narrationOk ? '' : '  *** TOO FAST — NARRATION LOST ***'));
+    if (!$narrationOk) {
+        sg_notify_failure('Το βίντεο βγήκε με κομμένη αφήγηση', array(
+            'Job: ' . basename($dir),
+            sprintf('Ρυθμός: %.1f χαρακτήρες/δευτ — το φυσιολογικό είναι ~17.', $charRate),
+            sprintf('Διάρκεια: %.0f δευτ. Με κανονικό ρυθμό θα ήταν %.0f δευτ.', $duration, $spokenChars / 17),
+            'Πιθανή αιτία: σκηνές που έπεσαν στο εφεδρικό TTS και κόπηκαν.',
+        ));
+    }
 
     $publish = !empty($job['autoPublish']) ? sg_publish($job, $dir, basename($dir), $chapters, $duration, $final) : null;
 
