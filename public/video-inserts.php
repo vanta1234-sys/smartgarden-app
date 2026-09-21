@@ -184,6 +184,8 @@ if ($total <= 1) { vi_status($statusFile, 'error', 'Δεν διαβάστηκε 
 // never without text and the picture underneath never stops moving. The PNGs have to carry
 // alpha for this; a slide drawn on an opaque field would simply hide the video.
 $overlay = isset($_GET['overlay']) && $_GET['overlay'] !== '0';
+$planOnly = isset($_GET['plan']) && $_GET['plan'] !== '0';
+$plannedCmds = array();
 
 // The strip: original, slide, original, slide, … in time order.
 $strip = array();
@@ -285,6 +287,12 @@ foreach ($strip as $i => $p) {
              . $VENC . ' ' . escapeshellarg($dst) . ' 2>&1';
     }
 
+    // &plan=1 returns the exact ffmpeg invocations and runs none of them. Three passes in a
+    // row produced byte-identical output from three different filter graphs, which is not
+    // something a filter change can do — so the question stopped being "which graph is
+    // right" and became "which graph is this machine actually running".
+    if ($planOnly) { $plannedCmds[] = $cmd; continue; }
+
     // Retried, because on this host a piece that dies does so intermittently: the renderer
     // learned the same thing scene by scene, where an identical second attempt succeeds
     // almost every time. Without it, one OOM kill three quarters of the way through throws
@@ -315,6 +323,13 @@ foreach ($strip as $i => $p) {
         exit(1);
     }
     $pieces[] = $dst;
+}
+
+if ($planOnly) {
+    vi_out(array(
+        'success' => true, 'plan' => true, 'overlay' => $overlay,
+        'pieces' => count($strip), 'commands' => $plannedCmds,
+    ));
 }
 
 // Join, then put the untouched original audio back over it.
