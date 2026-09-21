@@ -229,12 +229,18 @@ foreach ($strip as $i => $p) {
         // libx264 fails to open an encoder. The picture runs untouched underneath — no fade
         // on it, because it is one continuous shot — and only the lettering dissolves in
         // and out on its own alpha at the two moments it changes.
+        // ONE overlay frame, not a looped image stream, and eof_action=repeat to hold it.
+        // This host's ffmpeg 6.0 stalls the main input when a `-loop 1` image is the second
+        // input of an overlay — the renderer hit the same thing scene by scene and settled
+        // on exactly this shape. The symptom here was a frozen picture with a correct
+        // duration; on 9.0 locally the looped version works, which is why an A/B run on
+        // this machine showed both variants identical and moving.
+        //
+        // The cost is the lettering's fade: `fade` needs frames over time and there is only
+        // one, so the text changes on a cut. Fading the composite instead would dim the
+        // photograph with it, and the photograph is meant to run unbroken.
         $len = $p['to'] - $p['from'];
-        $ov = '[1:v]format=rgba,fade=t=in:st=0:d=' . sprintf('%.2f', $FADE_IN) . ':alpha=1';
-        if ($len > $FADE_IN + $FADE_OUT + 0.3) {
-            $ov .= ',fade=t=out:st=' . sprintf('%.2f', $len - $FADE_OUT)
-                 . ':d=' . sprintf('%.2f', $FADE_OUT) . ':alpha=1';
-        }
+        $ov = '[1:v]format=rgba';
         // setpts=PTS-STARTPTS is the whole trick. -ss before -i leaves the background's
         // timestamps starting at $from, while the looped PNG starts at zero, and overlay
         // syncs its two inputs by timestamp — so they never coincided and it held the
@@ -243,11 +249,11 @@ foreach ($strip as $i => $p) {
         // 110 seconds apart identical to the byte. Rebasing the background to zero makes
         // the two streams share a clock. A single input never needed this, which is why
         // replace mode was always fine.
-        $fc = '[0:v]scale=1920:1080,setsar=1,setpts=PTS-STARTPTS[bg];' . $ov . '[ov];[bg][ov]overlay=0:0:format=auto';
+        $fc = '[0:v]scale=1920:1080,setsar=1,setpts=PTS-STARTPTS[bg];' . $ov
+            . '[ov];[bg][ov]overlay=0:0:eof_action=repeat:format=auto';
         $cmd = escapeshellarg($FFMPEG) . ' -y -hide_banner -loglevel error -threads 1'
              . ' -ss ' . sprintf('%.3f', $p['from']) . ' -t ' . sprintf('%.3f', $len)
              . ' -i ' . escapeshellarg($src)
-             . ' -loop 1 -framerate 30 -t ' . sprintf('%.3f', $len)
              . ' -i ' . escapeshellarg($p['png'])
              . ' -filter_complex ' . escapeshellarg($fc)
              . $VENC . ' ' . escapeshellarg($dst) . ' 2>&1';
