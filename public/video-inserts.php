@@ -178,12 +178,22 @@ if (is_file($FFPROBE)) {
 }
 if ($total <= 1) { vi_status($statusFile, 'error', 'Δεν διαβάστηκε η διάρκεια του βίντεο'); exit(1); }
 
+// &overlay=1 keeps the lettering in front and lets the photographs keep changing behind
+// it, instead of the slide taking the whole frame for its stretch. A slide then holds from
+// the moment its subject is introduced until the next one replaces it, so the screen is
+// never without text and the picture underneath never stops moving. The PNGs have to carry
+// alpha for this; a slide drawn on an opaque field would simply hide the video.
+$overlay = isset($_GET['overlay']) && $_GET['overlay'] !== '0';
+
 // The strip: original, slide, original, slide, … in time order.
 $strip = array();
 $cursor = 0.0;
 foreach ($items as $it) {
     if ($it['start'] > $cursor + 0.05) $strip[] = array('kind' => 'src', 'from' => $cursor, 'to' => $it['start']);
-    $strip[] = array('kind' => 'slide', 'png' => $it['png'], 'name' => $it['name'], 'dur' => $it['dur']);
+    $strip[] = $overlay
+        ? array('kind' => 'over', 'png' => $it['png'], 'name' => $it['name'],
+                'from' => $it['start'], 'to' => $it['start'] + $it['dur'], 'dur' => $it['dur'])
+        : array('kind' => 'slide', 'png' => $it['png'], 'name' => $it['name'], 'dur' => $it['dur']);
     $cursor = $it['start'] + $it['dur'];
 }
 if ($cursor < $total - 0.05) $strip[] = array('kind' => 'src', 'from' => $cursor, 'to' => $total);
@@ -214,7 +224,26 @@ foreach ($strip as $i => $p) {
     $FADE_OUT = 0.75;
 
     $dst = $work . '/p' . sprintf('%03d', $i) . '.mp4';
-    if ($p['kind'] === 'src') {
+    if ($p['kind'] === 'over') {
+        // Two inputs, which is the most this host will carry in one filter graph before
+        // libx264 fails to open an encoder. The picture runs untouched underneath — no fade
+        // on it, because it is one continuous shot — and only the lettering dissolves in
+        // and out on its own alpha at the two moments it changes.
+        $len = $p['to'] - $p['from'];
+        $ov = '[1:v]format=rgba,fade=t=in:st=0:d=' . sprintf('%.2f', $FADE_IN) . ':alpha=1';
+        if ($len > $FADE_IN + $FADE_OUT + 0.3) {
+            $ov .= ',fade=t=out:st=' . sprintf('%.2f', $len - $FADE_OUT)
+                 . ':d=' . sprintf('%.2f', $FADE_OUT) . ':alpha=1';
+        }
+        $fc = '[0:v]scale=1920:1080,setsar=1[bg];' . $ov . '[ov];[bg][ov]overlay=0:0:format=auto';
+        $cmd = escapeshellarg($FFMPEG) . ' -y -hide_banner -loglevel error -threads 1'
+             . ' -ss ' . sprintf('%.3f', $p['from']) . ' -t ' . sprintf('%.3f', $len)
+             . ' -i ' . escapeshellarg($src)
+             . ' -loop 1 -framerate 30 -t ' . sprintf('%.3f', $len)
+             . ' -i ' . escapeshellarg($p['png'])
+             . ' -filter_complex ' . escapeshellarg($fc)
+             . $VENC . ' ' . escapeshellarg($dst) . ' 2>&1';
+    } elseif ($p['kind'] === 'src') {
         $len = $p['to'] - $p['from'];
         $vf = 'scale=1920:1080,setsar=1';
         // A stretch of video only fades where it meets a slide.
