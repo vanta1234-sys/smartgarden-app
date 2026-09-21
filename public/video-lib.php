@@ -42,8 +42,8 @@ define('SG_FONT', __DIR__ . '/fonts/NotoSans-Variable.ttf');
 // The headroom is what is left for the site to write to while a render is running — the
 // article JSON, logs, an upload. Raise the quota here if the plan grows; it is the number
 // the host enforces, not a guess.
-define('SG_ACCOUNT_QUOTA_MB', 1024);
-define('SG_ACCOUNT_HEADROOM_MB', 120);
+define('SG_ACCOUNT_QUOTA_MB', 10240);
+define('SG_ACCOUNT_HEADROOM_MB', 500);
 
 // ============================================================================
 // Disk

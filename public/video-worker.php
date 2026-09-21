@@ -121,12 +121,13 @@ function sg_run_job($dir) {
     sg_status($dir, 'running', 3, 'Ξεκινά η δημιουργία βίντεο');
     sg_log($dir, 'job start: ' . ($job['article']['slug'] ?? '?') . ' (' . $n . ' scenes)');
 
-    // "~15MB behind" was written for a twenty-second Short. A long-form render leaves a
-    // few hundred, and at three days' retention that is more than the entire 1 GB account.
-    // Six hours is still far longer than the minutes an upload needs, and the delete now
-    // descends into subdirectories, which the old glob+rmdir pair never did.
+    // Six hours was what a 1 GB account could afford. The plan is 10 GB as of 2026-09-21
+    // and the account sits at 759MB, so a finished render can be kept long enough to be
+    // fetched the next day without re-rendering it. Forty-eight hours, with the three
+    // faults that actually caused the outage fixed: failures clean up after themselves,
+    // intermediates go the moment a render succeeds, and the delete descends.
     foreach ((array) glob(dirname($dir) . '/*', GLOB_ONLYDIR) as $old) {
-        if ($old === $dir || filemtime($old) > time() - 21600) continue;
+        if ($old === $dir || filemtime($old) > time() - 172800) continue;
         sg_rmtree($old);
     }
 
