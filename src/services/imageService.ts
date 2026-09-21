@@ -330,79 +330,79 @@ export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
   // failure in a different costume.
   {
     url: "https://images.unsplash.com/photo-1697829234209-5497520a9fc6?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["ελαιωνας", "ελαιοδεντρ", "δεντρο ελια", "λιπανση", "καλιο", "αρδευση", "ετησιος κυκλος"],
+    keywords: ["ελιες", "ελια", "ελαιο", "ελαιωνας", "ελαιοδεντρ", "δεντρο ελια", "λιπανση", "καλιο", "αρδευση", "ετησιος κυκλος"],
     category: "plant_care",
     alt: "Olive grove with mature trees on a bright day"
   },
   {
     url: "https://images.unsplash.com/photo-1758641283518-59ade23743ae?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["κλαδι ελιας", "φυλλα ελιας", "καρποδεση", "σκληρυνση πυρηνα", "ελαιοδεντρ"],
+    keywords: ["ελιες", "ελια", "ελαιο", "κλαδι ελιας", "φυλλα ελιας", "καρποδεση", "σκληρυνση πυρηνα", "ελαιοδεντρ"],
     category: "plant_care",
     alt: "Olive branch with narrow silver-green leaves"
   },
   {
     url: "https://images.unsplash.com/photo-1663178405985-25074d8e72f4?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["συγκομιδη", "διχτυα", "μαζεμα", "ραβδισμ", "ελαιοσυλλογη"],
+    keywords: ["ελιες", "ελια", "ελαιο", "συγκομιδη", "διχτυα", "μαζεμα", "ραβδισμ", "ελαιοσυλλογη"],
     category: "plant_care",
     alt: "Freshly harvested olives collected on nets under the trees"
   },
   {
     url: "https://images.unsplash.com/photo-1642275964193-8b9a8523443b?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["συγκομιδη", "επιλογη καρπων", "ποικιλι", "διαλογη"],
+    keywords: ["ελιες", "ελια", "ελαιο", "συγκομιδη", "επιλογη καρπων", "ποικιλι", "διαλογη"],
     category: "plant_care",
     alt: "A hand holding a few just-picked green and black olives"
   },
   {
     url: "https://images.unsplash.com/photo-1572777856134-4e658bbf3b78?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["φρεσκοκομμεν", "ακατεργαστ", "πλυσιμο", "καθαρισμ", "παρτιδα"],
+    keywords: ["ελιες", "ελια", "ελαιο", "φρεσκοκομμεν", "ακατεργαστ", "πλυσιμο", "καθαρισμ", "παρτιδα"],
     category: "plant_care",
     alt: "A mass of just-harvested olives mixed with leaves and twigs"
   },
   {
     url: "https://images.unsplash.com/photo-1698775942613-3e9fc114b2a1?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["ελαιοευρωπαιν", "πικραδα", "πικρ", "πρασινη ελια", "ωμη ελια"],
+    keywords: ["ελιες", "ελια", "ελαιο", "ελαιοευρωπαιν", "πικραδα", "πικρ", "πρασινη ελια", "ωμη ελια"],
     category: "plant_care",
     alt: "Green olives with a few dark ones, freshly picked with leaves"
   },
   {
     url: "https://images.unsplash.com/photo-1634657443172-efbae44fd04b?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["ωριμανσ", "μαυρη ελια", "σταδια", "υδρολυσ"],
+    keywords: ["ελιες", "ελια", "ελαιο", "ωριμανσ", "μαυρη ελια", "σταδια", "υδρολυσ"],
     category: "plant_care",
     alt: "Green and black olives together, close up"
   },
   {
     url: "https://images.unsplash.com/photo-1666361374724-3844eebf0f4b?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["ποικιλιες ελιας", "χρωμα καρπου", "μεγαλη ποσοτητα"],
+    keywords: ["ελιες", "ελια", "ελαιο", "ποικιλιες ελιας", "χρωμα καρπου", "μεγαλη ποσοτητα"],
     category: "plant_care",
     alt: "A large quantity of olives at different stages of ripeness"
   },
   {
     url: "https://images.unsplash.com/photo-1714583357992-98f0ad946902?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["αλμη", "ζυμωσ", "γαλακτοβακτηρι", "μαριναρ", "αρωματικ", "σκορδο"],
+    keywords: ["ελιες", "ελια", "ελαιο", "αλμη", "ζυμωσ", "γαλακτοβακτηρι", "μαριναρ", "αρωματικ", "σκορδο"],
     category: "plant_care",
     alt: "Olives sitting in brine with garlic cloves and herbs"
   },
   {
     url: "https://images.unsplash.com/photo-1737681159526-0561967bd0e5?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["αλμη", "διαλυμα", "αλατι", "ανανεωση", "δοχειο", "εμβαπτισ"],
+    keywords: ["ελιες", "ελια", "ελαιο", "αλμη", "διαλυμα", "αλατι", "ανανεωση", "δοχειο", "εμβαπτισ"],
     category: "plant_care",
     alt: "Olives submerged in brine in a shallow container with a spoon"
   },
   {
     url: "https://images.unsplash.com/photo-1756361946320-5a80f13b86e0?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["χαρακτη", "τσακιστη", "σαρκα", "επιδερμιδα", "υφη"],
+    keywords: ["ελιες", "ελια", "ελαιο", "χαρακτη", "τσακιστη", "σαρκα", "επιδερμιδα", "υφη"],
     category: "plant_care",
     alt: "Close-up of glossy green and dark olives showing skin and flesh"
   },
   {
     url: "https://images.unsplash.com/photo-1683543121487-b718fa4f8bd1?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["επιτραπεζι", "σερβιρισμα", "ειδη ελιας", "αποτελεσμα"],
+    keywords: ["ελιες", "ελια", "ελαιο", "επιτραπεζι", "σερβιρισμα", "ειδη ελιας", "αποτελεσμα"],
     category: "plant_care",
     alt: "Bowls of green, purple and black table olives side by side"
   },
   {
     url: "https://images.unsplash.com/photo-1651224074828-78818c4b74f9?w=1200&auto=format&fit=crop&q=80",
-    keywords: ["μαλακωμα", "αλλοιωσ", "ελαττωμ", "λαθη", "αποδομησ"],
+    keywords: ["ελιες", "ελια", "ελαιο", "μαλακωμα", "αλλοιωσ", "ελαττωμ", "λαθη", "αποδομησ"],
     category: "plant_care",
     alt: "Olives in bulk, some bruised and softening"
   },
