@@ -119,7 +119,10 @@ if (isset($_GET['dry'])) {
 }
 
 // ---------------------------------------------------------------- spawn or run
-if (!isset($_GET['run'])) {
+// A plan is cheap and produces no file, so it runs inline and can answer in the response.
+// Detaching it wrote the commands to nohup's /dev/null, which is a diagnostic that cannot
+// be read — the same shape of mistake as the flags that never arrived.
+if (!isset($_GET['run']) && !(isset($_GET['plan']) && $_GET['plan'] !== '0')) {
     // One pass at a time per job. Two of them share a status file, a work directory and an
     // output path, so the second silently corrupts the first's pieces and whichever finishes
     // last wins — which is how a failure reported for piece 9 turned out to belong to a run
