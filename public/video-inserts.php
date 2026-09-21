@@ -265,7 +265,11 @@ foreach ($strip as $i => $p) {
         // one, so the text changes on a cut. Fading the composite instead would dim the
         // photograph with it, and the photograph is meant to run unbroken.
         $len = $p['to'] - $p['from'];
-        $ov = '[1:v]format=rgba';
+        // yuva420p, and overlay composites in YUV: with format=auto it converts the whole
+        // 1080p background to RGBA every frame to blend against an RGBA overlay, and this
+        // host has a 2GB address-space limit. Piece 4 was OOM-killed three times running.
+        // The overlay is converted once; the video is never taken out of its native space.
+        $ov = '[1:v]format=yuva420p';
         // setpts=PTS-STARTPTS is the whole trick. -ss before -i leaves the background's
         // timestamps starting at $from, while the looped PNG starts at zero, and overlay
         // syncs its two inputs by timestamp — so they never coincided and it held the
@@ -275,7 +279,7 @@ foreach ($strip as $i => $p) {
         // the two streams share a clock. A single input never needed this, which is why
         // replace mode was always fine.
         $fc = '[0:v]scale=1920:1080,setsar=1,setpts=PTS-STARTPTS[bg];' . $ov
-            . '[ov];[bg][ov]overlay=0:0:eof_action=repeat:format=auto';
+            . '[ov];[bg][ov]overlay=0:0:eof_action=repeat:format=yuv420';
         $cmd = escapeshellarg($FFMPEG) . ' -y -hide_banner -loglevel error -threads 1'
              . ' -ss ' . sprintf('%.3f', $p['from']) . ' -t ' . sprintf('%.3f', $len)
              . ' -i ' . escapeshellarg($src)
