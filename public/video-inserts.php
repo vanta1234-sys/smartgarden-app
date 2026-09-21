@@ -26,7 +26,20 @@
 $SG_CLI = (PHP_SAPI === 'cli');
 if ($SG_CLI) {
     if (!isset($argv[3])) { fwrite(STDERR, "usage: php video-inserts.php <job> <spec> <key>\n"); exit(1); }
+    // argv[4] carries the flags the HTTP request was given. Rebuilding $_GET from three
+    // fixed arguments silently dropped every one of them: &overlay=1 never reached the
+    // process that does the work, so three passes that were supposed to composite text
+    // over moving footage all ran in replace mode instead — 881 seconds of still slides
+    // and 29 of video. That is why the file came out at 41MB, why frames two minutes apart
+    // were identical (the same motionless slide), and why three different filter graphs
+    // produced byte-identical output: the code being edited never ran.
     $_GET = array('job' => $argv[1], 'spec' => $argv[2], 'key' => $argv[3], 'run' => '1');
+    if (isset($argv[4]) && $argv[4] !== '') {
+        parse_str($argv[4], $extra);
+        foreach ((array) $extra as $k => $v) {
+            if (!isset($_GET[$k])) $_GET[$k] = $v;
+        }
+    }
 } else {
     header('Content-Type: application/json; charset=utf-8');
 }
@@ -138,8 +151,15 @@ if (!isset($_GET['run'])) {
 
     vi_status($statusFile, 'queued', 'Σε αναμονή', array('inserts' => count($items)));
 
+    // Everything the request asked for that is not job/spec/key, handed on as a query
+    // string so the background process runs the same pass the caller described.
+    $passOn = array();
+    foreach (array('overlay', 'plan') as $flag) {
+        if (isset($_GET[$flag])) $passOn[$flag] = (string) $_GET[$flag];
+    }
     $cmd = 'nohup ' . escapeshellarg($cli) . ' ' . escapeshellarg(__FILE__)
          . ' ' . escapeshellarg($job) . ' ' . escapeshellarg($specRaw) . ' ' . escapeshellarg($_GET['key'])
+         . ' ' . escapeshellarg(http_build_query($passOn))
          . ' > ' . escapeshellarg($dir . '/inserts.log') . ' 2>&1 & echo $!';
     $pid = trim((string) @shell_exec($cmd));
 
