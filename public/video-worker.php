@@ -319,8 +319,32 @@ function sg_run_job($dir) {
             // is the caption's own fade, which a static lower third does not need; the
             // picture still fades at both edges.
             if (SG_LONG) {
+                // The caption says which section we are in; after ten seconds it has said it,
+                // and leaving it up for the rest of a twenty-second scene buries the picture
+                // under permanent furniture — especially once slides are composited above it.
+                //
+                // It cannot be faded directly: the overlay is a single frame held by
+                // eof_action=repeat, and `fade` needs frames over time. So the clean picture
+                // is dissolved back OVER the captioned one through a mask that opens on a
+                // schedule. `color=white` put through `fade=t=in` is black until CAP_HOLD and
+                // white CAP_FADE seconds later — which is exactly the alpha ramp needed, and
+                // it costs no extra input and no geq expression to escape.
+                $capHold = 10.0;
+                $capFade = 1.6;
                 $txt = '[1:v]format=rgba[ov]';
-                $vf = $pic . ';' . $txt . ';[kb][ov]overlay=0:0:eof_action=repeat[v]';
+                if ($sceneDur > $capHold + $capFade + 0.4) {
+                    $vf = $pic
+                        . ';[kb]split[kbA][kbB]'
+                        . ';[kbA][ov]overlay=0:0:eof_action=repeat[cap]'
+                        . ';color=white:s=' . SG_W . 'x' . SG_H . ':r=30:d=' . sprintf('%.3f', $sceneDur)
+                        . ',fade=t=in:st=' . sprintf('%.2f', $capHold) . ':d=' . sprintf('%.2f', $capFade)
+                        . ',format=gray[m]'
+                        . ';[kbB][m]alphamerge[clean]'
+                        . ';[cap][clean]overlay=0:0[v]';
+                } else {
+                    // Too short to bother: the caption simply stays for the whole scene.
+                    $vf = $pic . ';' . $txt . ';[kb][ov]overlay=0:0:eof_action=repeat[v]';
+                }
             } else {
                 $txt = '[1:v]format=rgba,fade=t=in:st=0.10:d=' . sprintf('%.2f', $fadeT) . ':alpha=1'
                      . ',fade=t=out:st=' . sprintf('%.2f', $outT) . ':d=0.24:alpha=1[ov]';
