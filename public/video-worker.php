@@ -333,7 +333,7 @@ function sg_run_job($dir) {
                 $capFade = 1.6;
                 $txt = '[1:v]format=rgba[ov]';
                 if ($sceneDur > $capHold + $capFade + 0.4) {
-                    $vf = $pic
+                    $vf = $pic . ';' . $txt
                         . ';[kb]split[kbA][kbB]'
                         . ';[kbA][ov]overlay=0:0:eof_action=repeat[cap]'
                         . ';color=white:s=' . SG_W . 'x' . SG_H . ':r=30:d=' . sprintf('%.3f', $sceneDur)
