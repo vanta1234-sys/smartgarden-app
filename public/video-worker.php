@@ -564,7 +564,11 @@ function sg_run_job($dir) {
     $spokenChars = 0;
     foreach ($scenes as $sc) $spokenChars += mb_strlen((string) ($sc['voiceover'] ?? ''), 'UTF-8');
     $charRate = $duration > 0 ? $spokenChars / $duration : 0;
-    $narrationOk = $charRate > 0 && $charRate < 22;
+    // 22 was too loose: a 2026-09-23 render came back at 735.2s (20.8 chars/sec) against
+    // a confirmed-good 902.1s (17.0) for the identical script -- a render that would have
+    // published with missing narration and never tripped this check. 19.5 gives ~15%
+    // headroom over the observed 16.8-17.0 baseline and would have caught it.
+    $narrationOk = $charRate > 0 && $charRate < 19.5;
     sg_log($dir, sprintf('narration: %d chars in %.1fs = %.1f chars/sec%s',
         $spokenChars, $duration, $charRate, $narrationOk ? '' : '  *** TOO FAST — NARRATION LOST ***'));
     if (!$narrationOk) {
