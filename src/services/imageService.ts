@@ -443,27 +443,21 @@ export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
 ];
 
 // Fallback pool of unique botanical photos for round-robin rotation
+// A "fallback" photo has to be honestly generic -- safe to show under narration about
+// ANY plant, because nothing matched this scene specifically. Found 2026-09-25 when a
+// video about tap-water chlorosis showed an aloe plant during a sentence about pH-meter
+// calibration: 15 of these 20 entries turned out to duplicate an URL from
+// CURATED_GARDENING_PHOTOS (tomatoes, carrots, peppers, strawberries, succulents,
+// orchids, monstera, grapes, bonsai -- each correctly subject-gated there), and a 16th
+// ("Tomato Greenhouse Interior") was species-specific without even being a duplicate.
+// Those photos are not gone -- they still show up correctly for the tomato, succulent
+// etc. articles they belong to, through the curated path. They just no longer leak into
+// videos about something else through the rotation fallback, which walks this list
+// without checking subject relevance at all.
 export const FALLBACK_BOTANICAL_PHOTOS = [
   "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", // Vertical Garden
-  "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&auto=format&fit=crop&q=80", // Ripe Tomatoes on Vine
-  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // Tomato Greenhouse Interior
   "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&auto=format&fit=crop&q=80", // Garden Trowel with Soil
-  "https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1200&auto=format&fit=crop&q=80", // Bonsai Tree in Pot
-  "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=1200&auto=format&fit=crop&q=80", // Fresh Harvested Carrots
-  "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=1200&auto=format&fit=crop&q=80", // Vibrant Chili Peppers
-  "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=1200&auto=format&fit=crop&q=80", // Fresh Strawberries
   "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1200&auto=format&fit=crop&q=80", // Seedling Tray with Sprouts
-  "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=1200&auto=format&fit=crop&q=80", // Tomato Greenhouse Interior
-  "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80", // Potted Aloe / Succulent
-  "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=1200&auto=format&fit=crop&q=80", // Orchids
-  "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80", // Monstera Indoor Plant
-  "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=1200&auto=format&fit=crop&q=80", // Fresh Salad Greens
-  "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&auto=format&fit=crop&q=80", // Grapevine Pergola
-  "https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=1200&auto=format&fit=crop&q=80", // Fresh Strawberries
-  "https://images.unsplash.com/photo-1512428813834-c702c7702b78?w=1200&auto=format&fit=crop&q=80", // Bonsai Tree in Pot
-  "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=1200&auto=format&fit=crop&q=80", // Monstera Indoor Plant
-  "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=1200&auto=format&fit=crop&q=80", // Fresh Harvested Carrots
-  "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?w=1200&auto=format&fit=crop&q=80", // Potted Aloe / Succulent
 ];
 
 function stripAccents(str: string): string {
