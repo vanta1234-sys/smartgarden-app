@@ -406,6 +406,40 @@ export const CURATED_GARDENING_PHOTOS: CuratedPhoto[] = [
     category: "plant_care",
     alt: "Olives in bulk, some bruised and softening"
   },
+  // --- Tap-water quality: watering imagery --------------------------------
+  //
+  // Added 2026-09-25 for an article on tap water hardness/chlorine causing chlorosis.
+  // pH meters, EC meters and mineral-scale close-ups do not exist on Unsplash under any
+  // search tried (ph meter water, tds meter, limescale pot rim, rain barrel) -- three
+  // searches returned diabetes glucometers, a hygrometer, a crypto wallet, pottery-wheel
+  // photos and rock geology. Rather than mislabel any of those, this is honestly just
+  // watering photography, verified and more varied than the single can-watering-a-pot shot
+  // the catalogue had; scenes about pH thresholds and EC numbers fall through to neutral
+  // garden imagery, which the existing design already treats as an acceptable outcome.
+  {
+    url: "https://images.unsplash.com/photo-1515150144380-bca9f1650ed9?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ποτισμα", "νερο", "καταιωνισμος", "ψεκασμος", "λαχανοκηπος", "βροχη"],
+    category: "irrigation_iot",
+    alt: "Overhead sprinkler watering a row of young vegetables"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1667992714862-df8713baf8c6?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ποτιστηρι", "ποτισμα", "νερο", "κηπου"],
+    category: "irrigation_iot",
+    alt: "Yellow metal watering can resting on a garden post outdoors"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1645111094156-fc33bbf48b2e?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ποτισμα", "νερο", "ανθη", "λουλουδια"],
+    category: "irrigation_iot",
+    alt: "Hand watering white flowers with a metal watering can"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1692651771569-95dd3ed878a8?w=1200&auto=format&fit=crop&q=80",
+    keywords: ["ποτιστηρι", "νερο", "γκαζον", "κηπου"],
+    category: "irrigation_iot",
+    alt: "Yellow watering can standing on moss in a shaded garden corner"
+  },
 ];
 
 // Fallback pool of unique botanical photos for round-robin rotation

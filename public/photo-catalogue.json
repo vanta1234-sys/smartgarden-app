@@ -872,6 +872,52 @@
       ],
       "category": "plant_care",
       "alt": "Olives in bulk, some bruised and softening"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1515150144380-bca9f1650ed9?w=1200&auto=format&fit=crop&q=80",
+      "keywords": [
+        "ποτισμα",
+        "νερο",
+        "καταιωνισμος",
+        "ψεκασμος",
+        "λαχανοκηπος",
+        "βροχη"
+      ],
+      "category": "irrigation_iot",
+      "alt": "Overhead sprinkler watering a row of young vegetables"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1667992714862-df8713baf8c6?w=1200&auto=format&fit=crop&q=80",
+      "keywords": [
+        "ποτιστηρι",
+        "ποτισμα",
+        "νερο",
+        "κηπου"
+      ],
+      "category": "irrigation_iot",
+      "alt": "Yellow metal watering can resting on a garden post outdoors"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1645111094156-fc33bbf48b2e?w=1200&auto=format&fit=crop&q=80",
+      "keywords": [
+        "ποτισμα",
+        "νερο",
+        "ανθη",
+        "λουλουδια"
+      ],
+      "category": "irrigation_iot",
+      "alt": "Hand watering white flowers with a metal watering can"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1692651771569-95dd3ed878a8?w=1200&auto=format&fit=crop&q=80",
+      "keywords": [
+        "ποτιστηρι",
+        "νερο",
+        "γκαζον",
+        "κηπου"
+      ],
+      "category": "irrigation_iot",
+      "alt": "Yellow watering can standing on moss in a shaded garden corner"
     }
   ],
   "neutral": [
