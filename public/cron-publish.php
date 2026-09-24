@@ -2010,6 +2010,31 @@ if ($selectedTopic === null) {
         exit;
     }
 
+    // The daily-publish cap above only ever checked an article's own `date`, which a
+    // deepen never touches — so this branch had no throttle of its own, and cron-job.org
+    // pinging more than once a day meant more than one rewrite a day (three on
+    // 2026-09-09... 2026-09-22, once the pool ran out). Explicit now, at 3: a deepen never
+    // adds a URL — 74 stays 74 — so the "many new pages" pattern the March 2026 core
+    // update penalised doesn't apply the way it does to new articles. 3/day still finishes
+    // the 44-article backlog in under three weeks instead of forty-four days.
+    // &maxdeepen= overrides it for a manual run.
+    $maxDeepenPerDay = isset($_GET['maxdeepen']) ? max(0, (int) $_GET['maxdeepen']) : 3;
+    $today = date('Y-m-d');
+    $deepenedToday = 0;
+    foreach ($existingArticles as $existing) {
+        if (isset($existing['deepenedAt']) && $existing['deepenedAt'] === $today) $deepenedToday++;
+    }
+    if ($deepenedToday >= $maxDeepenPerDay) {
+        echo json_encode(array(
+            'success' => false,
+            'skipped' => true,
+            'reason' => 'Daily deepen cap reached (' . $deepenedToday . '/' . $maxDeepenPerDay . ' today).',
+            'deepenedToday' => $deepenedToday,
+            'maxDeepenPerDay' => $maxDeepenPerDay,
+        ), JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     list($deepenCode, $deepenPayload) = sg_deepen_run(
         $existingArticles, $latestFile, $GEMINI_API_KEY, $OPENAI_API_KEY, '1', true
     );
