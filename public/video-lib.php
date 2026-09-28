@@ -365,7 +365,7 @@ function sg_build_script($article) {
             // Short falls off a cliff and the payoff never gets seen.
             // Spoken only. The caption keeps "3-5", which reads correctly on screen; it is
             // just the synthesiser that needs the word.
-            'voiceover' => sg_speak_ranges(sg_scene_line($summary, 95)),
+            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($summary, 95)))),
             'onScreenText' => $angle['problemText'],
             'step' => 0,
         ),
@@ -378,7 +378,7 @@ function sg_build_script($article) {
             'tag' => 'ΒΗΜΑ ' . ($i + 1),
             // No spoken "Πρώτον/Δεύτερον" any more: the numbered badge on screen already
             // says which step this is, and the word cost most of a second each time.
-            'voiceover' => sg_speak_ranges(sg_scene_line($bullet, 95)),
+            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($bullet, 95)))),
             // Generous, because the renderer wraps to four lines and shrinks the type to fit.
             // Cutting at 95 chars put an ellipsis in the middle of most takeaways.
             'onScreenText' => sg_scene_line($bullet, 95),
@@ -442,6 +442,42 @@ function sg_speak_ranges($text) {
 }
 
 /**
+ * "pH 7.5" and "EC 6,0" both got read with the decimal mark silently dropped -- "seven
+ * five" instead of "seven point five" -- because the synthesiser doesn't reliably vocalise
+ * either "." or "," on its own (found 2026-09-28, reported against the water-quality
+ * video). Spelling the separator out as the word "κόμμα" removes the ambiguity entirely.
+ * Runs AFTER sg_speak_ranges, so "6.0-6.5" is already "6.0 έως 6.5" by the time this sees
+ * it and turns each endpoint into "6 κόμμα 0". The {1,2} cap on the fractional part is
+ * deliberate: a genuine thousands-grouped number like "1.500" has a 3-digit second group
+ * and must NOT be read as "1 κόμμα 500".
+ */
+function sg_speak_decimals($text) {
+    return preg_replace('/(\d+)[.,](\d{1,2})(?!\d)/u', '$1 κόμμα $2', (string) $text);
+}
+
+/**
+ * "Cl", "Mn", "Zn" and the rest of the periodic-table shorthand this site's chemistry
+ * sections use read fine on the page but come out as bare Latin letters when spoken
+ * (reported 2026-09-28: "χλώριο ως Cl" is clear in print, not read aloud). Expanded to the
+ * Greek element name only for narration -- the article text itself keeps the abbreviation,
+ * which is what a reader actually wants on screen. Boundary-guarded on both sides so it
+ * only fires on the symbol as its own token (parenthesised, comma-separated, hyphenated in
+ * an N-P-K ratio) and never mid-word.
+ */
+function sg_speak_elements($text) {
+    static $map = array(
+        'Cl' => 'χλώριο', 'Mn' => 'μαγγάνιο', 'Zn' => 'ψευδάργυρος', 'Fe' => 'σίδηρος',
+        'Ca' => 'ασβέστιο', 'Mg' => 'μαγνήσιο', 'Cu' => 'χαλκός', 'Mo' => 'μολυβδαίνιο',
+        'Na' => 'νάτριο', 'N' => 'άζωτο', 'P' => 'φώσφορος', 'K' => 'κάλιο',
+        'S' => 'θείο', 'B' => 'βόριο',
+    );
+    $pattern = '/(?<![\p{L}\p{N}])(' . implode('|', array_keys($map)) . ')(?![\p{L}\p{N}])/u';
+    return preg_replace_callback($pattern, function ($m) use ($map) {
+        return $map[$m[1]];
+    }, (string) $text);
+}
+
+/**
  * Turn an article's markdown body into something worth listening to.
  *
  * Every pattern carries /u. Greek letters are two bytes and this site has been bitten
@@ -485,7 +521,7 @@ function sg_speech_text($md) {
         if (!preg_match('/[.!;:]$/u', $t)) $t .= '.';
         $out[] = $t;
     }
-    return sg_speak_ranges(implode(' ', $out));
+    return sg_speak_elements(sg_speak_decimals(sg_speak_ranges(implode(' ', $out))));
 }
 
 /**
