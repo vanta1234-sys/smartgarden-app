@@ -24,6 +24,13 @@ if ($text === '') {
     exit;
 }
 
+// PHP's own default max_execution_time (commonly 30s on shared hosting) was shorter than
+// the receive-loop deadline below, so a long synthesis got killed by PHP itself before
+// that deadline -- or this script's own error handling -- ever ran, surfacing as a bare
+// Cloudflare 502 with no body instead of a graceful JSON error or a complete result
+// (found 2026-09-29, raising the deadline from 12s to handle longer scenes exposed this).
+set_time_limit(50);
+
 function edgeTtsFail($message) {
     http_response_code(502);
     header('Content-Type: application/json; charset=utf-8');
@@ -197,7 +204,12 @@ try {
         'Cookie' => "muid={$muid};",
     );
 
-    $sock = wsConnect('speech.platform.bing.com', 443, $path, $headers, 8);
+    // Also sets the socket's ongoing read timeout (via stream_set_timeout inside
+    // wsConnect), not just the initial handshake -- 8s there meant a single slow gap
+    // between chunks during a long synthesis could truncate the stream even with the
+    // outer receive-loop deadline raised below. 20s tolerates a slow chunk without
+    // masking a genuinely dead connection for too long.
+    $sock = wsConnect('speech.platform.bing.com', 443, $path, $headers, 20);
 
     $ts = gmdate('D M d Y H:i:s') . ' GMT+0000 (Coordinated Universal Time)';
     $configMsg = "X-Timestamp:{$ts}\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n"
@@ -224,7 +236,16 @@ try {
     $audio = '';
     $words = array();
     $turnEnded = false;
-    $deadline = microtime(true) + 12;
+    // 12s cut synthesis off mid-stream for anything long enough to need it: found
+    // 2026-09-29 when a ~26-32s scene came back with audio that just stopped mid-sentence
+    // ("κόβεται ξαφνικά", reported against the water-quality video) -- the loop hit this
+    // deadline before Path:turn.end arrived, so $audio held only whatever chunks had
+    // streamed back so far, and that partial clip still passed the caller's ">4000 bytes"
+    // sanity check and got accepted as a complete scene. Both callers already budget 45-60s
+    // for the whole HTTP round trip (video-worker.php's sg_fetch_to_file, video-render.php's
+    // selftest probe), so raising this to 35s leaves real margin under either without
+    // risking an indefinite hang.
+    $deadline = microtime(true) + 35;
 
     while (!$turnEnded && microtime(true) < $deadline) {
         $frame = wsReadFrame($sock);
