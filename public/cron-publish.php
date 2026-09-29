@@ -3107,17 +3107,27 @@ if (count($existingArticles) > 100) {
 // image (via article.php), so this is deliberately just a link + short caption,
 // not a duplicate of the article body.
 //
-// TEMPORARILY DISABLED (2026-09-09): Meta blocked the entire Facebook app's API
-// access ("API access blocked" from debug_token, confirmed with an app-level
-// token — not a per-user/per-page token issue). Likely trigger: a brand-new
-// 0-follower Page receiving a burst of video uploads plus 10 auto-posts within
-// ~15 minutes on the same day. Flip FB_AUTO_POST_ENABLED back to true once the
-// user has resolved this via developers.facebook.com (App Review / Alerts) —
-// do not just silently leave it off.
-define('FB_AUTO_POST_ENABLED', false);
+// Re-enabled 2026-09-29 after the 2026-09-09 lockout was resolved (the Page itself was
+// locked for posting too fast; separately, the developer account had its own "Account
+// confirmation needed" hold, cleared the same day via phone/WhatsApp verification — both
+// confirmed fixed with a live read-only Graph API call before this was turned back on).
+// The trigger the first time was a burst of ~10 auto-posts within ~15 minutes on one day —
+// nothing before ever actually throttled this block, it fired on every single new-article
+// publish. A marker file is the fix: at most one Facebook post per calendar day, mirroring
+// the deepen cap's per-day counter and [[feedback-video-publish-rate]]'s one-topic/day rule.
+// Never remove this guard to "just flip it back on" again.
+define('FB_AUTO_POST_ENABLED', true);
 $fbPageId = getenv('FACEBOOK_PAGE_ID');
 $fbPageToken = getenv('FACEBOOK_PAGE_ACCESS_TOKEN');
-if (FB_AUTO_POST_ENABLED && $fbPageId && $fbPageToken) {
+$fbMarkerFile = __DIR__ . '/facebook-last-post.json';
+// Defined locally rather than reusing $today from the deepen branch above: that branch
+// exits before this new-article path is ever reached, so $today would be undefined here.
+$fbToday = date('Y-m-d');
+$fbAlreadyPostedToday = false;
+$fbMarker = json_decode((string) @file_get_contents($fbMarkerFile), true);
+if (is_array($fbMarker) && ($fbMarker['date'] ?? '') === $fbToday) $fbAlreadyPostedToday = true;
+
+if (FB_AUTO_POST_ENABLED && $fbPageId && $fbPageToken && !$fbAlreadyPostedToday) {
     $articleUrl = 'https://smartgarden.gr/article/' . rawurlencode($newArticleObj['slug']);
     $fbCh = curl_init("https://graph.facebook.com/v26.0/{$fbPageId}/feed");
     curl_setopt_array($fbCh, array(
@@ -3130,8 +3140,18 @@ if (FB_AUTO_POST_ENABLED && $fbPageId && $fbPageToken) {
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 15,
     ));
-    curl_exec($fbCh); // best-effort — a Facebook hiccup must never fail article publishing
+    $fbResp = curl_exec($fbCh); // best-effort — a Facebook hiccup must never fail article publishing
+    $fbHttpCode = curl_getinfo($fbCh, CURLINFO_HTTP_CODE);
     curl_close($fbCh);
+    // Only mark today as "done" on an actual successful post (2xx with an id back) — a
+    // failed attempt (Page down, token expired) must not burn the day's one slot, or a
+    // real outage would silently cancel that day's post with no retry.
+    $fbDecoded = json_decode((string) $fbResp, true);
+    if ($fbHttpCode >= 200 && $fbHttpCode < 300 && !empty($fbDecoded['id'])) {
+        @file_put_contents($fbMarkerFile, json_encode(array(
+            'date' => $fbToday, 'slug' => $newArticleObj['slug'], 'postId' => $fbDecoded['id'],
+        ), JSON_UNESCAPED_UNICODE));
+    }
 }
 
 // ==========================================
