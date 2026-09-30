@@ -3155,6 +3155,17 @@ if (FB_AUTO_POST_ENABLED && $fbPageId && $fbPageToken && !$fbAlreadyPostedToday)
 }
 
 // ==========================================
+// 7a1b. PING BING/YANDEX VIA INDEXNOW
+// ==========================================
+// One free HTTP call, no account or daily cap to worry about (unlike Facebook/Pinterest
+// this carries no lockout risk — IndexNow has no rate-limit-driven ban history on this
+// site), so it just fires on every new article with no throttle needed.
+if (!empty($newArticleObj['slug'])) {
+    require_once __DIR__ . '/indexnow-lib.php';
+    @sg_indexnow_submit(array('https://smartgarden.gr/article/' . rawurlencode($newArticleObj['slug'])));
+}
+
+// ==========================================
 // 7a2. AUTO-PIN THE ARTICLE TO PINTEREST
 // ==========================================
 // Pins the freshly published article to the board matching its category. The image is
