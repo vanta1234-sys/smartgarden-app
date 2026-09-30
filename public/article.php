@@ -46,6 +46,30 @@ if ($article) {
     $image = $article['image'] ?? $article['imageUrl'] ?? 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80';
     $url = 'https://smartgarden.gr/article/' . rawurlencode($slug);
 
+    // Same fixed w=700/h=359 transform AnimatedShortVideo.tsx applies to this exact hero
+    // (cardImageWidth/cardImageHeight there) -- a preload for the raw 1200w image was
+    // worse than no preload at all: it's a different URL than the one the <img> tag
+    // actually requests, so the browser fetched BOTH (the preload, unused, plus the real
+    // one, still starting late), burning bandwidth under throttled mobile for zero LCP
+    // benefit (confirmed via PageSpeed 2026-09-30: LCP got worse, 9.5s -> 10.2s, after
+    // adding the mismatched preload). Keeping this in exact sync with that file's own
+    // math, not just today's numbers, is what makes the preload actually hit.
+    $heroImageForPreload = $image;
+    if (strpos($heroImageForPreload, 'images.unsplash.com') !== false) {
+        $cardW = 700;
+        $cardH = (int) round($cardW / 1.95);
+        if (preg_match('/[?&]w=\d+/', $heroImageForPreload)) {
+            $heroImageForPreload = preg_replace('/([?&])w=\d+/', '${1}w=' . $cardW, $heroImageForPreload, 1);
+        } else {
+            $heroImageForPreload .= (strpos($heroImageForPreload, '?') !== false ? '&' : '?') . 'w=' . $cardW;
+        }
+        if (preg_match('/[?&]h=\d+/', $heroImageForPreload)) {
+            $heroImageForPreload = preg_replace('/([?&])h=\d+/', '${1}h=' . $cardH, $heroImageForPreload, 1);
+        } else {
+            $heroImageForPreload = preg_replace('/([?&])w=\d+/', '${1}w=' . $cardW . '&h=' . $cardH, $heroImageForPreload, 1);
+        }
+    }
+
     $replacements = [
         '/<title>.*?<\/title>/s' => '<title>' . htmlspecialchars($seoTitle, ENT_QUOTES) . '</title>',
         '/<meta name="description" content=".*?"/s' => '<meta name="description" content="' . htmlspecialchars(sg_meta_description($description), ENT_QUOTES) . '"',
@@ -73,7 +97,7 @@ if ($article) {
     // build the <img> tag before the browser even knows the image exists.
     $html = preg_replace(
         '/<\/head>/',
-        '<link rel="preload" as="image" fetchpriority="high" href="' . htmlspecialchars($image, ENT_QUOTES) . '" /></head>',
+        '<link rel="preload" as="image" fetchpriority="high" href="' . htmlspecialchars($heroImageForPreload, ENT_QUOTES) . '" /></head>',
         $html,
         1
     );

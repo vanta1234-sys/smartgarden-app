@@ -2,4 +2,3 @@ User-agent: *
 Allow: /
 
 Sitemap: https://smartgarden.gr/sitemap.xml
-Agentmap: https://smartgarden.gr/.well-known/ard.json
