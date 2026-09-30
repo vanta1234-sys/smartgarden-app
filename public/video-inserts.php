@@ -246,7 +246,21 @@ $VENC = ' -c:v libx264 -preset veryfast -crf 22 -pix_fmt yuv420p -r 30 -fps_mode
 $pieces = array();
 $work = $dir . '/inserts-work';
 if (!is_dir($work)) @mkdir($work, 0755, true);
-foreach ((array) glob($work . '/*') as $f) @unlink($f);
+
+// Only wipe and start over if this is genuinely a first run or the spec actually changed --
+// a &force=1 restart of the SAME spec (the normal case: the previous attempt just died
+// silently) now resumes from whatever pieces already finished instead of re-encoding them
+// from piece 1. Piece files are index-named (p000.mp4, p001.mp4, ...), not content-hashed,
+// so resuming blindly across a spec change would silently splice a piece encoded for the
+// OLD timing into the NEW video -- wrong output with no error. The spec marker makes that
+// impossible: any mismatch (or no marker at all, e.g. an old job dir from before this
+// change) falls back to the original wipe-everything behavior.
+$specMarkerFile = $work . '/.spec';
+$prevSpec = @file_get_contents($specMarkerFile);
+if ($prevSpec !== $specRaw) {
+    foreach ((array) glob($work . '/*') as $f) @unlink($f);
+    file_put_contents($specMarkerFile, $specRaw);
+}
 
 foreach ($strip as $i => $p) {
     vi_status($statusFile, 'running', 'Κομμάτι ' . ($i + 1) . ' από ' . count($strip),
@@ -334,6 +348,22 @@ foreach ($strip as $i => $p) {
     // something a filter change can do — so the question stopped being "which graph is
     // right" and became "which graph is this machine actually running".
     if ($planOnly) { $plannedCmds[] = $cmd; continue; }
+
+    // Resume point: a &force=1 restart used to wipe every already-encoded piece and start
+    // over from piece 1, which is why one stalled run on the water-quality video cost
+    // several full re-encodes of the same first two-thirds before finally reaching the end
+    // (2026-09-30). The retry-within-a-piece logic below already existed for a single
+    // ffmpeg call dying; this is the same idea one level up, for the whole nohup'd process
+    // dying between pieces with no error ever written (a real, repeatedly observed failure
+    // mode distinct from the per-piece retry, which only fires if the process is still
+    // alive to run it). Same "good enough" bar the fresh-encode check uses below
+    // (exit 0 + file exists + size > 2000) rather than a full ffprobe duration check, so a
+    // resumed piece is held to the same standard as a freshly-encoded one, not a stricter
+    // or looser one.
+    if (file_exists($dst) && filesize($dst) > 2000) {
+        $pieces[] = $dst;
+        continue;
+    }
 
     // Retried, because on this host a piece that dies does so intermittently: the renderer
     // learned the same thing scene by scene, where an identical second attempt succeeds
