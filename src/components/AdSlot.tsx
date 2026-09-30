@@ -55,7 +55,15 @@ export const AdSlot: React.FC<AdSlotProps> = ({ slot, label = 'Διαφήμισ�
   if (!slot) return null;
 
   return (
-    <div className={`my-6 ${className}`} hidden={unfilled}>
+    // min-height reserves space before AdSense resolves fill/unfilled, which is what was
+    // shifting the content below every article's ad unit (found via PageSpeed 2026-09-30:
+    // CLS 0.127, flagged on the block right after this one). 250px matches the shortest
+    // common outcome for a responsive "auto" unit at this width (Google's own baseline
+    // rectangle size) -- an unfilled slot still collapses to nothing via `hidden` above,
+    // and a filled ad taller than 250px still only grows the page once, same as any image
+    // without a reserved size; the reservation only prevents the downward shift, not every
+    // possible one.
+    <div className={`my-6 ${className}`} style={{ minHeight: unfilled ? undefined : 250 }} hidden={unfilled}>
       <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1" hidden={!filled}>{label}</div>
       <ins
         ref={insRef}
