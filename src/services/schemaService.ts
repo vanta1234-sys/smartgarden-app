@@ -126,6 +126,38 @@ export function getHowToStepsForArticle(article: ArticleItem): HowToStepData[] {
   return steps.slice(0, 12);
 }
 
+// The catalogue holds three different date formats across older and newer batches (ISO
+// YYYY-MM-DD, D/M/Y, and Greek "20 Αυγούστου 2026" -- the same three the RSS feed has to
+// handle), and datePublished/dateModified went straight in as whatever that raw string
+// happened to be. Google's Rich Results Test flags a bare date with no time or timezone as
+// "Invalid datetime value" / "missing a timezone" (both non-critical, but real, confirmed
+// 2026-09-30 against a live article). Normalizes all three to a real ISO 8601 datetime;
+// unrecognized input falls through to the same generic fallback date the caller already
+// used before this existed, so nothing that worked before can start throwing.
+const GREEK_MONTHS: Record<string, number> = {
+  'Ιανουαρίου': 1, 'Φεβρουαρίου': 2, 'Μαρτίου': 3, 'Απριλίου': 4,
+  'Μαΐου': 5, 'Μαίου': 5, 'Ιουνίου': 6, 'Ιουλίου': 7, 'Αυγούστου': 8,
+  'Σεπτεμβρίου': 9, 'Οκτωβρίου': 10, 'Νοεμβρίου': 11, 'Δεκεμβρίου': 12,
+};
+
+function toIsoDateTime(raw: string): string {
+  const s = (raw || '').trim();
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}T00:00:00+02:00`;
+
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return `${m[3]}-${pad(Number(m[2]))}-${pad(Number(m[1]))}T00:00:00+02:00`;
+
+  m = s.match(/^(\d{1,2})\s+(\S+)\s+(\d{4})$/u);
+  if (m && GREEK_MONTHS[m[2]]) {
+    return `${m[3]}-${pad(GREEK_MONTHS[m[2]])}-${pad(Number(m[1]))}T00:00:00+02:00`;
+  }
+
+  return s; // Unrecognized: pass through unchanged, matching prior behavior exactly.
+}
+
 export function injectArticleSchema(article: ArticleItem) {
   if (typeof document === 'undefined' || !article) return;
 
@@ -151,7 +183,7 @@ export function injectArticleSchema(article: ArticleItem) {
   // every article's structured data and og:image showed one generic stock photo (found
   // 2026-09-14 by reading the live rendered JSON-LD on two unrelated articles).
   const imgUrl = article.imageUrl || article.image || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200';
-  const pubDate = article.date || '2026-08-25';
+  const pubDate = toIsoDateTime(article.date || '2026-08-25');
   const howToSteps = getHowToStepsForArticle(article);
 
   // Dynamic FAQ questions extracted or tailored to the article
