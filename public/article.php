@@ -325,8 +325,16 @@ if ($article) {
 
     $ld = json_encode($graph, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
+    // Matches the root div by anchoring on </body>, which always follows it in the built
+    // index.html, not by requiring the div to be empty -- index.html now ships a static
+    // homepage hero inside #root (for LCP), so an empty-only match silently stopped firing
+    // here and every article page lost its SSR body, JSON-LD, ad slots and embedded article
+    // JSON with no error anywhere (found 2026-09-30 via a live CLS investigation that turned
+    // up window.__SG_ADS__ missing entirely from the served HTML). Vite hoists the built
+    // page's <script type="module"> into <head>, so that tag is not a usable anchor here --
+    // confirmed by testing this exact regex against the real dist/index.html before deploying.
     $html = preg_replace(
-        '/<div id="root">\s*<\/div>/',
+        '/<div id="root">.*?<\/div>(?=\s*<\/body>)/s',
         '<div id="root">' . $ssr . '</div>' . "
 "
             . '<script type="application/ld+json" id="smartgarden-article-schema">' . $ld . '</script>'

@@ -34,7 +34,14 @@ function sg_inject_body($html, $blockHtml, $ld = null) {
         $insert .= "\n" . '<script type="application/ld+json">'
                  . json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
     }
-    return preg_replace('/<div id="root">\s*<\/div>/', $insert, $html, 1);
+    // Anchored on </body>, not on #root being empty -- index.html now ships a static
+    // homepage hero inside #root (for LCP), so an empty-only match silently stopped firing
+    // on every page this function serves (the homepage plus the other ~75 sitemap URLs
+    // this file's header describes), each quietly losing all of its crawlable SSR content
+    // with no error anywhere. Found 2026-09-30. Vite hoists the built page's
+    // <script type="module"> into <head>, so that tag is not a usable anchor either --
+    // tested this exact regex against the real dist/index.html before trusting it.
+    return preg_replace('/<div id="root">.*?<\/div>(?=\s*<\/body>)/s', $insert, $html, 1);
 }
 
 /** Article teaser list — the main source of internal links for a crawler. */
