@@ -1,0 +1,36 @@
+{
+  "entries": [
+    {
+      "identifier": "urn:air:smartgarden.gr:content:articles",
+      "displayName": "SmartGarden.gr Gardening Guides",
+      "type": "application/rss+xml",
+      "url": "https://smartgarden.gr/rss.xml",
+      "description": "Daily, scientifically-grounded Greek-language gardening guides for the Greek/Mediterranean climate: balcony container gardening, vegetable growing, irrigation/IoT automation, pest and disease management, plant propagation. Botanical names, pH/EC parameters, season-specific advice.",
+      "representativeQueries": [
+        "why are my tomato leaves turning yellow",
+        "how to prune olive trees in a pot",
+        "when to plant vegetables in Greece by region",
+        "how to fix chlorosis from hard tap water",
+        "best watering schedule for balcony plants in summer"
+      ],
+      "capabilities": ["ContentCatalog"],
+      "version": "1.0.0",
+      "updatedAt": "2026-09-30T00:00:00Z"
+    },
+    {
+      "identifier": "urn:air:smartgarden.gr:data:frost-dates",
+      "displayName": "SmartGarden.gr Greek Frost Date & Climate Data",
+      "type": "text/html",
+      "url": "https://smartgarden.gr/pagetos",
+      "description": "First/last frost dates and safe planting dates for 50+ Greek regions, computed from 20 years of ERA5 reanalysis data -- unique dataset not published elsewhere for Greece. Also live per-city evapotranspiration/temperature/humidity comparison for 15 Greek cities.",
+      "representativeQueries": [
+        "last frost date Athens",
+        "when is it safe to plant tomatoes in Thessaloniki",
+        "evapotranspiration comparison Greek cities"
+      ],
+      "capabilities": ["ContentCatalog"],
+      "version": "1.0.0",
+      "updatedAt": "2026-09-30T00:00:00Z"
+    }
+  ]
+}
