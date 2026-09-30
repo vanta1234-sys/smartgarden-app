@@ -64,6 +64,20 @@ if ($article) {
         $html = preg_replace($pattern, $replacement, $html, 1);
     }
 
+    // The hero/featured image is the LCP element on every article page (confirmed via
+    // PageSpeed 2026-09-30: 9.5s LCP, 1,590ms of it just the browser not even starting the
+    // fetch yet), but it's rendered by React with loading="lazy" -- lazy-loading defers
+    // discovery on purpose, which is exactly backwards for the single largest element on
+    // the page. A preload hint in <head> starts the fetch immediately from the raw HTML
+    // response, in parallel with the JS bundle, instead of waiting for React to mount and
+    // build the <img> tag before the browser even knows the image exists.
+    $html = preg_replace(
+        '/<\/head>/',
+        '<link rel="preload" as="image" fetchpriority="high" href="' . htmlspecialchars($image, ENT_QUOTES) . '" /></head>',
+        $html,
+        1
+    );
+
     // ---------------------------------------------------------------------------
     // Server-render the article itself.
     //

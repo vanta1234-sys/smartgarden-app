@@ -7,6 +7,13 @@ interface CartoonHoverPlayerProps {
   isHovered: boolean;
   lang: Language;
   className?: string;
+  /** Pass through to AnimatedShortVideo's own priority prop -- true when this instance
+   * is the page's LCP candidate (the article modal's cover header), so the image loads
+   * eager+high-priority instead of lazy. AnimatedShortVideo already had this mechanism;
+   * it just never reached here (found via PageSpeed 2026-09-30: 9.5s LCP, 1.59s of it
+   * the browser not even starting the image fetch because it was silently defaulting to
+   * loading="lazy" on the one image that's always above the fold on this view). */
+  priority?: boolean;
 }
 
 export const CartoonHoverPlayer: React.FC<CartoonHoverPlayerProps> = ({
@@ -14,6 +21,7 @@ export const CartoonHoverPlayer: React.FC<CartoonHoverPlayerProps> = ({
   isHovered,
   lang,
   className = '',
+  priority = false,
 }) => {
   return (
     <div className={`relative overflow-hidden ${className}`}>
@@ -23,6 +31,7 @@ export const CartoonHoverPlayer: React.FC<CartoonHoverPlayerProps> = ({
         summary={article.summary[lang] || article.summary.el}
         staticImage={article.image}
         isHovered={isHovered}
+        priority={priority}
       />
     </div>
   );

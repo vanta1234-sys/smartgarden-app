@@ -73,12 +73,15 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({
               forcePlay={true}
               lang={lang}
               className="w-full h-full"
+              priority={true}
             />
           ) : (
-            <img 
-              src={article.image} 
-              alt={article.title[lang]} 
+            <img
+              src={article.image}
+              alt={article.title[lang]}
               className="w-full h-full object-cover"
+              loading="eager"
+              fetchPriority="high"
             />
           )}
 
