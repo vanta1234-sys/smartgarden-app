@@ -136,7 +136,9 @@ if ($article) {
             $esc = function ($t) { return htmlspecialchars($t, ENT_QUOTES, 'UTF-8'); };
             // Inline bold first, so it survives the escaping around it.
             $inline = function ($t) use ($esc) {
-                return preg_replace('/\*\*(.+?)\*\*/u', '<strong>$1</strong>', $esc($t));
+                $h = preg_replace('/\*\*(.+?)\*\*/u', '<strong>$1</strong>', $esc($t));
+                // [text](/path): site-relative targets only, so an article body can never emit an off-site link here.
+                return preg_replace('/\[([^\]]+)\]\((\/[^)\s]*)\)/u', '<a href="$2">$1</a>', $h);
             };
             // A line that is only an image is one of our own photographs.
             if (preg_match('/^!\\[(.*?)\\]\\((.+?)\\)$/u', $line, $m)) {
