@@ -3965,6 +3965,27 @@ foreach ($topicPool as $t) {
     }
 }
 
+// The pool has emptied twice without anyone being told, and each time the site went days with
+// no new article, Facebook post, pin or video. Mail the owner while there is still time to
+// refill it (notify.php sends at most one mail per subject per 12 hours).
+$remainingTopics = 0;
+foreach ($topicPool as $poolTopic) {
+    if ($topicVersionCounts[$poolTopic['slug']] < $MAX_VERSIONS_PER_TOPIC) $remainingTopics++;
+}
+if ($remainingTopics <= 3) {
+    require_once __DIR__ . '/notify.php';
+    @sg_notify_failure(
+        $remainingTopics === 0
+            ? 'SmartGarden: το pool θεμάτων άδειασε, δεν βγαίνουν νέα άρθρα'
+            : 'SmartGarden: το pool θεμάτων τελειώνει (' . $remainingTopics . ' αδημοσίευτα)',
+        array(
+            'Αδημοσίευτα θέματα πριν από αυτή την εκτέλεση: ' . $remainingTopics,
+            'Όταν αδειάσει, ο cron ξαναγράφει μόνο παλιά άρθρα και δεν βγαίνει νέο άρθρο, post στο Facebook, pin ή βίντεο.',
+            'Χρειάζονται νέα θέματα στο topicPool του public/cron-publish.php.',
+        )
+    );
+}
+
 if ($selectedTopic === null) {
     // Every topic in the pool has been published, so there is no new article to write —
     // and measured against the live set on 2026-09-20 that is true of all 22 of them from
