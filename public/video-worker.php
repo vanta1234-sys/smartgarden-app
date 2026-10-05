@@ -516,11 +516,19 @@ function sg_run_job($dir) {
         $bedVolume = '0.20';
         if (SG_LONG && count($tracks) > 1) {
             $rotation = array_merge(array_slice($tracks, $seed % count($tracks)), array_slice($tracks, 0, $seed % count($tracks)));
+            // -stream_loop does NOT loop a concat-demuxer input: the list plays once and the bed
+            // simply stops. The whole library is ~655s, so every episode longer than 10:55 lost its
+            // music at that point (all three 'tap water' renders did). Repeat the rotation in the
+            // playlist itself until it comfortably outlasts the video; -shortest trims the excess.
+            $libSecs = 0.0;
+            foreach ($rotation as $t) $libSecs += max(1.0, sg_duration($ffprobe, $t));
+            $reps = max(1, (int) ceil(($total + 10.0) / max(1.0, $libSecs)));
             $playlist = $dir . '/music.txt';
             $plLines = '';
-            foreach ($rotation as $t) $plLines .= "file '" . str_replace("'", "'\\''", $t) . "'\n";
+            for ($rep = 0; $rep < $reps; $rep++)
+                foreach ($rotation as $t) $plLines .= "file '" . str_replace("'", "'\\''", $t) . "'\n";
             file_put_contents($playlist, $plLines);
-            $musicInput = ' -stream_loop -1 -f concat -safe 0 -i ' . escapeshellarg($playlist);
+            $musicInput = ' -f concat -safe 0 -i ' . escapeshellarg($playlist);
             $bedVolume = '0.13';
             sg_log($dir, 'music: rotation of ' . count($rotation) . ' tracks at ' . $bedVolume);
         }
