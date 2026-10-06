@@ -360,6 +360,23 @@ export const FrostDatesPage: React.FC<FrostDatesPageProps> = ({ onBack }) => {
             μικροκλίμα (ρεματιά, πλαγιά, ταράτσα, αστικός ιστός) μπορεί να διαφέρει αισθητά. Ένα μπαλκόνι στον
             3ο όροφο είναι συνήθως 1-2°C θερμότερο από έναν κήπο στο έδαφος της ίδιας περιοχής.
           </p>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Τα δεδομένα διατίθενται ελεύθερα με άδεια{' '}
+            <a
+              href="https://creativecommons.org/licenses/by/4.0/deed.el"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-emerald-400 hover:text-emerald-300"
+            >
+              Creative Commons Αναφορά 4.0 (CC BY 4.0)
+            </a>
+            : αναφέρετε «SmartGarden.gr — Ημερομηνίες παγετού» με σύνδεσμο προς smartgarden.gr/pagetos. Πρωτογενής
+            πηγή: Open-Meteo.com (ERA5, Copernicus/ECMWF).{' '}
+            <a href="/frost_dates.json" className="underline text-emerald-400 hover:text-emerald-300">
+              Λήψη των δεδομένων (JSON)
+            </a>
+            .
+          </p>
         </div>
       </div>
     </div>

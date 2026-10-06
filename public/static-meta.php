@@ -361,6 +361,87 @@ if ($route === 'home') {
         }
     }
 
+} elseif ($route === 'pagetos') {
+    // The frost page is the one asset on this site nobody else in Greece has, and until now a
+    // crawler that does not run JavaScript (Bing, most AI search bots) saw only the generic
+    // description paragraph under it. This is the same table the React page shows, rendered
+    // from the same frost_dates.json, with Dataset markup so it can also surface in Google
+    // Dataset Search.
+    $fd = json_decode((string) @file_get_contents(__DIR__ . '/frost_dates.json'), true) ?: array();
+    $locs = (isset($fd['locations']) && is_array($fd['locations'])) ? $fd['locations'] : array();
+    $nLocs = count($locs);
+    $period = isset($fd['period']) ? (string) $fd['period'] : '2005-01-01 — 2024-12-31';
+    $generated = isset($fd['generated']) ? (string) $fd['generated'] : '';
+    $body = '<h1>Ημερομηνίες Παγετού &amp; Ασφαλής Φύτευση ανά Περιοχή στην Ελλάδα</h1>'
+          . '<p>Πότε είναι ο τελευταίος παγετός της άνοιξης, πότε έρχεται ο πρώτος του φθινοπώρου και από ποια '
+          . 'ημερομηνία φυτεύεις χωρίς κίνδυνο, για ' . $nLocs . ' ελληνικές περιοχές. Υπολογισμένο από είκοσι '
+          . 'χρόνια ημερήσιων ελάχιστων θερμοκρασιών (' . sg_e($period) . ').</p>';
+    if ($nLocs) {
+        $body .= '<table><thead><tr><th>Περιοχή</th><th>Περιφέρεια</th><th>Υψόμετρο (m)</th>'
+               . '<th>Τελευταίος παγετός άνοιξης (0 °C, διάμεσος)</th><th>Ασφαλής ημερομηνία φύτευσης</th>'
+               . '<th>Πρώτος παγετός φθινοπώρου (0 °C, διάμεσος)</th><th>Έτη με παγετό (από 20)</th>'
+               . '<th>Ελάχιστη θερμοκρασία περιόδου (°C)</th></tr></thead><tbody>';
+        foreach ($locs as $l) {
+            $h = (isset($l['hard_frost']) && is_array($l['hard_frost'])) ? $l['hard_frost'] : array();
+            $years = (int) (isset($h['years_with_frost']) ? $h['years_with_frost'] : 0);
+            $lastSp = isset($h['last_spring_frost']['label']) ? $h['last_spring_frost']['label'] : '—';
+            $first = isset($h['first_autumn_frost']['label']) ? $h['first_autumn_frost']['label'] : '—';
+            $safe = isset($h['safe_planting_date']['label']) ? $h['safe_planting_date']['label'] : 'Όλο τον χρόνο';
+            if ($years === 0) { $lastSp = '—'; $first = '—'; $safe = 'Όλο τον χρόνο'; }
+            $body .= '<tr><th>' . sg_e(isset($l['name']) ? $l['name'] : '') . '</th>'
+                   . '<td>' . sg_e(isset($l['region']) ? $l['region'] : '') . '</td>'
+                   . '<td>' . sg_e(isset($l['elevation_m']) ? $l['elevation_m'] : '') . '</td>'
+                   . '<td>' . sg_e($lastSp) . '</td><td>' . sg_e($safe) . '</td><td>' . sg_e($first) . '</td>'
+                   . '<td>' . $years . '</td>'
+                   . '<td>' . sg_e(isset($l['absolute_min_c']) ? $l['absolute_min_c'] : '') . '</td></tr>';
+        }
+        $body .= '</tbody></table>';
+    }
+    $body .= '<h2>Μεθοδολογία</h2><p>Τα δεδομένα προέρχονται από το Open-Meteo Historical Weather API (ανάλυση '
+           . 'ERA5 των Copernicus/ECMWF), περίοδος ' . sg_e($period) . '. Για κάθε έτος και κάθε τοποθεσία '
+           . 'εντοπίζεται η τελευταία ημέρα πριν την 1η Ιουλίου και η πρώτη μετά την 1η Ιουλίου με ελάχιστη '
+           . 'θερμοκρασία ≤0 °C. Οι ημερομηνίες «τελευταίου» και «πρώτου» παγετού είναι η διάμεσος των ετών στα '
+           . 'οποία σημειώθηκε παγετός. Η «ασφαλής ημερομηνία φύτευσης» είναι το 90ό εκατοστημόριο των ίδιων '
+           . 'ετών: σε 9 στις 10 χρονιές με παγετό, ο τελευταίος παγετός είχε ήδη περάσει μέχρι αυτή την '
+           . 'ημερομηνία.</p><p>Πρόκειται για κλιματολογικούς μέσους όρους σε ανάλυση πλέγματος, όχι πρόγνωση: το '
+           . 'τοπικό μικροκλίμα (ρεματιά, πλαγιά, ταράτσα, αστικός ιστός) μπορεί να διαφέρει αισθητά.</p>'
+           . '<p>Τα δεδομένα διατίθενται ελεύθερα με άδεια '
+           . '<a href="https://creativecommons.org/licenses/by/4.0/deed.el">Creative Commons Αναφορά 4.0 (CC BY 4.0)</a>: '
+           . 'αναφέρετε «SmartGarden.gr — Ημερομηνίες παγετού» με σύνδεσμο προς '
+           . '<a href="/pagetos">smartgarden.gr/pagetos</a>. Λήψη: <a href="/frost_dates.json">frost_dates.json</a>.</p>'
+           . '<p><a href="/fyta">Βάση δεδομένων φυτών</a> · <a href="/imerologio-sporas">Ημερολόγιο σποράς</a> · '
+           . '<a href="/">Όλοι οι οδηγοί</a></p>';
+    $dsFrom = '2005-01-01';
+    $dsTo = '2024-12-31';
+    if (preg_match_all('/\d{4}-\d{2}-\d{2}/', $period, $dm) && count($dm[0]) >= 2) {
+        $dsFrom = $dm[0][0];
+        $dsTo = $dm[0][1];
+    }
+    $dataset = array(
+        '@context' => 'https://schema.org', '@type' => 'Dataset',
+        'name' => 'Ημερομηνίες παγετού και ασφαλούς φύτευσης για ' . $nLocs . ' περιοχές της Ελλάδας',
+        'description' => 'Διάμεσες ημερομηνίες τελευταίου παγετού της άνοιξης και πρώτου παγετού του φθινοπώρου, '
+            . 'ασφαλής ημερομηνία φύτευσης (90ό εκατοστημόριο), έτη με παγετό και ελάχιστη θερμοκρασία περιόδου, '
+            . 'για ' . $nLocs . ' ελληνικές περιοχές. Υπολογισμένα από ημερήσιες ελάχιστες θερμοκρασίες ERA5 ('
+            . $dsFrom . ' έως ' . $dsTo . ').',
+        'url' => $home . 'pagetos',
+        'inLanguage' => 'el',
+        'keywords' => array('παγετός', 'τελευταίος παγετός', 'πρώτος παγετός', 'ημερομηνία φύτευσης',
+            'κλιματολογικά δεδομένα', 'Ελλάδα', 'κηπουρική'),
+        'creator' => array('@type' => 'Organization', 'name' => 'SmartGarden.gr', 'url' => $home),
+        'temporalCoverage' => $dsFrom . '/' . $dsTo,
+        'spatialCoverage' => array('@type' => 'Place', 'name' => 'Ελλάδα'),
+        'license' => 'https://creativecommons.org/licenses/by/4.0/',
+        'isBasedOn' => 'https://open-meteo.com/en/docs/historical-weather-api',
+        'isAccessibleForFree' => true,
+        'distribution' => array(array(
+            '@type' => 'DataDownload', 'encodingFormat' => 'application/json',
+            'contentUrl' => $home . 'frost_dates.json',
+        )),
+    );
+    if ($generated !== '') $dataset['dateModified'] = $generated;
+    $ld = array(sg_breadcrumbs(array('Αρχική' => $home, 'Ημερομηνίες Παγετού' => $home . 'pagetos')), $dataset);
+
 } elseif ($route === 'imerologio-sporas') {
     // The same year-at-a-glance the React page renders below its month picker.
     $body = '<h1>Ημερολόγιο Σποράς &amp; Εργασιών Κήπου</h1>'
