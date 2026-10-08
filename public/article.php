@@ -88,6 +88,24 @@ if ($article) {
         $html = preg_replace($pattern, $replacement, $html, 1);
     }
 
+    // Pinterest Rich Pins read og:type=article plus og:site_name and, optionally, the
+    // article:* tags; without site_name a pin cannot show the site's name under the image.
+    // The author is the organisation, same as the Article schema further down: this file
+    // does not know of a named writer, so it does not invent one.
+    $ogExtra = '<meta property="og:site_name" content="SmartGarden.gr" />';
+    $pubDate = (string) ($article['date'] ?? '');
+    if (preg_match('/^\d{4}-\d{2}-\d{2}/', $pubDate)) {
+        $ogExtra .= '<meta property="article:published_time" content="' . htmlspecialchars(substr($pubDate, 0, 10), ENT_QUOTES) . '" />';
+    }
+    $ogCat = $article['categoryLabel']['el'] ?? (is_string($article['categoryLabel'] ?? null) ? $article['categoryLabel'] : '');
+    if ($ogCat !== '') {
+        $ogExtra .= '<meta property="article:section" content="' . htmlspecialchars($ogCat, ENT_QUOTES) . '" />';
+    }
+    $ogExtra .= '<meta property="article:author" content="SmartGarden.gr" />';
+    $html = preg_replace_callback('/<\/head>/', function () use ($ogExtra) {
+        return $ogExtra . '</head>';
+    }, $html, 1);
+
     // The hero/featured image is the LCP element on every article page (confirmed via
     // PageSpeed 2026-09-30: 9.5s LCP, 1,590ms of it just the browser not even starting the
     // fetch yet), but it's rendered by React with loading="lazy" -- lazy-loading defers
