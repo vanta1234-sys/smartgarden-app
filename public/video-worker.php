@@ -802,8 +802,26 @@ function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $f
         sg_log($dir, 'tiktok: ' . json_encode($result['tiktok'], JSON_UNESCAPED_UNICODE));
     }
 
-    // Only YouTube is alerted on. TikTok has been failing on purpose since its production
-    // app is still in review, and an alert that fires every single day is one nobody reads.
+    // TikTok used to be left out of the alerts because it failed every day on purpose while the
+    // production app was in review. The app was approved on 2026-09-23 and the production account
+    // was connected on 2026-10-12, so a failure now means something real: an expired login, or the
+    // creator inbox is full of drafts that were never posted or deleted. A long-form video is
+    // skipped on purpose and is not a failure. notify.php already limits this to one mail per
+    // subject per 12 hours.
+    if (!SG_LONG && !$result['tiktok']['ok']) {
+        sg_notify_failure('SmartGarden: το βίντεο δεν ανέβηκε στο TikTok', array(
+            'Το βίντεο ανέβηκε κανονικά στο YouTube, αλλά το TikTok δεν το δέχτηκε.',
+            '',
+            'Άρθρο: ' . ($article['slug'] ?? '?'),
+            'Σφάλμα: ' . ($result['tiktok']['error'] ?? '(άγνωστο)'),
+            '',
+            'Πιθανές αιτίες:',
+            '- Έληξε η σύνδεση: ξανά https://smartgarden.gr/tiktok-auth-login.php',
+            '- Γέμισε η ουρά των πρόχειρων: άνοιξε το TikTok και ανέβασε ή σβήσε τα πρόχειρα.',
+            '- Το TikTok απέρριψε το αρχείο: δες το λόγο στο tiktok-check-status.php.',
+        ));
+    }
+
     if (!$result['youtube']['ok']) {
         sg_notify_failure('SmartGarden: το βίντεο δεν ανέβηκε στο YouTube', array(
             'Το βίντεο δημιουργήθηκε κανονικά αλλά το ανέβασμα απέτυχε.',
