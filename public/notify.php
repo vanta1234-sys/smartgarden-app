@@ -24,6 +24,16 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
 // address the site itself uses for newsletters and platform correspondence, so a monitoring
 // email lands there among dozens of others and gets skimmed past — which defeats the point.
 // Override with SetEnv SG_NOTIFY_TO in .htaccess to change it without touching code.
+// THE switch for every automatic video upload (YouTube Shorts and TikTok drafts). Off since
+// 2026-10-12: the owner watched the rendered Shorts and rejected them (generic hooks unrelated to the
+// article, sentences cut mid-thought, scene photos of the wrong plant), and said nothing may be
+// uploaded anywhere until that is fixed. While it is false the cron does not queue a render, the
+// worker uploads nothing even if a job is started by hand with &publish=1, and the previous-day
+// check does not complain that there is no video. Flip to true only when the owner says so.
+if (!defined('SG_VIDEO_AUTOPUBLISH')) {
+    define('SG_VIDEO_AUTOPUBLISH', false);
+}
+
 if (!defined('SG_NOTIFY_TO')) {
     define('SG_NOTIFY_TO', getenv('SG_NOTIFY_TO') ?: 'vanta1234@gmail.com');
 }
@@ -88,6 +98,10 @@ function sg_notify_failure($subject, array $lines) {
  * can only run during a publish cannot be tested without publishing.
  */
 function sg_check_previous_day(array $articles, $jobsRoot, $cronKey, $notify = true) {
+    if (!SG_VIDEO_AUTOPUBLISH) {
+        return array('checked' => date('Y-m-d', strtotime('-1 day')), 'result' => 'video-publishing-disabled',
+                     'note' => 'Η αυτόματη δημοσίευση βίντεο είναι κλειστή (SG_VIDEO_AUTOPUBLISH).');
+    }
     $yesterday = date('Y-m-d', strtotime('-1 day'));
     $prev = null;
     foreach ($articles as $a) {

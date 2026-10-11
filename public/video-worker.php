@@ -688,6 +688,12 @@ function sg_format_chapters($chapters, $total) {
  * 10.5MB. The email even said which ones failed, which is how it was found.
  */
 function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $final = '') {
+    // Kill switch, see notify.php. Returns before anything is uploaded or alerted on.
+    if (!SG_VIDEO_AUTOPUBLISH) {
+        sg_log($dir, 'publish: skipped (SG_VIDEO_AUTOPUBLISH is off)');
+        return array('youtube' => array('ok' => false, 'error' => 'Αυτόματη δημοσίευση κλειστή'),
+                     'tiktok' => array('ok' => false, 'error' => 'Αυτόματη δημοσίευση κλειστή'), 'skipped' => true);
+    }
     $key = $job['key'];
     $script = $job['script'];
     $article = $job['article'];

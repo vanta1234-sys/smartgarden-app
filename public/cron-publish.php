@@ -7090,7 +7090,9 @@ $videoJobId = null;
 // Defined outside the branch: the previous-day check further down builds a link with it and
 // would otherwise depend on this block having run.
 $videoKey = $providedKey !== '' ? $providedKey : $VALID_KEYS[0];
-if (!empty($newArticleObj['id'])) {
+// SG_VIDEO_AUTOPUBLISH (notify.php) is off: no render is queued and nothing is uploaded anywhere.
+require_once __DIR__ . '/notify.php';
+if (SG_VIDEO_AUTOPUBLISH && !empty($newArticleObj['id'])) {
     $videoCh = curl_init('https://smartgarden.gr/video-render.php?action=start&publish=1'
         . '&articleId=' . rawurlencode($newArticleObj['id'])
         . '&key=' . rawurlencode($videoKey));
