@@ -63,13 +63,30 @@ function sg_duration($ffprobe, $file) {
 }
 
 /**
+ * Real length of an audio file, by decoding it.
+ *
+ * The narration comes from a live relay whose MP3 header is not trustworthy, so ffprobe's
+ * duration can be short. Measured on a finished Short: speech ended 0.0-0.1 s after the picture
+ * had already changed, i.e. the last syllable was cut. Decoding the whole file to a null sink
+ * and reading the final timestamp gives the length of the sound that is actually there.
+ */
+function sg_audio_decoded_duration($ffmpeg, $file) {
+    $cmd = escapeshellarg($ffmpeg) . ' -hide_banner -nostats -i ' . escapeshellarg($file) . ' -f null - 2>&1';
+    $out = @shell_exec($cmd);
+    if (!is_string($out)) return 0.0;
+    if (!preg_match_all('/time=(\d+):(\d+):(\d+(?:\.\d+)?)/', $out, $m, PREG_SET_ORDER) || !count($m)) return 0.0;
+    $last = $m[count($m) - 1];
+    return ((int) $last[1]) * 3600 + ((int) $last[2]) * 60 + (float) $last[3];
+}
+
+/**
  * Fetch Greek narration for one line.
  *
  * Edge's neural voice first (far better Greek), Google Translate TTS as the backstop.
  * Both are called over HTTP against our own endpoints rather than being included, because
  * both scripts write audio straight to the output buffer and exit.
  */
-function sg_fetch_tts($text, $dest, $dir, &$words = null) {
+function sg_fetch_tts($text, $dest, $dir, &$words = null, $only = null) {
     $words = array();
     $clean = trim(str_replace(array('«', '»'), '', $text));
 
@@ -77,7 +94,7 @@ function sg_fetch_tts($text, $dest, $dir, &$words = null) {
     // come from the same synthesis: asking twice would give timings for different audio.
     $edgeMeta = 'https://smartgarden.gr/tts-edge.php?meta=1&voice=el-GR-AthinaNeural&text=' . rawurlencode($clean);
     $metaFile = $dest . '.json';
-    if (sg_fetch_to_file($edgeMeta, $metaFile, 60)) {
+    if ($only !== 'google' && sg_fetch_to_file($edgeMeta, $metaFile, 60)) {
         $decoded = json_decode((string) @file_get_contents($metaFile), true);
         @unlink($metaFile);
         if (!empty($decoded['audioBase64'])) {
@@ -92,13 +109,16 @@ function sg_fetch_tts($text, $dest, $dir, &$words = null) {
 
     // Plain audio, no timings — captions fall back to the static headline for this scene.
     $edge = 'https://smartgarden.gr/tts-edge.php?voice=el-GR-AthinaNeural&text=' . rawurlencode($clean);
-    if (sg_fetch_to_file($edge, $dest, 60) && filesize($dest) > 4000) {
+    if ($only !== 'google' && sg_fetch_to_file($edge, $dest, 60) && filesize($dest) > 4000) {
         // A 502 JSON error body would also be "a file"; real MP3 starts with ID3 or a frame sync.
         $head = (string) @file_get_contents($dest, false, null, 0, 3);
         if ($head === 'ID3' || (strlen($head) >= 2 && (ord($head[0]) === 0xFF))) {
             return 'edge';
         }
     }
+    // In single-engine mode there is no fallback: a different voice halfway through a video is
+    // worse than no video, so the caller retries or fails the job.
+    if ($only === 'edge') { @unlink($dest); return null; }
     sg_log($dir, 'edge TTS failed, falling back to Google for: ' . mb_substr($clean, 0, 40));
     @unlink($dest);
     // The whole line, not the first 190 characters of it. Google's own endpoint caps a
@@ -183,12 +203,39 @@ function sg_run_job($dir) {
         $audio = $base . '.mp3';
         $sceneWords = array();
         $engine = sg_fetch_tts($scene['voiceover'], $audio, $dir, $sceneWords);
+        // One voice for the whole video. Each scene used to pick Edge or, if Edge was slow,
+        // Google, so a single render could change speaker halfway through: the mistake the owner
+        // has had to point out again and again. The first scene decides the engine and every
+        // later scene must come from the same one; Edge is retried before giving up, and if the
+        // engine still cannot be matched the job fails instead of publishing a mixed voice.
+        if (!isset($lockedEngine)) $lockedEngine = null;
+        if ($lockedEngine === null && $engine === 'google') {
+            for ($try = 0; $try < 2 && $engine === 'google'; $try++) {
+                $retry = sg_fetch_tts($scene['voiceover'], $audio, $dir, $sceneWords, 'edge');
+                if ($retry === 'edge') $engine = 'edge';
+            }
+        }
+        if ($lockedEngine === null) {
+            $lockedEngine = $engine;
+        } elseif ($engine !== $lockedEngine) {
+            for ($try = 0; $try < 3 && $engine !== $lockedEngine; $try++) {
+                @unlink($audio);
+                $engine = sg_fetch_tts($scene['voiceover'], $audio, $dir, $sceneWords, $lockedEngine);
+            }
+            if ($engine !== $lockedEngine) {
+                sg_log($dir, 'scene ' . $i . ': could not get the same voice (' . ($lockedEngine ?: 'none') . ') as the earlier scenes');
+                sg_status($dir, 'error', $pct, 'Η φωνή θα άλλαζε στη μέση του βίντεο (σκηνή ' . ($i + 1) . '): το βίντεο δεν παράγεται');
+                return;
+            }
+        }
 
         // The CTA keeps its static caption: its narration says "Σμαρτ Γκάρντεν" phonetically
         // so the voice gets the brand right, and those words must never reach the screen.
         // Never in long form: forty scenes of per-word drawtext is a filter graph with
         // thousands of entries, on the host that OOM-kills ffmpeg for far less.
-        $useWords = !SG_LONG && count($sceneWords) > 0 && empty($scene['captionDisplay']);
+        $sameAsScreen = sg_strip_accents(mb_strtolower(preg_replace('/[^\p{L}\p{N}]+/u', '', (string) $scene['onScreenText']), 'UTF-8'))
+                     === sg_strip_accents(mb_strtolower(preg_replace('/[^\p{L}\p{N}]+/u', '', (string) $scene['voiceover']), 'UTF-8'));
+        $useWords = !SG_LONG && count($sceneWords) > 0 && empty($scene['captionDisplay']) && !$sameAsScreen;
         $scene['wordMode'] = $useWords;
 
         // --- text overlay -----------------------------------------------------
@@ -197,7 +244,7 @@ function sg_run_job($dir) {
             sg_status($dir, 'error', $pct, 'Αποτυχία στη δημιουργία των γραφικών (σκηνή ' . ($i + 1) . ')');
             return;
         }
-        $audioDur = ($engine && file_exists($audio)) ? sg_duration($ffprobe, $audio) : 0.0;
+        $audioDur = ($engine && file_exists($audio)) ? max(sg_duration($ffprobe, $audio), sg_audio_decoded_duration($ffmpeg, $audio)) : 0.0;
         if ($audioDur <= 0.3) {
             // No usable narration: keep the scene on screen for a readable beat instead of
             // dropping it, and carry on silently rather than failing the whole video.
@@ -212,9 +259,16 @@ function sg_run_job($dir) {
             // The 6s ceiling is a Shorts rule and would be a bug in long form, where a
             // scene carries a 420-character paragraph — about 25 seconds of speech. Capping
             // it there would cut the narration off mid-sentence forty times over.
-            $cap = SG_LONG ? 40.0 : 6.0;
-            $tail = SG_LONG ? 0.45 : 0.22;
-            $sceneDur = min($cap, max(1.6, $audioDur + $tail));
+            // No ceiling that is shorter than the narration. The 6-second cap for Shorts cut the
+            // voice off in the middle of a word whenever a line ran longer than six seconds,
+            // which is the "half words when the picture ends" the owner kept finding. The scene
+            // lasts exactly as long as its audio plus a short tail; a line that is too long is
+            // fixed by shortening the line (sg_scene_line), never by cutting the sound.
+            // 0.35 s after the last word. Measured with 0.22 s the speech reached the picture change
+            // on three of five scene boundaries.
+            $tail = SG_LONG ? 0.45 : 0.35;
+            $sceneDur = max(1.6, $audioDur + $tail);
+            if (!SG_LONG && $sceneDur > 10.0) sg_log($dir, 'scene ' . $i . ': long line, ' . round($sceneDur, 1) . 's');
         }
         sg_log($dir, 'scene ' . $i . ': engine=' . ($engine ?: 'none') . ' audio=' . round($audioDur, 2) . 's dur=' . round($sceneDur, 2) . 's');
 

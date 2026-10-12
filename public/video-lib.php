@@ -210,15 +210,24 @@ function sg_scene_line($text, $max) {
         if ($sp !== false && $sp >= $max * 0.5) $cut = mb_substr($cut, 0, $sp, 'UTF-8');
     }
 
-    // Words that only make sense with what follows them.
+    // Words that only make sense with what follows them. The articles were missing from this
+    // list, which is how a live Short ended on "...μαυρίζουν τα φύλλα και ο." and another on
+    // "...λίγο αργότερα στα.": the cut landed after a preposition or an article and nothing
+    // stopped it.
     $dangling = array('να', 'θα', 'και', 'σε', 'με', 'για', 'από', 'πρέπει', 'μπορεί', 'το',
-                      'τη', 'την', 'τον', 'τα', 'του', 'της', 'των', 'ή', 'που', 'ως', 'στο', 'στη');
-    for ($i = 0; $i < 3; $i++) {
+                      'τη', 'την', 'τον', 'τα', 'του', 'της', 'των', 'ή', 'που', 'ως', 'στο', 'στη',
+                      'ο', 'η', 'οι', 'τις', 'τους', 'ένα', 'μια', 'μία', 'ενός', 'είναι', 'στα', 'στις',
+                      'στον', 'στην', 'στους', 'αν', 'όταν', 'ότι', 'αλλά', 'γιατί', 'κάτω', 'έως',
+                      'περίπου', 'πάνω', 'προς', 'όπως', 'ούτε', 'μην', 'δεν', 'πιο', 'μέχρι', 'πριν',
+                      'μετά', 'ενώ', 'είτε', 'όχι', 'κατά', 'στου', 'στης', 'στων');
+    for ($i = 0; $i < 6; $i++) {
         $cut = preg_replace('/[\s,·;:\-—–]+$/u', '', $cut);
         $sp = mb_strrpos($cut, ' ', 0, 'UTF-8');
         if ($sp === false) break;
         $lastWord = mb_strtolower(mb_substr($cut, $sp + 1, null, 'UTF-8'), 'UTF-8');
-        if (!in_array($lastWord, $dangling, true)) break;
+        // A bare number or range ("σε 1-2") is a quantity whose unit never arrived.
+        $isNumber = preg_match('/^[0-9]+([\-–.,][0-9]+)*$/u', $lastWord) === 1;
+        if (!in_array($lastWord, $dangling, true) && !$isNumber) break;
         $cut = mb_substr($cut, 0, $sp, 'UTF-8');
     }
     $cut = preg_replace('/[\s,·;:\-—–]+$/u', '', $cut);
@@ -301,6 +310,31 @@ function sg_hook_pool_name($title) {
     return 'problem';
 }
 
+/**
+ * The opening line of a Short, taken from the article's own title.
+ *
+ * The hook used to be one of four canned phrases picked by a hash of the article id
+ * ("Μύθος ή Αλήθεια; Στο δικαστήριο μύθων κηπουρικής σήμερα εξετάζουμε αυτό"), so a video
+ * about basil turning black opened with a mock trial that had nothing to do with basil.
+ * Returns array(on-screen headline, spoken line).
+ */
+function sg_hook_from_title($title) {
+    $t = trim(preg_replace('/\s*\([^)]*\)/u', '', (string) $title));
+    $t = trim(preg_replace('/\s+/u', ' ', $t));
+    $parts = preg_split('/\s*[:—–]\s*/u', $t, 2);
+    $head = trim($parts[0]);
+    $tail = isset($parts[1]) ? trim($parts[1]) : '';
+    // "Σκόρδο: Πότε και Πώς..." -- a one-word head says nothing without what follows it.
+    if (mb_strlen($head, 'UTF-8') < 22 && $tail !== '') {
+        $head = $head . ': ' . $tail;
+        $tail = '';
+    }
+    $onScreen = sg_scene_line($head, 72);
+    $spoken = $onScreen . (preg_match('/[.!;?]$/u', $onScreen) ? '' : '.');
+    if ($tail !== '') $spoken .= ' ' . sg_scene_line($tail, 48);
+    return array($onScreen, $spoken);
+}
+
 function sg_build_script($article) {
     $title = isset($article['title']['el']) ? $article['title']['el'] : (string) ($article['title'] ?? '');
     $summary = isset($article['summary']['el']) ? $article['summary']['el'] : (string) ($article['summary'] ?? '');
@@ -342,14 +376,14 @@ function sg_build_script($article) {
               'problemText' => 'Αυτό ρωτάνε οι περισσότεροι'),
     );
 
-    $poolName = sg_hook_pool_name($cleanTitle);
-    $pool = $poolName === 'qa' ? $qaHookAngles : ($poolName === 'guide' ? $guideHookAngles : $problemHookAngles);
-
-    // Deterministic per article, so re-running a job produces the identical video.
-    $id = (string) ($article['id'] ?? '');
-    $sum = 0;
-    for ($i = 0; $i < strlen($id); $i++) $sum += ord($id[$i]);
-    $angle = $pool[count($pool) ? $sum % count($pool) : 0];
+    // The canned pools above are no longer used: the opening comes from the title and the
+    // second scene from the article's own summary, so nothing on screen is a stock phrase.
+    list($hookOnScreen, $hookSpoken) = sg_hook_from_title($title);
+    $contextLine = sg_scene_line($summary, 120);
+    $angle = array(
+        'hookTag' => 'HOOK', 'hookVoiceover' => $hookSpoken, 'hookText' => $hookOnScreen,
+        'problemTag' => 'CONTEXT', 'problemText' => $contextLine,
+    );
 
     $scenes = array(
         array(
@@ -365,7 +399,7 @@ function sg_build_script($article) {
             // Short falls off a cliff and the payoff never gets seen.
             // Spoken only. The caption keeps "3-5", which reads correctly on screen; it is
             // just the synthesiser that needs the word.
-            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($summary, 95)))),
+            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($summary, 120)))),
             'onScreenText' => $angle['problemText'],
             'step' => 0,
         ),
@@ -378,10 +412,10 @@ function sg_build_script($article) {
             'tag' => 'ΒΗΜΑ ' . ($i + 1),
             // No spoken "Πρώτον/Δεύτερον" any more: the numbered badge on screen already
             // says which step this is, and the word cost most of a second each time.
-            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($bullet, 95)))),
+            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($bullet, 120)))),
             // Generous, because the renderer wraps to four lines and shrinks the type to fit.
             // Cutting at 95 chars put an ellipsis in the middle of most takeaways.
-            'onScreenText' => sg_scene_line($bullet, 95),
+            'onScreenText' => sg_scene_line($bullet, 120),
             'step' => $i + 1,
         );
     }
@@ -723,6 +757,12 @@ function sg_match_score($text, $keywords) {
  * ended up showing lemons.
  */
 function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
+    // 2026-10-12: every scene of a Short shows the article's own photo. Anything else was chosen
+    // by keyword, and keywords put corn under a garlic sentence, pots under a planting date and an
+    // olive grove under a leaf-mulch tip. The camera move changes per scene, so the picture still
+    // moves; it just never shows the wrong plant. Only when an article has no photo at all does the
+    // old matching below run.
+    if ($articleImage) return array_fill(0, count($sceneTexts), $articleImage);
     $cat = sg_load_catalogue();
     $curated = $cat['curated'];
     $neutral = !empty($cat['neutral']) ? $cat['neutral'] : array();
@@ -734,7 +774,7 @@ function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
 
     $titleMatches = array();
     foreach ($curated as $p) {
-        if (sg_match_score($articleTitle . ' ' . $category, $p['keywords']) > 0) $titleMatches[] = $p['url'];
+        if (!empty($p['own']) && sg_match_score($articleTitle . ' ' . $category, $p['keywords']) > 0) $titleMatches[] = $p['url'];
     }
 
     $neutralIdx = 0;
@@ -759,6 +799,13 @@ function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
             $s += $subjectScore * 2;
 
             if ($s <= 0) continue;
+            // The sentence itself must name something the photo shows. Matching on the article's
+            // subject alone put an aubergine plant and an olive grove under a basil video and a
+            // leaf-mulch tip, because the category words overlapped.
+            // Stock photos are not used in Shorts at all (2026-10-12): the only images known to show
+            // this subject are the article's own photo and our own photographs. A repeated, correct
+            // picture with a different camera move beats a varied picture of the wrong plant.
+            if (empty($p['own'])) continue;
             // Our own photographs carry one or two keywords where a stock entry carries
             // eight, so on raw score they lost every time. When ours matches the scene at
             // all, it is a photograph of this plant taken in a real garden, which is worth
@@ -784,9 +831,9 @@ function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
         // An incidental one-word match on a subject the catalogue does not cover is how a
         // houseplant video ends up in a vegetable field. Below that bar, the article's own
         // photo — the one image chosen for this subject on purpose — wins.
-        if ($bestUrl !== null && $bestScore < 10 && $articleImage && $i > 1) $bestUrl = $articleImage;
+        if ($bestUrl !== null && $bestScore < 24 && $articleImage && $i >= 1) $bestUrl = $articleImage;
 
-        if ($bestUrl === null && $articleImage && $i > 1) $bestUrl = $articleImage;
+        if ($bestUrl === null && $articleImage && $i >= 1) $bestUrl = $articleImage;
 
         if ($bestUrl === null) {
             while ($neutralIdx < count($neutral)) {
@@ -1219,7 +1266,12 @@ function sg_render_overlay($scene, $dest) {
     // Skipped on step scenes: there the narration is just "Πρώτον: <the bullet>" and the
     // bullet is already the headline, so the strip only reprinted the same sentence in
     // smaller type under itself.
-    if ($step === 0 && !$wordMode) {
+    $normText = function ($s) {
+        return sg_strip_accents(mb_strtolower(preg_replace('/[^\p{L}\p{N}]+/u', '', (string) $s), 'UTF-8'));
+    };
+    $captionSame = $normText($scene['onScreenText']) === $normText(
+        !empty($scene['captionDisplay']) ? $scene['captionDisplay'] : $scene['voiceover']);
+    if ($step === 0 && !$wordMode && !$captionSame) {
         $captionSource = !empty($scene['captionDisplay']) ? $scene['captionDisplay'] : $scene['voiceover'];
         $captionSource = sg_strip_emoji(str_replace(array('«', '»'), '', $captionSource));
         $capLines = array_slice(sg_wrap_lines($captionSource, 33, SG_W - 180), 0, 2);
