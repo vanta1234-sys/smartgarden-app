@@ -1,251 +1,251 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-<channel>
-  <title>SmartGarden.gr - Επιστημονική Γεωπονία &amp; Αστική Κηπουρική</title>
-  <link>https://smartgarden.gr</link>
-  <description>Εξειδικευμένοι τεχνικοί οδηγοί, βιολογική φυτοπροστασία, αυτοματισμοί ποτίσματος και αστική κηπουρική.</description>
-  <language>el</language>
-  <lastBuildDate>Sun, 06 Sep 2026 21:00:55 GMT</lastBuildDate>
-  <atom:link href="https://smartgarden.gr/rss.xml" rel="self" type="application/rss+xml" />
-  <item>
-    <title>Κλάδεμα &amp; Αναζωογόνηση Γερανιών και Πελαργονίων μετά τον Καύσωνα: Ερωτήσεις &amp; Απαντήσεις</title>
-    <link>https://smartgarden.gr/article/kladema-anazwoogonisi-geraniwn-pelargoniwn-kafsonas-20260907</link>
-    <guid>https://smartgarden.gr/article/kladema-anazwoogonisi-geraniwn-pelargoniwn-kafsonas-20260907</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:00 GMT</pubDate>
-    <description>Πώς να επαναφέρετε τα ταλαιπωρημένα γεράνια, βαμβακούλες και μολόχες μετά το καλοκαιρινό θερμικό στρες. Αυστηρό κλάδεμα στο 1/3, αντιμετώπιση της πεταλούδας Cacyreus marshalli και φθινοπωρινή ανθοφορία.</description>
-    <category>Φροντίδα Φυτών</category>
-  </item>
-  <item>
-    <title>Εσπεριδοειδή σε Γλάστρα (Λεμονιά, Κουμκουάτ, Μανταρινιά): Αντιμετώπιση Χλώρωσης Σιδήρου &amp; Καρπόπτωση: Ερωτήσεις &amp; Απαντήσεις</title>
-    <link>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260906</link>
-    <guid>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260906</guid>
-    <pubDate>Sat, 05 Sep 2026 21:00:00 GMT</pubDate>
-    <description>Πλήρης οδηγός για λεμονιές, μανταρινιές και κουμκουάτ σε γλάστρες. Θεραπεία κίτρινων φύλλων με χηλικό σίδηρο EDDHA, πρόληψη καρπόπτωσης, λίπανση καλίου και βιολογική προστασία από φυλλοκνίστη.</description>
-    <category>Μπαλκόνι &amp; Γλάστρες</category>
-  </item>
-  <item>
-    <title>Ελιά σε Γλάστρα &amp; Μπονσάι Ελιάς: Κλάδεμα Διαμόρφωσης, Μεταφύτευση &amp; Λίπανση: Ερωτήσεις &amp; Απαντήσεις</title>
-    <link>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260904</link>
-    <guid>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260904</guid>
-    <pubDate>Thu, 03 Sep 2026 21:00:00 GMT</pubDate>
-    <description>Πώς να διατηρήσετε μια υγιή και καρποφόρα ελιά στο μπαλκόνι ή σε μορφή μπονσάι. Ιδανικό υπόστρωμα με 40% ελαφρόπετρα, χειμερινό κλάδεμα σε σχήμα κυπέλλου, συρμάτωμα και αντιμετώπιση λεκανίου.</description>
-    <category>Μπαλκόνι &amp; Γλάστρες</category>
-  </item>
-  <item>
-    <title>Κομποστοποίηση στο Μπαλκόνι με Κάδους Bokashi &amp; Γαιοσκώληκες: Μηδενικές Οσμές &amp; Υγρό Λίπασμα: Ερωτήσεις &amp; Απαντήσεις</title>
-    <link>https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260904</link>
-    <guid>https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260904</guid>
-    <pubDate>Thu, 03 Sep 2026 21:00:00 GMT</pubDate>
-    <description>Ολοκληρωμένος πρακτικός οδηγός αναερόβιας ζύμωσης Bokashi και παραγωγής vermicompost στο αστικό διαμέρισμα. Συλλογή Bokashi tea, δοσολογία αραίωσης 1:100 και διατροφή γαιοσκωλήκων Eisenia fetida.</description>
-    <category>Οικολογική Φροντίδα</category>
-  </item>
-  <item>
-    <title>Οικολογική Ζιζανιοκτονία: Γεωργικό Ξύδι 20%, Corn Gluten Meal &amp; Αιθέρια Έλαια: Ερωτήσεις &amp; Απαντήσεις</title>
-    <link>https://smartgarden.gr/article/viologiki-zizanioktonia-ksydi-corn-gluten-20260902</link>
-    <guid>https://smartgarden.gr/article/viologiki-zizanioktonia-ksydi-corn-gluten-20260902</guid>
-    <pubDate>Tue, 01 Sep 2026 21:00:00 GMT</pubDate>
-    <description>Πλήρης οδηγός φυσικής καταπολέμησης αγριόχορτων χωρίς γλυφοσάτη. Προ-φυτρωτικός έλεγχος σπόρων με Corn Gluten Meal και μετα-φυτρωτικός ψεκασμός επαφής με οξικό οξύ 20% και ευγενόλη.</description>
-    <category>Οικολογική Φροντίδα</category>
-  </item>
-  <item>
-    <title>Ρομποτικά Χλοοκοπτικά 2026: Χωρίς Καλώδιο με RTK-GPS, 3D LiDAR &amp; AI Vision: Εποχιακός Οδηγός</title>
-    <link>https://smartgarden.gr/article/robotic-mowers-guide-ellada-2026-20260902</link>
-    <guid>https://smartgarden.gr/article/robotic-mowers-guide-ellada-2026-20260902</guid>
-    <pubDate>Tue, 01 Sep 2026 21:00:00 GMT</pubDate>
-    <description>Ο απόλυτος τεχνικός οδηγός 2026 για ρομποτικές χλοοκοπτικές μηχανές χωρίς περιμετρικό καλώδιο. Σύγκριση τεχνολογιών RTK-GNSS, 3D LiDAR, κάμερες τεχνητής νοημοσύνης, διαχείριση κλίσεων και επιλογή μοντέλου για ελληνικά κτήματα και γκαζόν.</description>
-    <category>Ρομποτικά Mowers</category>
-  </item>
-  <item>
-    <title>Ντομάτα σε Γλάστρα: Πρόληψη Ξηράς Κορυφής (BER), Κλάδεμα Λαίμαργων &amp; Υποστύλωση — Επικαιροποιημένος Οδηγός 2026-09-01</title>
-    <link>https://smartgarden.gr/article/ntomata-se-glastra-ksiri-koryfi-klawdema-20260901</link>
-    <guid>https://smartgarden.gr/article/ntomata-se-glastra-ksiri-koryfi-klawdema-20260901</guid>
-    <pubDate>Mon, 31 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Όλα τα μυστικά για πλούσια παραγωγή ντομάτας στο μπαλκόνι. Αποτροπή μαυρίσματος στον πάτο του καρπού με χηλικό ασβέστιο, κλάδεμα μασχαλιαίων βλαστών και βιοπροστασία από Tuta absoluta.</description>
-    <category>Λαχανόκηπος</category>
-  </item>
-  <item>
-    <title>Άρδευση σε Ταράτσες &amp; Ρετιρέ: Αντιμετώπιση Ισχυρών Ανέμων &amp; Αυτοεξισορροπούμενοι Σταλάκτες — Επικαιροποιημένος Οδηγός 2026-09-01</title>
-    <link>https://smartgarden.gr/article/ardefsi-taratsas-retyre-anemos-stalaktes-pc-20260901</link>
-    <guid>https://smartgarden.gr/article/ardefsi-taratsas-retyre-anemos-stalaktes-pc-20260901</guid>
-    <pubDate>Mon, 31 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πλήρης μηχανολογική μελέτη άρδευσης για εκτεθειμένες ταράτσες. Σταλάκτες πίεσης PC/AS, παλμική άρδευση, προστασία από ανεμοπίεση και πλέγματα σκίασης.</description>
-    <category>Αυτόματο Πότισμα &amp; IoT</category>
-  </item>
-  <item>
-    <title>Υπερυψωμένα Παρτέρια Hugelkultur: Αυτονομία Νερού &amp; Εκρηκτική Παραγωγή Λαχανικών — Επικαιροποιημένος Οδηγός 2026-09-01</title>
-    <link>https://smartgarden.gr/article/yperypsomena-parteria-hugelkultur-paragwgi-20260901</link>
-    <guid>https://smartgarden.gr/article/yperypsomena-parteria-hugelkultur-paragwgi-20260901</guid>
-    <pubDate>Mon, 31 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πώς να κατασκευάσετε παρτέρια Hugelkultur που μιμούνται το φυσικό δάσος. Στρωμάτωση κορμών, κλαδιών και κομπόστ, εξοικονόμηση 70% νερού άρδευσης και μέθοδος No-Dig.</description>
-    <category>Λαχανόκηπος</category>
-  </item>
-  <item>
-    <title>Ολοκληρωμένος Οδηγός για την Επαγγελματική Καλλιέργεια...</title>
-    <link>https://smartgarden.gr/article/καλλιέργεια-μαρουλιού</link>
-    <guid>https://smartgarden.gr/article/καλλιέργεια-μαρουλιού</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:55 GMT</pubDate>
-    <description>Μάθετε τα πάντα για ολοκληρωμένος οδηγός. Ένας αναλυτικός οδηγός για την καλλιέργεια του Lactuca sativa, σχεδιασμένος για επαγγελματίες και προχωρημένους.</description>
-    <category>Λαχανόκηπος</category>
-  </item>
-  <item>
-    <title>Εσπεριδοειδή σε Γλάστρα (Λεμονιά, Κουμκουάτ, Μανταρινιά): Αντιμετώπιση Χλώρωσης Σιδήρου &amp; Καρπόπτωση — Επικαιροποιημένος Οδηγός 2026-08-31</title>
-    <link>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260831</link>
-    <guid>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260831</guid>
-    <pubDate>Sun, 30 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πλήρης οδηγός για λεμονιές, μανταρινιές και κουμκουάτ σε γλάστρες. Θεραπεία κίτρινων φύλλων με χηλικό σίδηρο EDDHA, πρόληψη καρπόπτωσης, λίπανση καλίου και βιολογική προστασία από φυλλοκνίστη.</description>
-    <category>Μπαλκόνι &amp; Γλάστρες</category>
-  </item>
-  <item>
-    <title>Ελιά σε Γλάστρα &amp; Μπονσάι Ελιάς: Κλάδεμα Διαμόρφωσης, Μεταφύτευση &amp; Λίπανση — Επικαιροποιημένος Οδηγός 2026-08-31</title>
-    <link>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260831</link>
-    <guid>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260831</guid>
-    <pubDate>Sun, 30 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πώς να διατηρήσετε μια υγιή και καρποφόρα ελιά στο μπαλκόνι ή σε μορφή μπονσάι. Ιδανικό υπόστρωμα με 40% ελαφρόπετρα, χειμερινό κλάδεμα σε σχήμα κυπέλλου, συρμάτωμα και αντιμετώπιση λεκανίου.</description>
-    <category>Μπαλκόνι &amp; Γλάστρες</category>
-  </item>
-  <item>
-    <title>Κομποστοποίηση στο Μπαλκόνι με Κάδους Bokashi &amp; Γαιοσκώληκες: Μηδενικές Οσμές &amp; Υγρό Λίπασμα — Επικαιροποιημένος Οδηγός 2026-08-31</title>
-    <link>https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260831</link>
-    <guid>https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260831</guid>
-    <pubDate>Sun, 30 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Ολοκληρωμένος πρακτικός οδηγός αναερόβιας ζύμωσης Bokashi και παραγωγής vermicompost στο αστικό διαμέρισμα. Συλλογή Bokashi tea, δοσολογία αραίωσης 1:100 και διατροφή γαιοσκωλήκων Eisenia fetida.</description>
-    <category>Οικολογική Φροντίδα</category>
-  </item>
-  <item>
-    <title>Κλάδεμα &amp; Αναζωογόνηση Γερανιών και Πελαργονίων μετά τον Καύσωνα</title>
-    <link>https://smartgarden.gr/article/kladema-anazwoogonisi-geraniwn-pelargoniwn-kafsonas-20260830</link>
-    <guid>https://smartgarden.gr/article/kladema-anazwoogonisi-geraniwn-pelargoniwn-kafsonas-20260830</guid>
-    <pubDate>Sat, 29 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πώς να επαναφέρετε τα ταλαιπωρημένα γεράνια, βαμβακούλες και μολόχες μετά το καλοκαιρινό θερμικό στρες. Αυστηρό κλάδεμα στο 1/3, αντιμετώπιση της πεταλούδας Cacyreus marshalli και φθινοπωρινή ανθοφορία.</description>
-    <category>Φροντίδα Φυτών</category>
-  </item>
-  <item>
-    <title>Εσπεριδοειδή σε Γλάστρα (Λεμονιά, Κουμκουάτ, Μανταρινιά): Αντιμετώπιση Χλώρωσης Σιδήρου &amp; Καρπόπτωση</title>
-    <link>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260830</link>
-    <guid>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260830</guid>
-    <pubDate>Sat, 29 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πλήρης οδηγός για λεμονιές, μανταρινιές και κουμκουάτ σε γλάστρες. Θεραπεία κίτρινων φύλλων με χηλικό σίδηρο EDDHA, πρόληψη καρπόπτωσης, λίπανση καλίου και βιολογική προστασία από φυλλοκνίστη.</description>
-    <category>Μπαλκόνι &amp; Γλάστρες</category>
-  </item>
-  <item>
-    <title>Ελιά σε Γλάστρα &amp; Μπονσάι Ελιάς: Κλάδεμα Διαμόρφωσης, Μεταφύτευση &amp; Λίπανση</title>
-    <link>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260830</link>
-    <guid>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260830</guid>
-    <pubDate>Sat, 29 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πώς να διατηρήσετε μια υγιή και καρποφόρα ελιά στο μπαλκόνι ή σε μορφή μπονσάι. Ιδανικό υπόστρωμα με 40% ελαφρόπετρα, χειμερινό κλάδεμα σε σχήμα κυπέλλου, συρμάτωμα και αντιμετώπιση λεκανίου.</description>
-    <category>Μπαλκόνι &amp; Γλάστρες</category>
-  </item>
-  <item>
-    <title>Κομποστοποίηση στο Μπαλκόνι με Κάδους Bokashi &amp; Γαιοσκώληκες: Μηδενικές Οσμές &amp; Υγρό Λίπασμα</title>
-    <link>https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260829</link>
-    <guid>https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260829</guid>
-    <pubDate>Fri, 28 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Ολοκληρωμένος πρακτικός οδηγός αναερόβιας ζύμωσης Bokashi και παραγωγής vermicompost στο αστικό διαμέρισμα. Συλλογή Bokashi tea, δοσολογία αραίωσης 1:100 και διατροφή γαιοσκωλήκων Eisenia fetida.</description>
-    <category>Οικολογική Φροντίδα</category>
-  </item>
-  <item>
-    <title>Οικολογική Ζιζανιοκτονία: Γεωργικό Ξύδι 20%, Corn Gluten Meal &amp; Αιθέρια Έλαια</title>
-    <link>https://smartgarden.gr/article/viologiki-zizanioktonia-ksydi-corn-gluten-20260829</link>
-    <guid>https://smartgarden.gr/article/viologiki-zizanioktonia-ksydi-corn-gluten-20260829</guid>
-    <pubDate>Fri, 28 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πλήρης οδηγός φυσικής καταπολέμησης αγριόχορτων χωρίς γλυφοσάτη. Προ-φυτρωτικός έλεγχος σπόρων με Corn Gluten Meal και μετα-φυτρωτικός ψεκασμός επαφής με οξικό οξύ 20% και ευγενόλη.</description>
-    <category>Οικολογική Φροντίδα</category>
-  </item>
-  <item>
-    <title>Ρομποτικά Χλοοκοπτικά 2026: Χωρίς Καλώδιο με RTK-GPS, 3D LiDAR &amp; AI Vision</title>
-    <link>https://smartgarden.gr/article/robotic-mowers-guide-ellada-2026-20260829</link>
-    <guid>https://smartgarden.gr/article/robotic-mowers-guide-ellada-2026-20260829</guid>
-    <pubDate>Fri, 28 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Εξαντλητικό γεωπονικό εγχειρίδιο 2.200+ λέξεων για Ρομποτικά Χλοοκοπτικά 2026: Χωρίς Καλώδιο με RTK-GPS, 3D LiDAR &amp; AI Vision. Ανάλυση φυσιολογίας (Ρομποτικά Χλοοκοπτικά 2026: Χωρίς Καλώδιο με RTK-GPS, 3D LiDAR &amp; AI Vision (Βοτανικό Είδος &amp; Υβρίδιο)), εδαφολογικές προδιαγραφές (pH 6.0 - 7.0, EC 1.4 - 2.0 mS/cm), αυτοματισμοί στάγδην άρδευσης IoT, πλήρες εποχιακό πρόγραμμα NPK λίπανσης, 10 κρίσιμα λάθη και 12μηνο ημερολόγιο επεμβάσεων.</description>
-    <category>Ρομποτικά Mowers</category>
-  </item>
-  <item>
-    <title>Ντομάτα σε Γλάστρα: Πρόληψη Ξηράς Κορυφής (BER), Κλάδεμα Λαίμαργων &amp; Υποστύλωση</title>
-    <link>https://smartgarden.gr/article/ntomata-se-glastra-ksiri-koryfi-klawdema-20260828</link>
-    <guid>https://smartgarden.gr/article/ntomata-se-glastra-ksiri-koryfi-klawdema-20260828</guid>
-    <pubDate>Thu, 27 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Όλα τα μυστικά για πλούσια παραγωγή ντομάτας στο μπαλκόνι. Αποτροπή μαυρίσματος στον πάτο του καρπού με χηλικό ασβέστιο, κλάδεμα μασχαλιαίων βλαστών και βιοπροστασία από Tuta absoluta.</description>
-    <category>Λαχανόκηπος</category>
-  </item>
-  <item>
-    <title>Άρδευση σε Ταράτσες &amp; Ρετιρέ: Αντιμετώπιση Ισχυρών Ανέμων &amp; Αυτοεξισορροπούμενοι Σταλάκτες</title>
-    <link>https://smartgarden.gr/article/ardefsi-taratsas-retyre-anemos-stalaktes-pc-20260828</link>
-    <guid>https://smartgarden.gr/article/ardefsi-taratsas-retyre-anemos-stalaktes-pc-20260828</guid>
-    <pubDate>Thu, 27 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πλήρης μηχανολογική μελέτη άρδευσης για εκτεθειμένες ταράτσες. Σταλάκτες πίεσης PC/AS, παλμική άρδευση, προστασία από ανεμοπίεση και πλέγματα σκίασης.</description>
-    <category>Αυτόματο Πότισμα &amp; IoT</category>
-  </item>
-  <item>
-    <title>Υπερυψωμένα Παρτέρια Hugelkultur: Αυτονομία Νερού &amp; Εκρηκτική Παραγωγή Λαχανικών</title>
-    <link>https://smartgarden.gr/article/yperypsomena-parteria-hugelkultur-paragwgi-20260828</link>
-    <guid>https://smartgarden.gr/article/yperypsomena-parteria-hugelkultur-paragwgi-20260828</guid>
-    <pubDate>Thu, 27 Aug 2026 21:00:00 GMT</pubDate>
-    <description>Πώς να κατασκευάσετε παρτέρια Hugelkultur που μιμούνται το φυσικό δάσος. Στρωμάτωση κορμών, κλαδιών και κομπόστ, εξοικονόμηση 70% νερού άρδευσης και μέθοδος No-Dig.</description>
-    <category>Λαχανόκηπος</category>
-  </item>
-  <item>
-    <title>Ολοκληρωμένος Τεχνικός Οδηγός: Κομποστοποίηση στο Μπαλκόνι με Κάδους Bokashi &amp; Γαιοσκώληκες: Μηδενικές Οσμές &amp; Υγρό Λίπασμα (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)</title>
-    <link>https://smartgarden.gr/article/published-1787659939763</link>
-    <guid>https://smartgarden.gr/article/published-1787659939763</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:55 GMT</pubDate>
-    <description>Ολοκληρωμένος επιστημονικός οδηγός για «Ολοκληρωμένος Τεχνικός Οδηγός: Κομποστοποίηση στο Μπαλκόνι με Κάδους Bokashi &amp; Γαιοσκώληκες: Μηδενικές Οσμές &amp; Υγρό Λίπασμα (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.</description>
-    <category>ΑΣΤΙΚΗ ΟΙΚΟΛΟΓΙΑ</category>
-  </item>
-  <item>
-    <title>Ολοκληρωμένος Τεχνικός Οδηγός: Ελιά σε Γλάστρα &amp; Μπονσάι Ελιάς: Κλάδεμα Διαμόρφωσης, Μεταφύτευση &amp; Λίπανση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)</title>
-    <link>https://smartgarden.gr/article/published-1787634040863</link>
-    <guid>https://smartgarden.gr/article/published-1787634040863</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:55 GMT</pubDate>
-    <description>Ολοκληρωμένος επιστημονικός οδηγός για «Ολοκληρωμένος Τεχνικός Οδηγός: Ελιά σε Γλάστρα &amp; Μπονσάι Ελιάς: Κλάδεμα Διαμόρφωσης, Μεταφύτευση &amp; Λίπανση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.</description>
-    <category>ΜΠΑΛΚΟΝΙ &amp; DESIGN</category>
-  </item>
-  <item>
-    <title>Ολοκληρωμένος Τεχνικός Οδηγός: Εσπεριδοειδή στο Μπαλκόνι (Λεμονιά, Κουμκουάτ, Μανταρινιά): Χλώρωση Σιδήρου &amp; Καρπόδεση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)</title>
-    <link>https://smartgarden.gr/article/published-1787605240857</link>
-    <guid>https://smartgarden.gr/article/published-1787605240857</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:55 GMT</pubDate>
-    <description>Ολοκληρωμένος επιστημονικός οδηγός για «Ολοκληρωμένος Τεχνικός Οδηγός: Εσπεριδοειδή στο Μπαλκόνι (Λεμονιά, Κουμκουάτ, Μανταρινιά): Χλώρωση Σιδήρου &amp; Καρπόδεση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.</description>
-    <category>ΦΡΟΝΤΙΔΑ ΦΥΤΩΝ</category>
-  </item>
-  <item>
-    <title>Εξειδικευμένος Τεχνικός Οδηγός: Βιολογική Αντιμετώπιση Αγριόχορτων και Ζιζανίων με Βιολογικό Ξύδι &amp; Corn Gluten (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)</title>
-    <link>https://smartgarden.gr/article/cron-published-1724576400000</link>
-    <guid>https://smartgarden.gr/article/cron-published-1724576400000</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:55 GMT</pubDate>
-    <description>Ολοκληρωμένος επιστημονικός οδηγός για «Εξειδικευμένος Τεχνικός Οδηγός: Βιολογική Αντιμετώπιση Αγριόχορτων και Ζιζανίων με Βιολογικό Ξύδι &amp; Corn Gluten (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.</description>
-    <category>Φροντίδα Φυτών</category>
-  </item>
-  <item>
-    <title>Εξειδικευμένος Τεχνικός Οδηγός: Υπερυψωμένα Παρτέρια (Raised Beds): Κατασκευή, Στρωμάτωση Hugelkultur &amp; Αποστράγγιση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)</title>
-    <link>https://smartgarden.gr/article/cron-published-1724662800000</link>
-    <guid>https://smartgarden.gr/article/cron-published-1724662800000</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:55 GMT</pubDate>
-    <description>Ολοκληρωμένος επιστημονικός οδηγός για «Εξειδικευμένος Τεχνικός Οδηγός: Υπερυψωμένα Παρτέρια (Raised Beds): Κατασκευή, Στρωμάτωση Hugelkultur &amp; Αποστράγγιση (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.</description>
-    <category>Λαχανόκηπος</category>
-  </item>
-  <item>
-    <title>Εξειδικευμένος Τεχνικός Οδηγός: Αυτόματο Πότισμα σε Ταράτσες με Υψηλό Άνεμο &amp; Έντονη Εξάτμιση: Σταλάκτες &amp; Ανεμοφράκτες (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)</title>
-    <link>https://smartgarden.gr/article/cron-published-1724749200000</link>
-    <guid>https://smartgarden.gr/article/cron-published-1724749200000</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:55 GMT</pubDate>
-    <description>Ολοκληρωμένος επιστημονικός οδηγός για «Εξειδικευμένος Τεχνικός Οδηγός: Αυτόματο Πότισμα σε Ταράτσες με Υψηλό Άνεμο &amp; Έντονη Εξάτμιση: Σταλάκτες &amp; Ανεμοφράκτες (Επιστημονική Διαχείριση, Άρδευση, Θρέψη &amp; Προστασία)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.</description>
-    <category>Αυτόματο Πότισμα &amp; IoT</category>
-  </item>
-  <item>
-    <title>Καλλιέργεια Ντομάτας σε Γλάστρα: Ολοκληρωμένος Οδηγός Άρδευσης, Θρέψης &amp; Πρόληψης Ασθενειών</title>
-    <link>https://smartgarden.gr/article/cron-published-1724835600000</link>
-    <guid>https://smartgarden.gr/article/cron-published-1724835600000</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:55 GMT</pubDate>
-    <description>Ολοκληρωμένος επιστημονικός οδηγός για «Καλλιέργεια Ντομάτας σε Γλάστρα: Ολοκληρωμένος Οδηγός Άρδευσης, Θρέψης &amp; Πρόληψης Ασθενειών». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.</description>
-    <category>Λαχανόκηπος</category>
-  </item>
-  <item>
-    <title>Ολοκληρωμένος Τεχνικός Οδηγός: Καλλιέργεια Ντομάτας σε Γλάστρα (pH, Άρδευση, NPK &amp; Ξηρή Κορυφή)</title>
-    <link>https://smartgarden.gr/article/guide-1-vegetables</link>
-    <guid>https://smartgarden.gr/article/guide-1-vegetables</guid>
-    <pubDate>Sun, 06 Sep 2026 21:00:55 GMT</pubDate>
-    <description>Ολοκληρωμένος επιστημονικός οδηγός για «Ολοκληρωμένος Τεχνικός Οδηγός: Καλλιέργεια Ντομάτας σε Γλάστρα (pH, Άρδευση, NPK &amp; Ξηρή Κορυφή)». Πλήρης μεθοδολογία βήμα-βήμα, τεχνικός πίνακας παραμέτρων (pH, EC, θερμοκρασία), βιολογική φυτοπροστασία και πρόγραμμα θρέψης.</description>
-    <category>ΛΑΧΑΝΟΚΗΠΟΣ</category>
-  </item>
-</channel>
+  <channel>
+    <title>SmartGarden.gr - Οδηγοί Κηπουρικής</title>
+    <link>https://smartgarden.gr/</link>
+    <atom:link href="https://smartgarden.gr/feed.xml" rel="self" type="application/rss+xml" />
+    <description>Επιστημονικοί οδηγοί κηπουρικής για μπαλκόνι και κήπο -- φροντίδα φυτών, άρδευση, λαχανόκηπος και πολλά ακόμα.</description>
+    <language>el-GR</language>
+    <lastBuildDate>Wed, 14 Oct 2026 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Κίτρινα Φύλλα στα Φυτά: Βρες την Αιτία από το Μοτίβο, Όχι Απλά από το Χρώμα</title>
+      <link>https://smartgarden.gr/article/kitrina-fylla-fyta-diagnosi-apo-to-motivo-20261014</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/kitrina-fylla-fyta-diagnosi-apo-to-motivo-20261014</guid>
+      <pubDate>Wed, 14 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Οδηγός διάγνωσης κίτρινων φύλλων από το μοτίβο: παλιά ή νέα φύλλα, ομοιόμορφο ή ανάμεσα στα νεύρα, με πίνακα αιτιών, 5 δοκιμές στο σπίτι και σωστή σειρά ενεργειών πριν δώσεις λίπασμα.</description>
+      <enclosure url="https://images.unsplash.com/photo-1729796866311-863a8192df8a?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Λεβάντα σε Γλάστρα: Γιατί Ξεραίνεται και Πώς τη Σώζεις</title>
+      <link>https://smartgarden.gr/article/levanta-se-glastra-giati-xerainetai-sosimo-20261013</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/levanta-se-glastra-giati-xerainetai-sosimo-20261013</guid>
+      <pubDate>Tue, 13 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Γιατί ξεραίνεται η λεβάντα στη γλάστρα και πώς τη σώζεις: πίνακας συμπτωμάτων, τεστ γρατσουνιάς και ριζών, σωστό υπόστρωμα, πότισμα, κλάδεμα πάνω από πράσινο ξύλο και ημερολόγιο ανά μήνα.</description>
+      <enclosure url="https://images.unsplash.com/photo-1758321761545-98d5739e5886?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Βασιλικός που Μαυρίζει και Μαραίνεται το Φθινόπωρο: Κρύο ή Ασθένεια; Διάσωση και Διαχείμαση</title>
+      <link>https://smartgarden.gr/article/vasilikos-mavrizei-marainetai-fthinoporo-diaxeimasi-20261012</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/vasilikos-mavrizei-marainetai-fthinoporo-diaxeimasi-20261012</guid>
+      <pubDate>Mon, 12 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Πώς ξεχωρίζεις το κρύο από τον ψευδοπερονόσπορο, το Fusarium και τη σήψη ριζών όταν μαυρίζει ο βασιλικός, πότε τον φέρνεις μέσα, πώς τον σώζεις και πώς τον περνάς τον χειμώνα με μοσχεύματα.</description>
+      <enclosure url="https://images.unsplash.com/photo-1786073486821-3b8cf993cea7?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Σκόρδο: Πότε και Πώς Φυτεύεται σε Γλάστρα και Κήπο στην Ελλάδα (Οκτώβριος-Δεκέμβριος)</title>
+      <link>https://smartgarden.gr/article/skordo-fyteysi-glastra-kipos-pote-pos-20261011</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/skordo-fyteysi-glastra-kipos-pote-pos-20261011</guid>
+      <pubDate>Sun, 11 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Πότε φυτεύεται το σκόρδο στην Ελλάδα, ποιες σκελίδες διαλέγεις, βάθος και απόσταση φύτευσης, γλάστρα και ζαρντινιέρα, λίπανση σε δύο φάσεις, ασθένειες, συγκομιδή και στέγνωμα για αποθήκευση μηνών.</description>
+      <enclosure url="https://images.unsplash.com/photo-1726161646475-1888873f3d89?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Λεμονιά και Πορτοκαλιά σε Γλάστρα τον Χειμώνα: Πότισμα, Λίπανση και Προστασία από Παγετό</title>
+      <link>https://smartgarden.gr/article/lemonia-portokalia-glastra-ximonas-potisma-pagetos-20261010</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/lemonia-portokalia-glastra-ximonas-potisma-pagetos-20261010</guid>
+      <pubDate>Sat, 10 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Πώς περνούν τον χειμώνα τα εσπεριδοειδή σε γλάστρα: αντοχή στο κρύο ανά είδος, θέση ανά περιοχή, πότισμα με το δάχτυλο, λίπανση, προστασία από παγετό βήμα-βήμα, διαχείμαση μέσα στο σπίτι και πίνακας διάγνωσης.</description>
+      <enclosure url="https://images.unsplash.com/photo-1680413557185-2a3da954bbe8?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Καλλιέργεια Κρεμμυδιού: Φύτευση, Λίπανση, Πότισμα και Συγκομιδή που Κρατά Μήνες</title>
+      <link>https://smartgarden.gr/article/kremmydi-kalliergeia-apo-fytario-lipansi-sygkomidi-20261009</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/kremmydi-kalliergeia-apo-fytario-lipansi-sygkomidi-20261009</guid>
+      <pubDate>Fri, 09 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Πώς καλλιεργείς κρεμμύδι από φυτάρι, σπόρο ή κρεμμυδάκι σποράς: ποικιλίες βραχείας ημέρας, ρηχή φύτευση 1-2 εκατοστών, λίπανση σε δύο φάσεις, ασθένειες, ανθοφορία πριν την ώρα, συγκομιδή και στέγνωμα.</description>
+      <enclosure url="https://images.unsplash.com/photo-1777499699424-e26d608008f4?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Φθινοπωρινός Καθαρισμός Κήπου και Μπαλκονιού: Τι Κόβεις, Τι Αφήνεις και Τι Κάνεις με τα Φύλλα</title>
+      <link>https://smartgarden.gr/article/fthinoporinos-katharismos-kipou-mpalkoniou-ti-kovis-ti-afineis-20261008</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/fthinoporinos-katharismos-kipou-mpalkoniou-ti-kovis-ti-afineis-20261008</guid>
+      <pubDate>Thu, 08 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Πίνακας απόφασης για τον φθινοπωρινό καθαρισμό: ποια φυτά και υπολείμματα αφαιρείς, ποια αφήνεις, πώς κάνεις τα φύλλα κάλυψη και χούμο, καθαρισμός αποχετεύσεων, γλάστρες, εργαλεία και πρόγραμμα τριών Σαββατοκύριακων.</description>
+      <enclosure url="https://images.unsplash.com/photo-1635628001185-d4437faea3e1?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Τι Σπέρνεις τον Οκτώβριο και τον Νοέμβριο σε Γλάστρα: Κουκιά, Μπιζέλια, Σπανάκι, Μαρούλι</title>
+      <link>https://smartgarden.gr/article/ti-spernei-oktovrio-noemvrio-glastra-koukia-mpizelia-spanaki-20261007</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/ti-spernei-oktovrio-noemvrio-glastra-koukia-mpizelia-spanaki-20261007</guid>
+      <pubDate>Wed, 07 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Τι σπέρνεις και πότε το φθινόπωρο σε γλάστρα και ζαρντινιέρα: πίνακας με βάθος γλάστρας και ημέρες συγκομιδής, κουκιά βήμα-βήμα, μαρούλι σε ζεστό Οκτώβριο, ρόκα, ραπανάκι, σπανάκι και ημερολόγιο σποράς.</description>
+      <enclosure url="https://images.unsplash.com/photo-1771759539571-a962b49a8d89?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Χειμερινή Προετοιμασία Συστήματος Ποτίσματος: Τι Αδειάζεις, Τι Βγάζεις και Τι Αφήνεις</title>
+      <link>https://smartgarden.gr/article/ximerini-proetoimasia-systimatos-potismatos-pagetos-20261006</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/ximerini-proetoimasia-systimatos-potismatos-pagetos-20261006</guid>
+      <pubDate>Tue, 06 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Πώς προστατεύεις ένα σύστημα στάγδην από τον παγετό: χάρτης κινδύνου ανά περιοχή, ποια εξαρτήματα σπάνε, 11 βήματα αποστράγγισης, μειωμένο χειμερινό πρόγραμμα και λίστα επανεκκίνησης την άνοιξη.</description>
+      <enclosure url="https://images.unsplash.com/photo-1748432171507-c1d62fe2e859?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Πανσέδες και Βιολέτες σε Γλάστρα: Φύτευση Οκτωβρίου για Άνθη ως τον Μάιο</title>
+      <link>https://smartgarden.gr/article/pansedes-violetes-glastra-fyteysi-oktovriou-20261005</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/pansedes-violetes-glastra-fyteysi-oktovriou-20261005</guid>
+      <pubDate>Mon, 05 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Πότε και πώς φυτεύεις πανσέδες και βιόλες στο μπαλκόνι: υπόστρωμα, πότισμα, λίπανση, αφαίρεση μαραμένων ανθών και ημερολόγιο ανά περιοχή της Ελλάδας, για ανθοφορία από τον Νοέμβριο ως τον Μάιο.</description>
+      <enclosure url="https://images.unsplash.com/photo-1787334278655-cdb4219b2264?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Κοκκοειδή &amp; Αλευρώδης: Πώς να τα Ξεχωρίσετε και να τα Αντιμετωπίσετε</title>
+      <link>https://smartgarden.gr/article/kokkoeidi-aleyrodis-antimetopisi-fyta-20261001</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/kokkoeidi-aleyrodis-antimetopisi-fyta-20261001</guid>
+      <pubDate>Thu, 01 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Πίνακας αναγνώρισης κοκκοειδών και αλευρώδη, γιατί προκαλούν καπνιά στα φύλλα, και βήμα-βήμα θεραπεία με οινόπνευμα, λάδι νιμ και σαπούνι καλίου - χωρίς σύγχυση μεταξύ των δύο εντόμων.</description>
+      <enclosure url="https://images.unsplash.com/photo-1682901724921-767db03da93c?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Ιβίσκος σε Γλάστρα: Γιατί Πέφτουν τα Μπουμπούκια Πριν Ανοίξουν</title>
+      <link>https://smartgarden.gr/article/ibiskos-se-glastra-mpoumpoukia-pou-peftoun-20260930</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/ibiskos-se-glastra-mpoumpoukia-pou-peftoun-20260930</guid>
+      <pubDate>Wed, 30 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Γιατί ο ιβίσκος ρίχνει τα μπουμπούκια πριν ανοίξουν: θερμοκρασιακό σοκ, ακανόνιστο πότισμα και έλλειψη καλίου. Πρόγραμμα λίπανσης υψηλού καλίου και οδηγός διαχείμασης σε ελληνικό κλίμα.</description>
+      <enclosure url="https://images.unsplash.com/photo-1780277981730-3871cc3eb127?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Τριανταφυλλιά σε Γλάστρα: Κλάδεμα Βήμα-Βήμα &amp; Αντιμετώπιση Μαύρης Κηλίδωσης</title>
+      <link>https://smartgarden.gr/article/triantafylia-se-glastra-klabema-mayri-kilidosi-20260928</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/triantafylia-se-glastra-klabema-mayri-kilidosi-20260928</guid>
+      <pubDate>Mon, 28 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πλήρης οδηγός για τριανταφυλλιά σε γλάστρα: σωστό μέγεθος δοχείου, χειμερινό κλάδεμα δομής βήμα-βήμα, πρόγραμμα λίπανσης ανά εποχή και αναγνώριση/αντιμετώπιση μαύρης κηλίδωσης και ωιδίου.</description>
+      <enclosure url="https://images.unsplash.com/photo-1773317184031-6f9622e02d88?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Η τεχνική Hugelkultur ποτίζεται μόνη της για μήνες — να πώς φτιάχνεται σωστά: Τι Αλλάζει στις Δύσκολες Περιπτώσεις</title>
+      <link>https://smartgarden.gr/article/yperypsomena-parteria-hugelkultur-paragwgi-20260920</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/yperypsomena-parteria-hugelkultur-paragwgi-20260920</guid>
+      <pubDate>Sun, 20 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πώς να κατασκευάσετε παρτέρια Hugelkultur που μιμούνται το φυσικό δάσος. Στρωμάτωση κορμών, κλαδιών και κομπόστ, εξοικονόμηση 70% νερού άρδευσης και μέθοδος No-Dig.</description>
+      <enclosure url="https://images.unsplash.com/photo-1621928805940-32212f98b339?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Το νερό της βρύσης μπορεί να κιτρινίζει τα φυτά σας — πώς να το καταλάβετε</title>
+      <link>https://smartgarden.gr/article/poiotita-nerou-potismatos-sklirotita-chlorio-20260919</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/poiotita-nerou-potismatos-sklirotita-chlorio-20260919</guid>
+      <pubDate>Sat, 19 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Σκληρότητα, διττανθρακικά και χλώριο στο νερό βρύσης: πώς ανεβάζουν σταδιακά το pH του υποστρώματος, δεσμεύουν τον σίδηρο και προκαλούν χλώρωση — και πώς διορθώνεται με οξίνιση ή βρόχινο νερό.</description>
+      <enclosure url="https://images.unsplash.com/photo-1599277100479-3252d492a19a?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Τα φυτά που αντέχουν αληθινά σε σκοτεινό δωμάτιο (και πόσο λίγο νερό θέλουν)</title>
+      <link>https://smartgarden.gr/article/fyta-esoterikou-xamilo-fotismo-sansevieria-zz-20260918</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/fyta-esoterikou-xamilo-fotismo-sansevieria-zz-20260918</guid>
+      <pubDate>Fri, 18 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Ποια φυτά εσωτερικού επιβιώνουν πραγματικά μακριά από παράθυρο, γιατί το υπερβολικό πότισμα τα σκοτώνει πιο συχνά από το σκοτάδι, και πώς η σκόνη στα φύλλα μειώνει μετρήσιμα τη φωτοσύνθεση.</description>
+      <enclosure url="https://images.unsplash.com/photo-1737043851462-be1020f20a9b?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Βόρειο μπαλκόνι χωρίς ήλιο: τι φυτεύεται πραγματικά και τι απλά επιβιώνει</title>
+      <link>https://smartgarden.gr/article/skiero-voreio-mpalkoni-fyta-xoris-ilio-20260917</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/skiero-voreio-mpalkoni-fyta-xoris-ilio-20260917</guid>
+      <pubDate>Thu, 17 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πώς μετράμε πραγματικά το φως σε σκιερό μπαλκόνι, ποια φυτά αποδίδουν σε βόρειο προσανατολισμό ή φωταγωγό, και γιατί το πότισμα στη σκιά είναι η συχνότερη αιτία απώλειας.</description>
+      <enclosure url="https://images.unsplash.com/photo-1618483474128-991a146dc60b?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Πότε χρειάζεται αλλαγή γλάστρας (και το λάθος που σκοτώνει το φυτό μετά)</title>
+      <link>https://smartgarden.gr/article/metafyteysi-allagi-glastras-pote-pos-20260916</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/metafyteysi-allagi-glastras-pote-pos-20260916</guid>
+      <pubDate>Wed, 16 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πότε πραγματικά χρειάζεται μεταφύτευση, πόσο μεγαλύτερη πρέπει να είναι η νέα γλάστρα, πώς γίνεται κλάδεμα ριζών και γιατί η λίπανση αμέσως μετά τη μεταφύτευση βλάπτει.</description>
+      <enclosure url="https://images.unsplash.com/photo-1668888501413-4cbcfe853442?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Μπρόκολο και κουνουπίδι σε γλάστρα: γιατί δένουν μικρά κεφάλια</title>
+      <link>https://smartgarden.gr/article/kramvoeidi-lachano-brokolo-kounoupidi-glastra-20260915</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/kramvoeidi-lachano-brokolo-kounoupidi-glastra-20260915</guid>
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Οδηγός φθινοπωρινής καλλιέργειας κραμβοειδών σε δοχείο: λάχανο, μπρόκολο, κουνουπίδι. Βάθος γλάστρας, θερμοκρασιακά παράθυρα, το φαινόμενο buttoning και οι τροφοπενίες βορίου/μολυβδαινίου που καταστρέφουν το κεφάλι.</description>
+      <enclosure url="https://images.unsplash.com/photo-1676091876329-f8c1166bf368?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Γιατί οι σπιτικές σας ελιές βγαίνουν πικρές (και η σωστή άλμη βήμα-βήμα)</title>
+      <link>https://smartgarden.gr/article/xepikrisma-elias-epitrapezies-elies-almi-20260915</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/xepikrisma-elias-epitrapezies-elies-almi-20260915</guid>
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πλήρης οδηγός ξεπικρίσματος επιτραπέζιας ελιάς με φυσική άλμη, χωρίς καυστική σόδα. Συγκέντρωση άλατος, γαλακτική ζύμωση, έλεγχος pH κάτω από 4.5 για ασφάλεια και χρονοδιαγράμματα ανά τύπο ελιάς.</description>
+      <enclosure url="https://images.unsplash.com/photo-1698775942613-3e9fc114b2a1?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Το γεράνι σας δείχνει νεκρό μετά τον καύσωνα; Έτσι αναζωογονείται μέσα σε λίγες εβδομάδες: Τι Αλλάζει στις Δύσκολες Περιπτώσεις</title>
+      <link>https://smartgarden.gr/article/kladema-anazwoogonisi-geraniwn-pelargoniwn-kafsonas-20260914</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/kladema-anazwoogonisi-geraniwn-pelargoniwn-kafsonas-20260914</guid>
+      <pubDate>Mon, 14 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πώς να επαναφέρετε τα ταλαιπωρημένα γεράνια, βαμβακούλες και μολόχες μετά το καλοκαιρινό θερμικό στρες. Αυστηρό κλάδεμα στο 1/3, αντιμετώπιση της πεταλούδας Cacyreus marshalli και φθινοπωρινή ανθοφορία.</description>
+      <enclosure url="https://images.unsplash.com/photo-1766430497661-bcfb8c90bf1b?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Εσπεριδοειδή σε Γλάστρα (Λεμονιά, Κουμκουάτ, Μανταρινιά): Αντιμετώπιση Χλώρωσης Σιδήρου &amp; Καρπόπτωση: Προχωρημένος Οδηγός</title>
+      <link>https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260909</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/esperidoeidi-se-glastra-lemonia-koumkouat-chlwrosi-20260909</guid>
+      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πλήρης οδηγός για λεμονιές, μανταρινιές και κουμκουάτ σε γλάστρες. Θεραπεία κίτρινων φύλλων με χηλικό σίδηρο EDDHA, πρόληψη καρπόπτωσης, λίπανση καλίου και βιολογική προστασία από φυλλοκνίστη.</description>
+      <enclosure url="https://images.unsplash.com/photo-1432457990754-c8b5f21448de?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Ελιά σε Γλάστρα &amp; Μπονσάι Ελιάς: Κλάδεμα Διαμόρφωσης, Μεταφύτευση &amp; Λίπανση: Προχωρημένος Οδηγός</title>
+      <link>https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260909</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/elia-se-glastra-bonsai-kladema-lipansi-20260909</guid>
+      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πώς να διατηρήσετε μια υγιή και καρποφόρα ελιά στο μπαλκόνι ή σε μορφή μπονσάι. Ιδανικό υπόστρωμα με 40% ελαφρόπετρα, χειμερινό κλάδεμα σε σχήμα κυπέλλου, συρμάτωμα και αντιμετώπιση λεκανίου.</description>
+      <enclosure url="https://images.unsplash.com/photo-1683320553264-e31acd4196e7?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Κομποστοποίηση στο Μπαλκόνι με Κάδους Bokashi &amp; Γαιοσκώληκες: Μηδενικές Οσμές &amp; Υγρό Λίπασμα: Προχωρημένος Οδηγός</title>
+      <link>https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260909</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/bokashi-composting-vermicomposting-balcony-20260909</guid>
+      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Ολοκληρωμένος πρακτικός οδηγός αναερόβιας ζύμωσης Bokashi και παραγωγής vermicompost στο αστικό διαμέρισμα. Συλλογή Bokashi tea, δοσολογία αραίωσης 1:100 και διατροφή γαιοσκωλήκων Eisenia fetida.</description>
+      <enclosure url="https://images.unsplash.com/photo-1621496654772-c66c48290259?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Οικολογική Ζιζανιοκτονία: Γεωργικό Ξύδι 20%, Corn Gluten Meal &amp; Αιθέρια Έλαια: Προχωρημένος Οδηγός</title>
+      <link>https://smartgarden.gr/article/viologiki-zizanioktonia-ksydi-corn-gluten-20260909</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/viologiki-zizanioktonia-ksydi-corn-gluten-20260909</guid>
+      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πλήρης οδηγός φυσικής καταπολέμησης αγριόχορτων χωρίς γλυφοσάτη. Προ-φυτρωτικός έλεγχος σπόρων με Corn Gluten Meal και μετα-φυτρωτικός ψεκασμός επαφής με οξικό οξύ 20% και ευγενόλη.</description>
+      <enclosure url="https://images.unsplash.com/photo-1645620352297-edef980f7e75?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Πολλαπλασιασμός Φυτών με Μοσχεύματα: Ο Πλήρης Οδηγός</title>
+      <link>https://smartgarden.gr/article/pollaplasiasmos-fyton-me-moscheymata-20260909</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/pollaplasiasmos-fyton-me-moscheymata-20260909</guid>
+      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Πώς να πολλαπλασιάσετε φυτά δωρεάν με μοσχεύματα στελέχους. Σωστό σημείο κοπής, ριζοβολία σε νερό vs χώμα, ορμόνη ριζοβολίας και πότε χρειάζεται.</description>
+      <enclosure url="https://images.unsplash.com/photo-1487700160041-babef9c3cb55?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Χριστουγεννιάτικα Φυτά: Αλεξανδρινό, Κάκτος Χριστουγέννων &amp; Καλανχόη</title>
+      <link>https://smartgarden.gr/article/xristougenniatika-fyta-alexandrino-kaktos-kalanchoe-20260909</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/xristougenniatika-fyta-alexandrino-kaktos-kalanchoe-20260909</guid>
+      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Φροντίδα των τριών πιο δημοφιλών χριστουγεννιάτικων φυτών: αλεξανδρινό (poinsettia), κάκτος Χριστουγέννων και καλανχόη. Πώς να τα κρατήσετε ζωντανά μετά τις γιορτές.</description>
+      <enclosure url="https://images.unsplash.com/photo-1759496330246-c2f8d23ae83d?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Τεστ Εδάφους στο Σπίτι: Υφή, pH &amp; Αποστράγγιση Χωρίς Εργαστήριο</title>
+      <link>https://smartgarden.gr/article/test-edafous-sto-spiti-pi-ipoifi-apostraggisi-20260909</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/test-edafous-sto-spiti-pi-ipoifi-apostraggisi-20260909</guid>
+      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Τρία απλά τεστ για να καταλάβετε τι χώμα έχετε, χωρίς εργαστήριο: το τεστ βάζου για υφή, το τεστ οξέος-βάσης για κατά προσέγγιση pH, και το τεστ αποστράγγισης.</description>
+      <enclosure url="https://images.unsplash.com/photo-1611843467160-25afb8df1074?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Τα 10 Πιο Συχνά Λάθη Αρχαρίων Κηπουρών (και Πώς να τα Αποφύγετε)</title>
+      <link>https://smartgarden.gr/article/10-syxna-lathi-arxarion-kipouron-20260909</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/10-syxna-lathi-arxarion-kipouron-20260909</guid>
+      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Τα πιο κοινά λάθη που σκοτώνουν φυτά αρχαρίων: υπερβολικό πότισμα, λάθος μέγεθος γλάστρας, καμία τρύπα αποστράγγισης και λάθος τοποθέτηση φωτισμού.</description>
+      <enclosure url="https://images.unsplash.com/photo-1768051618841-eb5a76eb0a2d?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+    <item>
+      <title>Βασικά Εργαλεία Κηπουρικής για Αρχάριους: Ο Πλήρης Οδηγός</title>
+      <link>https://smartgarden.gr/article/vasika-ergaleia-kipourikis-arxarion-20260909</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/vasika-ergaleia-kipourikis-arxarion-20260909</guid>
+      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Ποια εργαλεία χρειάζεστε πραγματικά για να ξεκινήσετε την κηπουρική μπαλκονιού. Φτυαράκι, κλαδευτήρι, ποτιστήρι και οι σωστές πρακτικές συντήρησης που προλαμβάνουν ασθένειες.</description>
+      <enclosure url="https://images.unsplash.com/photo-1573561368183-fd88bdb4503d?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
+  </channel>
 </rss>
