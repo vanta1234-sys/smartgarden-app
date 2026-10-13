@@ -331,8 +331,12 @@ function sg_hook_from_title($title) {
     }
     $onScreen = sg_scene_line($head, 72);
     $spoken = $onScreen . (preg_match('/[.!;?]$/u', $onScreen) ? '' : '.');
-    if ($tail !== '') $spoken .= ' ' . sg_scene_line($tail, 48);
-    return array($onScreen, $spoken);
+    $tailLine = '';
+    if ($tail !== '') {
+        $tailLine = sg_scene_line($tail, 48);
+        $spoken .= ' ' . $tailLine;
+    }
+    return array($onScreen, $spoken, $tailLine);
 }
 
 function sg_build_script($article) {
@@ -378,8 +382,14 @@ function sg_build_script($article) {
 
     // The canned pools above are no longer used: the opening comes from the title and the
     // second scene from the article's own summary, so nothing on screen is a stock phrase.
-    list($hookOnScreen, $hookSpoken) = sg_hook_from_title($title);
-    $contextLine = sg_scene_line($summary, 120);
+    list($hookOnScreen, $hookSpoken, $hookTail) = sg_hook_from_title($title);
+    // A summary that opens with the page's own structure ("Πίνακας απόφασης…", "Οδηγός…") reads
+    // as a menu, not as something a person would say. Use the next takeaway instead.
+    $contextSource = $summary;
+    if (preg_match('/^\s*(Πίνακας|Οδηγός|Πλήρης οδηγός)/u', (string) $summary) && isset($bullets[3]) && trim($bullets[3]) !== '') {
+        $contextSource = $bullets[3];
+    }
+    $contextLine = sg_scene_line($contextSource, 120);
     $angle = array(
         'hookTag' => 'HOOK', 'hookVoiceover' => $hookSpoken, 'hookText' => $hookOnScreen,
         'problemTag' => 'CONTEXT', 'problemText' => $contextLine,
@@ -399,7 +409,7 @@ function sg_build_script($article) {
             // Short falls off a cliff and the payoff never gets seen.
             // Spoken only. The caption keeps "3-5", which reads correctly on screen; it is
             // just the synthesiser that needs the word.
-            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($summary, 120)))),
+            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($contextSource, 120)))),
             'onScreenText' => $angle['problemText'],
             'step' => 0,
         ),
@@ -429,6 +439,10 @@ function sg_build_script($article) {
         'captionDisplay' => 'Όλος ο οδηγός στο SmartGarden.gr',
         'step' => 0,
     );
+
+    // Only the second half of the spoken hook goes in the strip under the headline, so it never has to
+    // be cut to fit. With captionDisplay set the worker also skips the word-by-word captions.
+    if ($hookTail !== '') $scenes[0]['captionDisplay'] = $hookTail;
 
     $slug = (string) ($article['slug'] ?? '');
     $tiktokCaption = "🌿 {$cleanTitle} | Μυστικά & Tips για το Μπαλκόνι!\n"
