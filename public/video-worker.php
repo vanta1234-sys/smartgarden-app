@@ -210,9 +210,21 @@ function sg_run_job($dir) {
         // engine still cannot be matched the job fails instead of publishing a mixed voice.
         if (!isset($lockedEngine)) $lockedEngine = null;
         if ($lockedEngine === null && $engine === 'google') {
+            // Into a side file: a failed single-engine fetch deletes its destination, which used to
+            // delete the Google narration just fetched and left the hook scene silent for 3 s
+            // (the lavender render of 2026-10-13, when Edge was down for a minute).
             for ($try = 0; $try < 2 && $engine === 'google'; $try++) {
-                $retry = sg_fetch_tts($scene['voiceover'], $audio, $dir, $sceneWords, 'edge');
-                if ($retry === 'edge') $engine = 'edge';
+                $retryFile = $audio . '.retry';
+                $retryWords = array();
+                $retry = sg_fetch_tts($scene['voiceover'], $retryFile, $dir, $retryWords, 'edge');
+                if ($retry === 'edge' && file_exists($retryFile)) {
+                    @unlink($audio);
+                    @rename($retryFile, $audio);
+                    $sceneWords = $retryWords;
+                    $engine = 'edge';
+                } else {
+                    @unlink($retryFile);
+                }
             }
         }
         if ($lockedEngine === null) {
@@ -594,12 +606,15 @@ function sg_run_job($dir) {
              . ',afade=t=out:st=' . sprintf('%.2f', $musicOut) . ':d=1.6[bed]';
         $mix = '[0:a][bed]amix=inputs=2:duration=first:normalize=0[a]';
 
+        // Single-threaded like the scene encodes: without it this pass was OOM-killed on the 96-CPU
+        // host (basil, 2026-10-13, three renders in four), taking the worker with it, so the job sat
+        // at "Ένωση σκηνών" forever with a finished video.mp4 and no error anywhere.
         $mcmd = escapeshellarg($ffmpeg) . ' -y -hide_banner -loglevel error'
               . ' -i ' . escapeshellarg($final)
               . $musicInput
               . ' -filter_complex ' . escapeshellarg($bed . ';' . $mix)
               . ' -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 128k -ar 44100 -ac 2'
-              . ' -shortest -movflags +faststart ' . escapeshellarg($withMusic) . ' 2>&1';
+              . ' -shortest -movflags +faststart -threads 1 -filter_complex_threads 1 ' . escapeshellarg($withMusic) . ' 2>&1';
 
         $mres = trim((string) @shell_exec($mcmd));
         $mdur = file_exists($withMusic) ? sg_duration($ffprobe, $withMusic) : 0.0;
