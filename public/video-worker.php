@@ -769,7 +769,9 @@ function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $f
     $checks['μέγεθος'] = (@filesize($final) > (SG_LONG ? 8000000 : 1000000));
     $checks['σκηνές'] = (count($script['scenes']) >= (SG_LONG ? 10 : 4));
     $failed = array_keys(array_filter($checks, function ($ok) { return !$ok; }));
-    $gateSays = count($failed) ? 'private' : 'public';
+    // Owner's rule (2026-10-13): nothing goes public unwatched. Automatic uploads are always private;
+    // the owner (or a manual, inspected upload) makes a video public after looking at it.
+    $gateSays = 'private';
     // An explicit override wins, but never upward: a render that failed its checks cannot be
     // talked into going public by a query parameter. It exists so a verification upload can
     // be pinned private while the gate still reports what it would have decided.

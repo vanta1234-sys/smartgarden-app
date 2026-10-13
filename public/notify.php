@@ -24,14 +24,14 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
 // address the site itself uses for newsletters and platform correspondence, so a monitoring
 // email lands there among dozens of others and gets skimmed past — which defeats the point.
 // Override with SetEnv SG_NOTIFY_TO in .htaccess to change it without touching code.
-// THE switch for every automatic video upload (YouTube Shorts and TikTok drafts). Off since
+// THE switch for every automatic video upload (YouTube Shorts and TikTok drafts). Was off from
 // 2026-10-12: the owner watched the rendered Shorts and rejected them (generic hooks unrelated to the
 // article, sentences cut mid-thought, scene photos of the wrong plant), and said nothing may be
 // uploaded anywhere until that is fixed. While it is false the cron does not queue a render, the
 // worker uploads nothing even if a job is started by hand with &publish=1, and the previous-day
-// check does not complain that there is no video. Flip to true only when the owner says so.
+// check does not complain that there is no video. Back ON 2026-10-13 at the owner's word, but uploads are always PRIVATE (video-worker.php).
 if (!defined('SG_VIDEO_AUTOPUBLISH')) {
-    define('SG_VIDEO_AUTOPUBLISH', false);
+    define('SG_VIDEO_AUTOPUBLISH', true);
 }
 
 if (!defined('SG_NOTIFY_TO')) {
