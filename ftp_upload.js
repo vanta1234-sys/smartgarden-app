@@ -6,10 +6,27 @@ import { execSync } from 'child_process';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const FTP_HOST = 'smartgarden.gr';
-const FTP_USER = 'smartgarden.gr_8p3lo1vph0t';
-const FTP_PASSWORD = 'Uc0Lptjan_j47Eg~';
-const FTP_REMOTE_DIR = '/httpdocs';
+// Credentials come from the environment or from .env.deploy (git-ignored).
+// There is deliberately no fallback: a deploy without credentials must stop.
+function readDotEnvDeploy() {
+  const out = {};
+  try {
+    const raw = fs.readFileSync(path.join(__dirname, '.env.deploy'), 'utf8');
+    for (const line of raw.split(/\r?\n/)) {
+      const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
+      if (m && !line.trim().startsWith('#')) out[m[1]] = m[2].replace(/^["']|["']$/g, '');
+    }
+  } catch {
+    // No file is fine; the environment may carry them instead.
+  }
+  return out;
+}
+const deployEnv = readDotEnvDeploy();
+
+const FTP_HOST = process.env.FTP_HOST || deployEnv.FTP_HOST || 'smartgarden.gr';
+const FTP_USER = process.env.FTP_USER || deployEnv.FTP_USER || '';
+const FTP_PASSWORD = process.env.FTP_PASSWORD || deployEnv.FTP_PASSWORD || '';
+const FTP_REMOTE_DIR = process.env.FTP_REMOTE_DIR || deployEnv.FTP_REMOTE_DIR || '/httpdocs';
 
 const logFile = path.join(__dirname, 'deploy_log.txt');
 function log(msg) {
@@ -52,6 +69,11 @@ async function deploy() {
   console.log('\n======================================================');
   console.log('  🌱 SMARTGARDEN FTP DEPLOYMENT & LIVE DIAGNOSTICS');
   console.log('======================================================\n');
+  if (!FTP_USER || !FTP_PASSWORD) {
+    console.error('❌ FTP_USER and FTP_PASSWORD are not set.');
+    console.error('   Put them in .env.deploy in the project root (git-ignored), or export them.');
+    process.exit(1);
+  }
   log(`Target Host: ${FTP_HOST}`);
   log(`Target User: ${FTP_USER}`);
   log(`Remote Directory: ${FTP_REMOTE_DIR}`);
