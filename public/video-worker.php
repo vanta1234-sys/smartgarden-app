@@ -770,6 +770,18 @@ function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $f
         return array('youtube' => array('ok' => false, 'error' => 'Αυτόματη δημοσίευση κλειστή'),
                      'tiktok' => array('ok' => false, 'error' => 'Αυτόματη δημοσίευση κλειστή'), 'skipped' => true);
     }
+    // Held for review (notify.php): the video stays on the server until it has been watched.
+    if (SG_VIDEO_HOLD_FOR_REVIEW) {
+        sg_log($dir, 'publish: held for review (SG_VIDEO_HOLD_FOR_REVIEW)');
+        require_once __DIR__ . '/notify.php';
+        sg_notify_failure('Νέο βίντεο έτοιμο — περιμένει έλεγχο πριν ανέβει', array(
+            'Job: ' . $jobId,
+            'Διάρκεια: ' . round($duration, 1) . 's',
+            'Δεν ανέβηκε πουθενά. Άνοιξε συνεδρία με τον Claude για να το δει και να το ανεβάσει.',
+        ));
+        return array('youtube' => array('ok' => false, 'error' => 'Σε αναμονή ελέγχου'),
+                     'tiktok' => array('ok' => false, 'error' => 'Σε αναμονή ελέγχου'), 'skipped' => true, 'held' => true);
+    }
     $key = $job['key'];
     $script = $job['script'];
     $article = $job['article'];

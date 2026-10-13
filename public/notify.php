@@ -30,6 +30,14 @@ if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
 // uploaded anywhere until that is fixed. While it is false the cron does not queue a render, the
 // worker uploads nothing even if a job is started by hand with &publish=1, and the previous-day
 // check does not complain that there is no video. Back ON 2026-10-13 at the owner's word, but uploads are always PRIVATE (video-worker.php).
+// Renders still happen automatically, but nothing is uploaded until the owner's review: Claude
+// watches the finished video (frames, voice engine, text) in a session and only then uploads it.
+// Decided 2026-10-14 after an unwatched render reached the TikTok inbox. Flip to false to upload
+// straight from the worker again.
+if (!defined('SG_VIDEO_HOLD_FOR_REVIEW')) {
+    define('SG_VIDEO_HOLD_FOR_REVIEW', true);
+}
+
 if (!defined('SG_VIDEO_AUTOPUBLISH')) {
     define('SG_VIDEO_AUTOPUBLISH', true);
 }
