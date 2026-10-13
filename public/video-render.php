@@ -563,15 +563,48 @@ if ($mode === 'long' && defined('SG_W') && SG_W !== 1920) {
 
 $script = $mode === 'long' ? sg_build_long_script($article) : sg_build_script($article);
 
+// &script=NAME: a hand-written script (public/video-scripts/NAME.json: scenes with voiceover,
+// onScreenText and the exact photo URL) replaces the one built from the article. Used when the
+// article's markdown reads badly aloud (its tables are dropped, its lists lose their lead-ins) and
+// when the keyword photo matching cannot be trusted: it once put olives and a rose garden under a
+// garlic video. The photos are then chosen and looked at by hand, one by one.
+$customImages = null;
+if (isset($_GET['script']) && preg_match('/^[a-z0-9_-]{1,60}$/i', (string) $_GET['script'])) {
+    $customFile = __DIR__ . '/video-scripts/' . $_GET['script'] . '.json';
+    $custom = is_file($customFile) ? json_decode((string) file_get_contents($customFile), true) : null;
+    if (!is_array($custom) || empty($custom['scenes']) || !is_array($custom['scenes'])) sg_err('script not found or unreadable: ' . $_GET['script']);
+    $customScenes = array();
+    $customImages = array();
+    foreach ($custom['scenes'] as $cs) {
+        $voice = trim((string) ($cs['voiceover'] ?? ''));
+        $photo = trim((string) ($cs['photo'] ?? ''));
+        if ($voice === '' || $photo === '') sg_err('script scene without voiceover or photo');
+        $head = (string) ($cs['onScreenText'] ?? '');
+        $customScenes[] = array(
+            'tag' => (string) ($cs['tag'] ?? 'SMARTGARDEN.GR'),
+            'voiceover' => $voice,
+            'onScreenText' => $head,
+            'captionDisplay' => $head,
+            'step' => 0,
+        );
+        $customImages[] = $photo;
+    }
+    $script['scenes'] = $customScenes;
+    if (!empty($custom['youtubeTitle'])) $script['youtubeTitle'] = (string) $custom['youtubeTitle'];
+    if (!empty($custom['youtubeDescription'])) $script['youtubeDescription'] = (string) $custom['youtubeDescription'];
+}
+
 // Per-scene photos, matched to what each scene actually says.
 $sceneTexts = array();
 foreach ($script['scenes'] as $s) {
     $sceneTexts[] = trim(($s['onScreenText'] ?? '') . ' ' . ($s['voiceover'] ?? '') . ' ' . ($s['tag'] ?? ''));
 }
 $articleTitleEl = is_array($article['title'] ?? null) ? ($article['title']['el'] ?? '') : (string) ($article['title'] ?? '');
-$sceneImages = $mode === 'long'
+$sceneImages = $customImages !== null
+    ? $customImages
+    : ($mode === 'long'
     ? sg_scene_images_long($sceneTexts, $article['image'] ?? '', $articleTitleEl, (string) ($article['category'] ?? ''))
-    : sg_scene_images($sceneTexts, $article['image'] ?? '', $articleTitleEl, (string) ($article['category'] ?? ''));
+    : sg_scene_images($sceneTexts, $article['image'] ?? '', $articleTitleEl, (string) ($article['category'] ?? '')));
 
 // &dry=1 returns the script and the chosen photos without creating a job or spawning the
 // worker. A long-form render costs twenty minutes of CPU; being able to read the narration
@@ -585,8 +618,12 @@ if (isset($_GET['dry'])) {
             'tag' => $s['tag'],
             'onScreen' => $s['onScreenText'],
             'chars' => mb_strlen((string) $s['voiceover'], 'UTF-8'),
-            'voiceover' => mb_substr((string) $s['voiceover'], 0, 110, 'UTF-8'),
-            'photo' => isset($sceneImages[$i]) ? basename(parse_url($sceneImages[$i], PHP_URL_PATH)) : '',
+            // &full=1: the whole narration and the whole photo address, so the script can be read
+            // end to end (and every photo looked at) before a twenty-minute render is paid for.
+            'voiceover' => isset($_GET['full']) ? (string) $s['voiceover'] : mb_substr((string) $s['voiceover'], 0, 110, 'UTF-8'),
+            'photo' => isset($sceneImages[$i])
+                ? (isset($_GET['full']) ? (string) $sceneImages[$i] : basename(parse_url($sceneImages[$i], PHP_URL_PATH)))
+                : '',
         );
     }
     sg_out(array(
