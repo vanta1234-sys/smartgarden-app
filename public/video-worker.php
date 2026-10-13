@@ -213,7 +213,8 @@ function sg_run_job($dir) {
             // Into a side file: a failed single-engine fetch deletes its destination, which used to
             // delete the Google narration just fetched and left the hook scene silent for 3 s
             // (the lavender render of 2026-10-13, when Edge was down for a minute).
-            for ($try = 0; $try < 2 && $engine === 'google'; $try++) {
+            for ($try = 0; $try < 5 && $engine === 'google'; $try++) {
+                if ($try > 0) sleep(6); // Edge was down for about a minute once; a pause beats the slow voice
                 $retryFile = $audio . '.retry';
                 $retryWords = array();
                 $retry = sg_fetch_tts($scene['voiceover'], $retryFile, $dir, $retryWords, 'edge');
@@ -226,6 +227,12 @@ function sg_run_job($dir) {
                     @unlink($retryFile);
                 }
             }
+        }
+        if ($lockedEngine === null && $engine !== 'edge') {
+            // The owner rejects the Google voice (old, slow): better no video than that one.
+            sg_log($dir, 'scene ' . $i . ': Edge voice unavailable after retries, refusing to render with ' . ($engine ?: 'no') . ' voice');
+            sg_status($dir, 'error', $pct, 'Η φωνή Edge δεν ήταν διαθέσιμη: το βίντεο δεν παράγεται με την παλιά φωνή');
+            return;
         }
         if ($lockedEngine === null) {
             $lockedEngine = $engine;
