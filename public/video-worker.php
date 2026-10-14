@@ -774,11 +774,20 @@ function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $f
     if (SG_VIDEO_HOLD_FOR_REVIEW) {
         sg_log($dir, 'publish: held for review (SG_VIDEO_HOLD_FOR_REVIEW)');
         require_once __DIR__ . '/notify.php';
-        sg_notify_failure('Νέο βίντεο έτοιμο — περιμένει έλεγχο πριν ανέβει', array(
+        $holdLines = array(
             'Job: ' . $jobId,
             'Διάρκεια: ' . round($duration, 1) . 's',
             'Δεν ανέβηκε πουθενά. Άνοιξε συνεδρία με τον Claude για να το δει και να το ανεβάσει.',
-        ));
+        );
+        // TikTok's inbox (draft) upload has no caption field at all, so a draft always arrives as
+        // "Χωρίς περιγραφή" and the caption has to be typed in the app. Ready to paste:
+        $ttCaption = isset($job['script']['tiktokCaption']) ? trim((string) $job['script']['tiktokCaption']) : '';
+        if ($ttCaption !== '') {
+            $holdLines[] = '';
+            $holdLines[] = 'Περιγραφή για το TikTok (επικόλλησέ την όταν πατάς Post):';
+            $holdLines[] = $ttCaption;
+        }
+        sg_notify_failure('Νέο βίντεο έτοιμο — περιμένει έλεγχο πριν ανέβει', $holdLines);
         return array('youtube' => array('ok' => false, 'error' => 'Σε αναμονή ελέγχου'),
                      'tiktok' => array('ok' => false, 'error' => 'Σε αναμονή ελέγχου'), 'skipped' => true, 'held' => true);
     }
