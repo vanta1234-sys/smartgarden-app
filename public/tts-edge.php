@@ -31,6 +31,70 @@ if ($text === '') {
 // (found 2026-09-29, raising the deadline from 12s to handle longer scenes exposed this).
 set_time_limit(50);
 
+// ==========================================
+// 0. Azure Speech (the official service), when a key is configured
+// ==========================================
+// Microsoft changed the Edge "read aloud" handshake on 2026-10-13 (403 -> Cloudflare 502 here), so this endpoint
+// goes through Azure AI Speech first when /azure_speech.json (outside the web root: {"key":"...","region":"..."})
+// or the AZURE_SPEECH_KEY / AZURE_SPEECH_REGION environment variables exist. Same voice (el-GR-AthinaNeural), same
+// 24 kHz 48 kbps mp3, same answer shapes as below, so no caller changes. The REST API has no word timings, so
+// ?meta=1 returns an empty "words" list and the video worker falls back to its static captions.
+function azureSpeechConfig() {
+    $cfgFile = dirname(__DIR__) . '/azure_speech.json';
+    $cfg = is_file($cfgFile) ? json_decode((string) @file_get_contents($cfgFile), true) : null;
+    $key = is_array($cfg) && !empty($cfg['key']) ? (string) $cfg['key'] : (string) getenv('AZURE_SPEECH_KEY');
+    $region = is_array($cfg) && !empty($cfg['region']) ? (string) $cfg['region'] : (string) getenv('AZURE_SPEECH_REGION');
+    if ($key === '' || !preg_match('/^[a-z0-9-]{3,40}$/i', $region)) return null;
+    return array('key' => $key, 'region' => strtolower($region));
+}
+
+function azureSpeechSynthesize($cfg, $text, $voice, $rate) {
+    $safeText = htmlspecialchars($text, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+    $safeVoice = htmlspecialchars($voice, ENT_QUOTES, 'UTF-8');
+    $safeRate = htmlspecialchars($rate, ENT_QUOTES, 'UTF-8');
+    $ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='el-GR'>"
+        . "<voice name='{$safeVoice}'><prosody rate='{$safeRate}'>{$safeText}</prosody></voice></speak>";
+    $ch = curl_init('https://' . $cfg['region'] . '.tts.speech.microsoft.com/cognitiveservices/v1');
+    curl_setopt_array($ch, array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => $ssml,
+        CURLOPT_TIMEOUT => 40,
+        CURLOPT_HTTPHEADER => array(
+            'Ocp-Apim-Subscription-Key: ' . $cfg['key'],
+            'Content-Type: application/ssml+xml',
+            'X-Microsoft-OutputFormat: audio-24khz-48kbitrate-mono-mp3',
+            'User-Agent: smartgarden.gr',
+        ),
+    ));
+    $audio = curl_exec($ch);
+    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    // Real MP3 starts with ID3 or a frame sync; an error body is JSON/text.
+    if ($code !== 200 || !is_string($audio) || strlen($audio) < 1500) return null;
+    $head = substr($audio, 0, 3);
+    if ($head !== 'ID3' && ord($head[0]) !== 0xFF) return null;
+    return $audio;
+}
+
+$azureCfg = azureSpeechConfig();
+if ($azureCfg !== null) {
+    $azureAudio = azureSpeechSynthesize($azureCfg, $text, $voice, $rate);
+    if ($azureAudio !== null) {
+        if ($wantMeta) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(array('success' => true, 'words' => array(), 'audioBase64' => base64_encode($azureAudio), 'engine' => 'azure'));
+            exit;
+        }
+        header('Content-Type: audio/mpeg');
+        header('Cache-Control: public, max-age=86400');
+        header('Content-Length: ' . strlen($azureAudio));
+        echo $azureAudio;
+        exit;
+    }
+    // Azure answered with something unusable (quota, outage): fall through to the Edge path below.
+}
+
 function edgeTtsFail($message) {
     http_response_code(502);
     header('Content-Type: application/json; charset=utf-8');
