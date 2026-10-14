@@ -85,23 +85,30 @@ $videoPath = null;
  * A failure is reported and never fatal: a video with YouTube's own frame grab is worth
  * far more than no video.
  */
-function sg_yt_thumbnail($accessToken, $videoId, $article, $jobDir) {
-    if (!is_array($article) || $videoId === '') return array('ok' => false, 'error' => 'no article metadata');
-    require_once __DIR__ . '/video-lib.php';
-    require_once __DIR__ . '/ssr-lib.php';
-
+function sg_yt_thumbnail($accessToken, $videoId, $article, $jobDir, $customThumb = '') {
+    if ($videoId === '') return array('ok' => false, 'error' => 'no video id');
     $photo = '';
-    $own = sg_pick_real_photo($article);
-    if (is_array($own) && !empty($own['file'])) {
-        $candidate = __DIR__ . '/' . ltrim((string) $own['file'], '/');
-        if (is_file($candidate)) $photo = $candidate;
-    }
-    if ($photo === '' && $jobDir !== '' && is_dir($jobDir)) {
-        foreach ((array) glob($jobDir . '/scene*.jpg') as $f) { $photo = $f; break; }
-    }
+    if ($customThumb !== '' && is_file($customThumb)) {
+        // A thumbnail that was designed and looked at by hand (public/video-thumbs/NAME.jpg). The automatic
+        // one cut the headline off ("ΟΚΤΩΒΡΙΟΣ-ΔΕΚΕΜΒΡ") and put weeds under a garlic video (2026-10-14).
+        $dest = $customThumb;
+    } else {
+        if (!is_array($article)) return array('ok' => false, 'error' => 'no article metadata');
+        require_once __DIR__ . '/video-lib.php';
+        require_once __DIR__ . '/ssr-lib.php';
 
-    $dest = ($jobDir !== '' && is_dir($jobDir) ? $jobDir : sys_get_temp_dir()) . '/thumb.jpg';
-    if (!sg_render_thumbnail($article, $dest, $photo)) return array('ok' => false, 'error' => 'render failed');
+        $own = sg_pick_real_photo($article);
+        if (is_array($own) && !empty($own['file'])) {
+            $candidate = __DIR__ . '/' . ltrim((string) $own['file'], '/');
+            if (is_file($candidate)) $photo = $candidate;
+        }
+        if ($photo === '' && $jobDir !== '' && is_dir($jobDir)) {
+            foreach ((array) glob($jobDir . '/scene*.jpg') as $f) { $photo = $f; break; }
+        }
+
+        $dest = ($jobDir !== '' && is_dir($jobDir) ? $jobDir : sys_get_temp_dir()) . '/thumb.jpg';
+        if (!sg_render_thumbnail($article, $dest, $photo)) return array('ok' => false, 'error' => 'render failed');
+    }
 
     $ch = curl_init('https://www.googleapis.com/upload/youtube/v3/thumbnails/set?uploadType=media&videoId=' . rawurlencode($videoId));
     curl_setopt_array($ch, array(
@@ -138,6 +145,12 @@ if ($jobId !== '') {
     $jobDir = $jobsRoot . '/' . $jobId;
     $jobMeta = @json_decode((string) @file_get_contents($jobDir . '/job.json'), true);
     $thumbArticle = is_array($jobMeta) && isset($jobMeta['article']) ? $jobMeta['article'] : null;
+    // "thumbnailFile":"name.jpg" uses public/video-thumbs/name.jpg instead of the generated picture.
+    $customThumb = '';
+    if (!empty($body['thumbnailFile']) && preg_match('/^[a-z0-9_-]{1,60}\.jpg$/i', (string) $body['thumbnailFile'])) {
+        $cand = __DIR__ . '/video-thumbs/' . $body['thumbnailFile'];
+        if (is_file($cand)) $customThumb = $cand;
+    }
     $variant = isset($body['variant']) ? preg_replace('/[^a-z]/', '', (string) $body['variant']) : '';
     $videoFile = $variant === 'slides' ? '/video-slides.mp4' : '/video.mp4';
     $videoPath = $jobsRoot . '/' . $jobId . $videoFile;
@@ -289,7 +302,7 @@ if ($videoPath !== null) {
             'resumable' => true,
             'privacyStatusRequested' => $privacyStatus,
             'privacyStatusActual' => $putResult['status']['privacyStatus'] ?? null,
-            'thumbnail' => sg_yt_thumbnail($accessToken, $putResult['id'], $thumbArticle ?? null, $jobDir ?? ''),
+            'thumbnail' => sg_yt_thumbnail($accessToken, $putResult['id'], $thumbArticle ?? null, $jobDir ?? '', $customThumb ?? ''),
         ]);
     } else {
         http_response_code(200);
