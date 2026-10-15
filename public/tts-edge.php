@@ -32,68 +32,131 @@ if ($text === '') {
 set_time_limit(50);
 
 // ==========================================
-// 0. Azure Speech (the official service), when a key is configured
+// 0. Gemini speech (Google's official TTS), tried first unless ?engine=edge
 // ==========================================
-// Microsoft changed the Edge "read aloud" handshake on 2026-10-13 (403 -> Cloudflare 502 here), so this endpoint
-// goes through Azure AI Speech first when /azure_speech.json (outside the web root: {"key":"...","region":"..."})
-// or the AZURE_SPEECH_KEY / AZURE_SPEECH_REGION environment variables exist. Same voice (el-GR-AthinaNeural), same
-// 24 kHz 48 kbps mp3, same answer shapes as below, so no caller changes. The REST API has no word timings, so
-// ?meta=1 returns an empty "words" list and the video worker falls back to its static captions.
-function azureSpeechConfig() {
-    $cfgFile = dirname(__DIR__) . '/azure_speech.json';
-    $cfg = is_file($cfgFile) ? json_decode((string) @file_get_contents($cfgFile), true) : null;
-    $key = is_array($cfg) && !empty($cfg['key']) ? (string) $cfg['key'] : (string) getenv('AZURE_SPEECH_KEY');
-    $region = is_array($cfg) && !empty($cfg['region']) ? (string) $cfg['region'] : (string) getenv('AZURE_SPEECH_REGION');
-    if ($key === '' || !preg_match('/^[a-z0-9-]{3,40}$/i', $region)) return null;
-    return array('key' => $key, 'region' => strtolower($region));
+// Microsoft changed the Edge "read aloud" handshake on 2026-10-13 (403 -> a Cloudflare 502 here), and the Azure
+// route needs a card, so the narration now comes from Gemini TTS with the key the site already holds for its
+// articles (GEMINI_API_KEY). ?engine=gemini = Gemini only, ?engine=edge = the Edge path below only. The video
+// worker (video-worker.php) passes the engine and the model explicitly and keeps ONE of each for a whole video,
+// so a render never changes voice halfway. Plain (no ?meta=1) requests without ?engine= keep the Edge path:
+// the browser callers (TikTokStudio.tsx, greekSpeechSynthesizer.ts) read the answer as 48 kbps mp3 and would
+// mis-measure a WAV.
+//
+// Measured 2026-10-16 on this key (free tier, no billing): the answer is 24 kHz mono 16-bit audio (WAV here), about
+// 15 characters of Greek per second, and every TTS model has its OWN allowance of 10 requests a day
+// (quotaId GenerateRequestsPerDayPerProjectPerModel-FreeTier), gemini-3.8-flash-tts also 3 a minute. That is
+// why there are four models below and why the worker picks one per video. A 429 comes back with
+// quota = "day" (this model is finished for today) or "minute" (wait retryAfter seconds).
+// The REST API has no word timings: ?meta=1 returns an empty "words" list, as the worker already copes with.
+const GEMINI_TTS_MODELS = array('gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts', 'gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts');
+const GEMINI_TTS_VOICE = 'Kore';
+
+function geminiTtsFail($info, $message) {
+    $code = isset($info['status']) ? (int) $info['status'] : 0;
+    http_response_code($code === 429 ? 429 : 502);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(array(
+        'error' => $message, 'engine' => 'gemini', 'upstreamStatus' => $code,
+        'quota' => isset($info['quota']) ? $info['quota'] : '', 'retryAfter' => isset($info['retryAfter']) ? (int) $info['retryAfter'] : 0,
+    ));
+    exit;
 }
 
-function azureSpeechSynthesize($cfg, $text, $voice, $rate) {
-    $safeText = htmlspecialchars($text, ENT_XML1 | ENT_QUOTES, 'UTF-8');
-    $safeVoice = htmlspecialchars($voice, ENT_QUOTES, 'UTF-8');
-    $safeRate = htmlspecialchars($rate, ENT_QUOTES, 'UTF-8');
-    $ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='el-GR'>"
-        . "<voice name='{$safeVoice}'><prosody rate='{$safeRate}'>{$safeText}</prosody></voice></speak>";
-    $ch = curl_init('https://' . $cfg['region'] . '.tts.speech.microsoft.com/cognitiveservices/v1');
+// Returns WAV bytes, or null with $info = array(status, quota, retryAfter) describing what went wrong.
+function geminiTtsSynthesize($text, $voiceName, $model, $timeout, &$info) {
+    $info = array('status' => 0, 'quota' => '', 'retryAfter' => 0);
+    $key = (string) getenv('GEMINI_API_KEY');
+    if ($key === '') return null;
+    $interactions = strpos($model, 'gemini-3.8') === 0;
+    if ($interactions) {
+        $url = 'https://generativelanguage.googleapis.com/v1beta/interactions';
+        $payload = array(
+            'model' => $model,
+            'input' => array(array('type' => 'user_input', 'content' => array(array('type' => 'text', 'text' => $text)))),
+            'response_format' => array('type' => 'audio'),
+            'generation_config' => array('speech_config' => array(array('voice' => $voiceName))),
+        );
+    } else {
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent';
+        $payload = array(
+            'contents' => array(array('parts' => array(array('text' => $text)))),
+            'generationConfig' => array(
+                'responseModalities' => array('AUDIO'),
+                'speechConfig' => array('voiceConfig' => array('prebuiltVoiceConfig' => array('voiceName' => $voiceName))),
+            ),
+        );
+    }
+    $ch = curl_init($url);
     curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => $ssml,
-        CURLOPT_TIMEOUT => 40,
-        CURLOPT_HTTPHEADER => array(
-            'Ocp-Apim-Subscription-Key: ' . $cfg['key'],
-            'Content-Type: application/ssml+xml',
-            'X-Microsoft-OutputFormat: audio-24khz-48kbitrate-mono-mp3',
-            'User-Agent: smartgarden.gr',
-        ),
+        CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE),
+        CURLOPT_TIMEOUT => $timeout,
+        CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-goog-api-key: ' . $key),
     ));
-    $audio = curl_exec($ch);
-    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $raw = curl_exec($ch);
+    $info['status'] = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    // Real MP3 starts with ID3 or a frame sync; an error body is JSON/text.
-    if ($code !== 200 || !is_string($audio) || strlen($audio) < 1500) return null;
-    $head = substr($audio, 0, 3);
-    if ($head !== 'ID3' && ord($head[0]) !== 0xFF) return null;
-    return $audio;
+    if (!is_string($raw)) { $info['status'] = 0; return null; }
+    if ($info['status'] === 429) {
+        $info['quota'] = strpos($raw, 'PerDay') !== false ? 'day' : 'minute';
+        if (preg_match('/retry in (?:(\d+)h)?(?:(\d+)m)?(\d+)(?:\.\d+)?s/i', $raw, $m)) {
+            $info['retryAfter'] = (int) $m[1] * 3600 + (int) $m[2] * 60 + (int) $m[3];
+        } elseif (preg_match('/"retryDelay":\s*"(\d+)s"/', $raw, $m)) {
+            $info['retryAfter'] = (int) $m[1];
+        }
+        return null;
+    }
+    if ($info['status'] !== 200) return null;
+    $j = json_decode($raw, true);
+    $audio = false;
+    if ($interactions) {
+        foreach ((array) ($j['steps'] ?? array()) as $step) {
+            foreach ((array) ($step['content'] ?? array()) as $part) {
+                if (($part['type'] ?? '') === 'audio' && !empty($part['data'])) $audio = base64_decode($part['data'], true);
+            }
+        }
+        // Already a WAV with its header.
+        if ($audio === false || strlen($audio) < 4800 || substr($audio, 0, 4) !== 'RIFF') { $info['status'] = 0; return null; }
+        $seconds = (strlen($audio) - 44) / 48000;
+        $wav = $audio;
+    } else {
+        $b64 = isset($j['candidates'][0]['content']['parts'][0]['inlineData']['data']) ? $j['candidates'][0]['content']['parts'][0]['inlineData']['data'] : '';
+        $pcm = $b64 !== '' ? base64_decode($b64, true) : false;
+        if ($pcm === false || strlen($pcm) < 4800) { $info['status'] = 0; return null; }
+        $seconds = strlen($pcm) / 48000;
+        $wav = 'RIFF' . pack('V', 36 + strlen($pcm)) . 'WAVEfmt ' . pack('VvvVVvv', 16, 1, 1, 24000, 48000, 2, 16)
+             . 'data' . pack('V', strlen($pcm)) . $pcm;
+    }
+    // Greek comes out at about 15 characters a second. Far from that means the model dropped or garbled
+    // the line (it does, now and then): refuse it so the caller asks again, rather than ship a clipped scene.
+    $rate = mb_strlen($text, 'UTF-8') / max(0.1, $seconds);
+    if ($rate < 8 || $rate > 24) { $info['status'] = 0; return null; }
+    return $wav;
 }
 
-$azureCfg = azureSpeechConfig();
-if ($azureCfg !== null) {
-    $azureAudio = azureSpeechSynthesize($azureCfg, $text, $voice, $rate);
-    if ($azureAudio !== null) {
+$engineParam = isset($_GET['engine']) ? strtolower(trim($_GET['engine'])) : 'auto';
+if ($engineParam !== 'edge' && ($engineParam === 'gemini' || $wantMeta) && getenv('GEMINI_API_KEY') !== false && getenv('GEMINI_API_KEY') !== '') {
+    $gVoice = isset($_GET['gvoice']) && preg_match('/^[A-Za-z]{3,20}$/', $_GET['gvoice']) ? $_GET['gvoice'] : GEMINI_TTS_VOICE;
+    $gModel = isset($_GET['gmodel']) && in_array($_GET['gmodel'], GEMINI_TTS_MODELS, true) ? $_GET['gmodel'] : GEMINI_TTS_MODELS[0];
+    $gInfo = array();
+    $gWav = geminiTtsSynthesize($text, $gVoice, $gModel, $engineParam === 'gemini' ? 45 : 25, $gInfo);
+    if ($gWav !== null) {
+        header('X-TTS-Engine: gemini');
         if ($wantMeta) {
             header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(array('success' => true, 'words' => array(), 'audioBase64' => base64_encode($azureAudio), 'engine' => 'azure'));
+            echo json_encode(array('success' => true, 'words' => array(), 'audioBase64' => base64_encode($gWav), 'engine' => 'gemini', 'model' => $gModel));
             exit;
         }
-        header('Content-Type: audio/mpeg');
-        header('Cache-Control: public, max-age=86400');
-        header('Content-Length: ' . strlen($azureAudio));
-        echo $azureAudio;
+        header('Content-Type: audio/wav');
+        header('Content-Length: ' . strlen($gWav));
+        echo $gWav;
         exit;
     }
-    // Azure answered with something unusable (quota, outage): fall through to the Edge path below.
+    if ($engineParam === 'gemini') geminiTtsFail($gInfo, ($gInfo['status'] ?? 0) === 429 ? 'Gemini TTS rate limit (' . $gModel . ')' : 'Gemini TTS returned nothing usable (' . $gModel . ')');
+    // auto: fall through to the Edge path below
 }
+if ($engineParam === 'gemini') geminiTtsFail(array('status' => 0), 'GEMINI_API_KEY is not configured');
 
 function edgeTtsFail($message) {
     http_response_code(502);
@@ -360,10 +423,12 @@ try {
             'success' => true,
             'words' => $words,
             'audioBase64' => base64_encode($audio),
+            'engine' => 'edge',
         ));
         exit;
     }
 
+    header('X-TTS-Engine: edge');
     header('Content-Type: audio/mpeg');
     header('Cache-Control: public, max-age=86400');
     header('Content-Length: ' . strlen($audio));

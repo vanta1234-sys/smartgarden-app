@@ -79,25 +79,110 @@ function sg_audio_decoded_duration($ffmpeg, $file) {
     return ((int) $last[1]) * 3600 + ((int) $last[2]) * 60 + (float) $last[3];
 }
 
+/** GET a URL and return the body (empty string on failure), with the HTTP status in $status. */
+function sg_http_get($url, $timeout, &$status) {
+    $ch = curl_init($url);
+    curl_setopt_array($ch, array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT => $timeout,
+        CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; SmartGardenBot/1.0; +https://smartgarden.gr)',
+    ));
+    $body = curl_exec($ch);
+    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    return is_string($body) ? $body : '';
+}
+
+/**
+ * The Gemini TTS models, in the order they are tried when a video starts. Each has its own free allowance of
+ * 10 requests a day (gemini-3.8-flash-tts also 3 a minute), so a model that has run out hands the next video
+ * to the next one. Within one video the model never changes: it is the voice.
+ */
+function sg_gemini_models() {
+    return array('gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts', 'gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts');
+}
+
+/**
+ * One scene of narration from Gemini, on a model chosen for the whole video.
+ * Returns true with the audio written to $dest; false when this model cannot do it (out for the day, or
+ * it kept failing). $dayOut is set when the model's daily allowance is gone.
+ */
+function sg_gemini_scene($clean, $dest, $model, $dir, &$dayOut) {
+    static $nextOk = array();
+    $dayOut = false;
+    $perMinuteGap = strpos($model, 'gemini-3.8') === 0 ? 21 : 7; // 3.8 flash: 3 requests a minute
+    for ($attempt = 0; $attempt < 5; $attempt++) {
+        $wait = (isset($nextOk[$model]) ? $nextOk[$model] : 0) - microtime(true);
+        if ($wait > 0) sleep((int) ceil($wait));
+        $started = microtime(true);
+        $url = 'https://smartgarden.gr/tts-edge.php?meta=1&engine=gemini&gmodel=' . rawurlencode($model) . '&text=' . rawurlencode($clean);
+        $status = 0;
+        $body = sg_http_get($url, 70, $status);
+        $decoded = json_decode($body, true);
+        if ($status === 200 && is_array($decoded) && !empty($decoded['audioBase64'])) {
+            $bytes = base64_decode($decoded['audioBase64'], true);
+            if ($bytes !== false && strlen($bytes) > 4000 && @file_put_contents($dest, $bytes)) {
+                // Spaced by the per-minute limit and, whatever that is, by 1.3 x the scene's own length:
+                // generation is faster than that and the free tier throttles on audio produced.
+                $nextOk[$model] = $started + max($perMinuteGap, 1.3 * (strlen($bytes) / 48000));
+                return true;
+            }
+        }
+        if ($status === 429 && is_array($decoded)) {
+            if (($decoded['quota'] ?? '') === 'day') { $dayOut = true; sg_log($dir, 'gemini ' . $model . ': daily allowance used up'); return false; }
+            $retry = (int) ($decoded['retryAfter'] ?? 0);
+            sg_log($dir, 'gemini ' . $model . ': rate limited, waiting ' . max(20, min(70, $retry ?: 40)) . 's');
+            sleep(max(20, min(70, $retry ?: 40)));
+            continue;
+        }
+        sg_log($dir, 'gemini ' . $model . ': attempt ' . ($attempt + 1) . ' gave nothing usable (HTTP ' . $status . ')');
+        sleep(5);
+    }
+    return false;
+}
+
 /**
  * Fetch Greek narration for one line.
  *
- * Edge's neural voice first (far better Greek), Google Translate TTS as the backstop.
- * Both are called over HTTP against our own endpoints rather than being included, because
- * both scripts write audio straight to the output buffer and exit.
+ * Engines: 'gemini' (Google's official TTS, free tier; the model is picked on the video's first scene and then
+ * kept), 'edge' (Microsoft Edge's neural voice, currently down), 'google' (Translate TTS, the old robotic
+ * voice). Both neural ones are reached through our own tts-edge.php, because it writes audio straight to the
+ * output buffer and exits.
+ *
+ * $only pins the engine: 'gemini', 'edge' or 'google'. null means "best available": Gemini, then Edge, then
+ * Google. The engine that actually answered is the return value, and the caller keeps every scene of a video on
+ * the same one. For Gemini the model is remembered in $GLOBALS['sg_gemini_model'] once one has answered.
  */
 function sg_fetch_tts($text, $dest, $dir, &$words = null, $only = null) {
     $words = array();
     $clean = trim(str_replace(array('«', '»'), '', $text));
 
-    // meta=1 returns the audio together with the time each word is spoken. Both have to
+    if ($only === null || $only === 'gemini') {
+        $pinned = isset($GLOBALS['sg_gemini_model']) ? $GLOBALS['sg_gemini_model'] : null;
+        $candidates = $pinned !== null ? array($pinned) : sg_gemini_models();
+        foreach ($candidates as $model) {
+            $dayOut = false;
+            if (sg_gemini_scene($clean, $dest, $model, $dir, $dayOut)) {
+                $GLOBALS['sg_gemini_model'] = $model;
+                if ($pinned === null) sg_log($dir, 'gemini model for this video: ' . $model);
+                return 'gemini';
+            }
+            // A model chosen for this video that fails mid-way is NOT swapped for another one (the voice would
+            // change); only before the first scene is there anything to choose between.
+            if ($pinned !== null) break;
+        }
+        if ($only === 'gemini') { @unlink($dest); return null; }
+    }
+
+    // meta=1 returns the audio together with the time each word is spoken (Edge only). Both have to
     // come from the same synthesis: asking twice would give timings for different audio.
-    $edgeMeta = 'https://smartgarden.gr/tts-edge.php?meta=1&voice=el-GR-AthinaNeural&text=' . rawurlencode($clean);
     $metaFile = $dest . '.json';
-    if ($only !== 'google' && sg_fetch_to_file($edgeMeta, $metaFile, 60)) {
-        $decoded = json_decode((string) @file_get_contents($metaFile), true);
-        @unlink($metaFile);
-        if (!empty($decoded['audioBase64'])) {
+    if ($only !== 'google' && $only !== 'gemini') {
+        $status = 0;
+        $body = sg_http_get('https://smartgarden.gr/tts-edge.php?meta=1&engine=edge&voice=el-GR-AthinaNeural&text=' . rawurlencode($clean), 60, $status);
+        $decoded = json_decode($body, true);
+        if ($status === 200 && !empty($decoded['audioBase64'])) {
             $bytes = base64_decode($decoded['audioBase64']);
             if ($bytes !== false && strlen($bytes) > 4000 && @file_put_contents($dest, $bytes)) {
                 $words = isset($decoded['words']) ? $decoded['words'] : array();
@@ -107,9 +192,9 @@ function sg_fetch_tts($text, $dest, $dir, &$words = null, $only = null) {
     }
     @unlink($metaFile);
 
-    // Plain audio, no timings — captions fall back to the static headline for this scene.
-    $edge = 'https://smartgarden.gr/tts-edge.php?voice=el-GR-AthinaNeural&text=' . rawurlencode($clean);
-    if ($only !== 'google' && sg_fetch_to_file($edge, $dest, 60) && filesize($dest) > 4000) {
+    // Plain audio, no timings (Edge only) — captions fall back to the static headline for this scene.
+    $edge = 'https://smartgarden.gr/tts-edge.php?voice=el-GR-AthinaNeural&engine=edge&text=' . rawurlencode($clean);
+    if ($only !== 'google' && $only !== 'gemini' && sg_fetch_to_file($edge, $dest, 60) && filesize($dest) > 4000) {
         // A 502 JSON error body would also be "a file"; real MP3 starts with ID3 or a frame sync.
         $head = (string) @file_get_contents($dest, false, null, 0, 3);
         if ($head === 'ID3' || (strlen($head) >= 2 && (ord($head[0]) === 0xFF))) {
@@ -119,7 +204,7 @@ function sg_fetch_tts($text, $dest, $dir, &$words = null, $only = null) {
     // In single-engine mode there is no fallback: a different voice halfway through a video is
     // worse than no video, so the caller retries or fails the job.
     if ($only === 'edge') { @unlink($dest); return null; }
-    sg_log($dir, 'edge TTS failed, falling back to Google for: ' . mb_substr($clean, 0, 40));
+    sg_log($dir, 'neural TTS failed (Gemini and Edge), falling back to Google for: ' . mb_substr($clean, 0, 40));
     @unlink($dest);
     // The whole line, not the first 190 characters of it. Google's own endpoint caps a
     // request at ~200 chars, but tts-greek.php already splits on clause boundaries and
@@ -135,7 +220,65 @@ function sg_fetch_tts($text, $dest, $dir, &$words = null, $only = null) {
     return null;
 }
 
+/**
+ * All the narration of a video, fetched BEFORE anything is encoded.
+ *
+ * One voice for the whole video, by construction: either every scene comes from the same Gemini model, or every
+ * scene from Edge. A Gemini model has only 10 free requests a day, so if one runs out part-way (or keeps failing)
+ * the scenes already fetched are dropped and the next model starts from scene one; the voice is never mixed. No
+ * Google Translate voice, ever: the owner rejected it, better no video than that one.
+ *
+ * Returns array('engine' => 'gemini'|'edge', 'words' => array(sceneIndex => word timings)) with
+ * scene{i}.mp3 written for every scene, or null when no neural voice could narrate the whole video.
+ */
+function sg_prefetch_narration($scenes, $dir) {
+    $n = count($scenes);
+    $clean = function ($t) { return trim(str_replace(array('«', '»'), '', (string) $t)); };
+    $drop = function () use ($n, $dir) { for ($k = 0; $k < $n; $k++) @unlink($dir . '/scene' . $k . '.mp3'); };
+
+    // Ten requests a day per model on the free tier: a video with more scenes than that cannot be narrated by Gemini at
+    // all, and trying would only burn today's allowance of every model (and tomorrow's Short would find them empty).
+    $geminiModels = $n <= 9 ? sg_gemini_models() : array();
+    if ($n > 9) sg_log($dir, 'voice: ' . $n . ' scenes is more than the free Gemini allowance of 10 requests a day, skipping Gemini');
+    foreach ($geminiModels as $model) {
+        $ok = true;
+        for ($i = 0; $i < $n; $i++) {
+            sg_status($dir, 'running', 4, 'Αφήγηση ' . ($i + 1) . ' από ' . $n . ' (' . $model . ')');
+            $dayOut = false;
+            if (!sg_gemini_scene($clean($scenes[$i]['voiceover']), $dir . '/scene' . $i . '.mp3', $model, $dir, $dayOut)) { $ok = false; break; }
+        }
+        if ($ok) {
+            sg_log($dir, 'voice: gemini model ' . $model . ' for all ' . $n . ' scenes');
+            return array('engine' => 'gemini', 'words' => array());
+        }
+        $drop();
+        sg_log($dir, 'voice: ' . $model . ' could not narrate the whole video' . (isset($i) ? ' (stopped at scene ' . $i . ')' : '') . ', trying the next model');
+    }
+
+    $words = array();
+    $ok = true;
+    for ($i = 0; $i < $n; $i++) {
+        sg_status($dir, 'running', 4, 'Αφήγηση ' . ($i + 1) . ' από ' . $n . ' (Edge)');
+        $dest = $dir . '/scene' . $i . '.mp3';
+        $got = null;
+        $w = array();
+        for ($try = 0; $try < 3 && $got !== 'edge'; $try++) {
+            if ($try > 0) sleep(6);
+            $got = sg_fetch_tts($clean($scenes[$i]['voiceover']), $dest, $dir, $w, 'edge');
+        }
+        if ($got !== 'edge') { $ok = false; break; }
+        $words[$i] = $w;
+    }
+    if ($ok) {
+        sg_log($dir, 'voice: edge for all ' . $n . ' scenes');
+        return array('engine' => 'edge', 'words' => $words);
+    }
+    $drop();
+    return null;
+}
+
 function sg_run_job($dir) {
+    unset($GLOBALS['sg_gemini_model']);
     $jobFile = $dir . '/job.json';
     if (!file_exists($jobFile)) { sg_status($dir, 'error', 0, 'job.json missing'); return; }
     $job = json_decode(file_get_contents($jobFile), true);
@@ -167,6 +310,15 @@ function sg_run_job($dir) {
     // who bounces because they cannot find the part they came for and one who jumps to it.
     // Only the render knows where the sections land, because only the render knows how long
     // each piece of narration turned out to be.
+    // The narration of the whole video first (see sg_prefetch_narration): one voice by construction, and a
+    // job that cannot get one fails here, in a minute, instead of after twenty minutes of encoding.
+    $narration = sg_prefetch_narration($scenes, $dir);
+    if ($narration === null) {
+        sg_log($dir, 'no neural voice (Gemini/Edge) could narrate the whole video, refusing to render with the Google voice');
+        sg_status($dir, 'error', 4, 'Καμία νευρωνική φωνή (Gemini/Edge) δεν ήταν διαθέσιμη: το βίντεο δεν παράγεται με την παλιά φωνή');
+        return;
+    }
+
     $chapters = array();
     $elapsed = 0.0;
     $lastChapter = null;
@@ -201,52 +353,8 @@ function sg_run_job($dir) {
         // Fetched before the overlay is drawn, because whether we got word timings decides
         // whether the overlay should leave room for them.
         $audio = $base . '.mp3';
-        $sceneWords = array();
-        $engine = sg_fetch_tts($scene['voiceover'], $audio, $dir, $sceneWords);
-        // One voice for the whole video. Each scene used to pick Edge or, if Edge was slow,
-        // Google, so a single render could change speaker halfway through: the mistake the owner
-        // has had to point out again and again. The first scene decides the engine and every
-        // later scene must come from the same one; Edge is retried before giving up, and if the
-        // engine still cannot be matched the job fails instead of publishing a mixed voice.
-        if (!isset($lockedEngine)) $lockedEngine = null;
-        if ($lockedEngine === null && $engine === 'google') {
-            // Into a side file: a failed single-engine fetch deletes its destination, which used to
-            // delete the Google narration just fetched and left the hook scene silent for 3 s
-            // (the lavender render of 2026-10-13, when Edge was down for a minute).
-            for ($try = 0; $try < 5 && $engine === 'google'; $try++) {
-                if ($try > 0) sleep(6); // Edge was down for about a minute once; a pause beats the slow voice
-                $retryFile = $audio . '.retry';
-                $retryWords = array();
-                $retry = sg_fetch_tts($scene['voiceover'], $retryFile, $dir, $retryWords, 'edge');
-                if ($retry === 'edge' && file_exists($retryFile)) {
-                    @unlink($audio);
-                    @rename($retryFile, $audio);
-                    $sceneWords = $retryWords;
-                    $engine = 'edge';
-                } else {
-                    @unlink($retryFile);
-                }
-            }
-        }
-        if ($lockedEngine === null && $engine !== 'edge') {
-            // The owner rejects the Google voice (old, slow): better no video than that one.
-            sg_log($dir, 'scene ' . $i . ': Edge voice unavailable after retries, refusing to render with ' . ($engine ?: 'no') . ' voice');
-            sg_status($dir, 'error', $pct, 'Η φωνή Edge δεν ήταν διαθέσιμη: το βίντεο δεν παράγεται με την παλιά φωνή');
-            return;
-        }
-        if ($lockedEngine === null) {
-            $lockedEngine = $engine;
-        } elseif ($engine !== $lockedEngine) {
-            for ($try = 0; $try < 3 && $engine !== $lockedEngine; $try++) {
-                @unlink($audio);
-                $engine = sg_fetch_tts($scene['voiceover'], $audio, $dir, $sceneWords, $lockedEngine);
-            }
-            if ($engine !== $lockedEngine) {
-                sg_log($dir, 'scene ' . $i . ': could not get the same voice (' . ($lockedEngine ?: 'none') . ') as the earlier scenes');
-                sg_status($dir, 'error', $pct, 'Η φωνή θα άλλαζε στη μέση του βίντεο (σκηνή ' . ($i + 1) . '): το βίντεο δεν παράγεται');
-                return;
-            }
-        }
+        $sceneWords = isset($narration['words'][$i]) ? $narration['words'][$i] : array();
+        $engine = $narration['engine'];
 
         // The CTA keeps its static caption: its narration says "Σμαρτ Γκάρντεν" phonetically
         // so the voice gets the brand right, and those words must never reach the screen.
