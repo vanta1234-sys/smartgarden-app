@@ -125,27 +125,57 @@ def align_end(sw, hw):
     return l.a + l.size, l.b + l.size
 
 
-def repair(wav, texts, cuts, dur, rounds=4):
+def fuzzy_find(needle, hay, start=0, need=4):
+    """Index in `hay` where most of the `needle` words (compared with a similarity of at least 0.72, since the transcription spells
+    words slightly differently every time) line up one after the other, or None."""
+    best = None
+    for p in range(max(0, start), max(0, len(hay) - 3)):
+        score = 0
+        for k, w in enumerate(needle):
+            if p + k < len(hay) and difflib.SequenceMatcher(None, w, hay[p + k]).ratio() >= 0.72: score += 1
+        if score >= need and (best is None or score > best[1]): best = (p, score)
+    return best[0] if best else None
+
+
+def repair(wav, texts, cuts, dur, rounds=6):
+    """Moves a cut only on evidence from the other side of it: words that open the NEXT scene turn up at the end of this scene's audio
+    (the cut is late by those words), or words that close THIS scene turn up at the start of the next scene's audio (it is early).
+    The move is the duration of those words, snapped to the nearest pause (never more than 12 s). A cut that flips direction between rounds
+    moves half as far; the best configuration seen is kept."""
     sil_all = silences(wav, dur, '-34', '0.05')
+    prev = {}; best = None
     for rnd in range(rounds):
         bounds = [0.0] + cuts + [dur]
         heard = [transcribe(wav, bounds[k], bounds[k + 1]) for k in range(len(texts))]
         if not all(heard): print('    (no transcript for some scene, keeping the cuts)'); return cuts, False
-        moves = []
+        hw = [norm_words(h) for h in heard]; sw = [norm_words(t) for t in texts]
+        moves = []; total = 0
         for j in range(len(cuts)):
-            sw, hw = norm_words(texts[j]), norm_words(heard[j])
-            us, uh = align_end(sw, hw)
-            extra, missing = len(hw) - uh, len(sw) - us
-            per_word = (bounds[j + 1] - bounds[j]) / max(1, len(hw))
-            if extra >= 3: moves.append((j, -extra * per_word))
-            elif missing >= 3: moves.append((j, missing * per_word))
+            seg_j = bounds[j + 1] - bounds[j]; seg_n = bounds[j + 2] - bounds[j + 1]
+            delta = 0.0
+            # late: the next scene's first words are inside this scene's audio, in its second half
+            late = fuzzy_find(sw[j + 1][:6], hw[j], int(0.4 * len(hw[j])))
+            if late is not None:
+                extra = len(hw[j]) - late; delta = -extra * seg_j / max(1, len(hw[j])); total += extra
+            else:
+                # early: this scene's last words are inside the next scene's audio, near its start
+                tail = sw[j][-8:]
+                early = fuzzy_find(tail[-6:], hw[j + 1][:max(14, len(hw[j + 1]) // 3)], 0)
+                if early is not None:
+                    missing = early + 6; delta = missing * seg_n / max(1, len(hw[j + 1])); total += missing
+            delta = max(-12.0, min(12.0, delta))
+            if delta:
+                if j in prev and prev[j] * delta < 0: delta /= 2
+                moves.append((j, delta))
+        if best is None or total < best[0]: best = (total, list(cuts))
         if not moves: return cuts, True
         print('    round', rnd, 'moves', [(j, round(d, 1)) for j, d in moves])
         for j, delta in moves:
+            prev[j] = delta
             target = cuts[j] + delta
-            cand = [s for s in sil_all if abs(s[3] - target) < 1.4 and (j == 0 or s[3] > cuts[j - 1] + 3) and (j == len(cuts) - 1 or s[3] < cuts[j + 1] - 3)]
+            cand = [s for s in sil_all if abs(s[3] - target) < 1.4 and s[3] > (cuts[j - 1] if j > 0 else 0.0) + 3 and (j == len(cuts) - 1 or s[3] < cuts[j + 1] - 3) and s[3] < dur - 3]
             if cand: cuts[j] = max(cand, key=lambda s: s[2] - 0.25 * abs(s[3] - target))[3]
-    return cuts, False
+    return best[1], best[0] <= 3
 
 
 def gemini_chunk(text, dest):
