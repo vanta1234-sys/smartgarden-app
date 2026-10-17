@@ -45,6 +45,7 @@ if (isset($_GET['healthcheck'])) {
         'success' => true,
         'articles' => count($arts),
         'previousDay' => sg_check_previous_day($arts, $root, $providedKey !== '' ? $providedKey : $VALID_KEYS[0], $notify),
+        'codeFiles' => sg_check_code_files(__DIR__, $notify),
     ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -8013,6 +8014,18 @@ if (SG_VIDEO_AUTOPUBLISH && !empty($newArticleObj['id'])) {
     $videoResp = json_decode((string) curl_exec($videoCh), true);
     curl_close($videoCh);
     if (!empty($videoResp['job'])) $videoJobId = $videoResp['job'];
+}
+
+// Daily self-checks, best effort and silent unless something is wrong (they only mail on a failure, at most once
+// per subject per 12 hours): did yesterday's article get its video, and is any code file on the server empty?
+// They had only ever been reachable through ?healthcheck=1, so nothing ran them.
+try {
+    $selfJobsRoot = is_dir(dirname(__DIR__) . '/video-jobs') ? dirname(__DIR__) . '/video-jobs' : __DIR__ . '/video-jobs';
+    $selfArticles = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true) ?: array();
+    @sg_check_previous_day($selfArticles, $selfJobsRoot, $videoKey, true);
+    @sg_check_code_files(__DIR__, true);
+} catch (Throwable $selfCheckError) {
+    // a monitoring problem must never fail the publish
 }
 
 // ==========================================

@@ -158,3 +158,31 @@ function sg_check_previous_day(array $articles, $jobsRoot, $cronKey, $notify = t
                  'duration' => $found['duration'] ?? null,
                  'youtube' => $found['publish']['youtube']['ok'] ?? null);
 }
+
+/**
+ * Is any code file on the server an empty file?
+ *
+ * On 2026-10-17 the host emptied video-inserts.php (and every byte-identical re-upload of it). Nothing noticed:
+ * the endpoint answered HTTP 200 with an empty body, so a long video would have lost its slides without a sound.
+ * A zero-byte PHP file is never legitimate, so this is a check with no thresholds to tune. Also looks at the two
+ * data files the whole site reads, which must never be empty either.
+ */
+function sg_check_code_files($dir, $notify = true) {
+    $empty = array();
+    $files = (array) glob(rtrim($dir, '/') . '/*.php');
+    foreach ($files as $f) {
+        if (@filesize($f) === 0) $empty[] = basename($f);
+    }
+    foreach (array('latest_articles.json', 'real-photos.json') as $j) {
+        $p = rtrim($dir, '/') . '/' . $j;
+        if (file_exists($p) && @filesize($p) < 100) $empty[] = $j;
+    }
+    if ($empty && $notify) {
+        sg_notify_failure('SmartGarden: αρχείο κώδικα άδειο στον server', array(
+            'Αυτά τα αρχεία έχουν μέγεθος μηδέν (ή σχεδόν μηδέν) και δεν πρέπει:',
+            '', implode("\n", $empty), '',
+            'Το πιο πιθανό είναι ότι ο hosting τα άδειασε μετά από μεταφόρτωση. Ξανά-ανέβασμα του ίδιου αρχείου δεν θα βοηθήσει: αλλάζει ένα byte (π.χ. μια γραμμή σχολίου) και ανεβάζεται ξανά.',
+        ));
+    }
+    return array('phpFilesChecked' => count($files), 'emptyFiles' => $empty, 'alerted' => (bool) ($empty && $notify));
+}
