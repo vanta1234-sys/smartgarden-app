@@ -6,7 +6,15 @@
     <atom:link href="https://smartgarden.gr/feed.xml" rel="self" type="application/rss+xml" />
     <description>Επιστημονικοί οδηγοί κηπουρικής για μπαλκόνι και κήπο -- φροντίδα φυτών, άρδευση, λαχανόκηπος και πολλά ακόμα.</description>
     <language>el-GR</language>
-    <lastBuildDate>Sat, 17 Oct 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 18 Oct 2026 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Αυτόματο Πότισμα Χωρίς Βρύση και Χωρίς Πρίζα: 5 Λύσεις που Δουλεύουν Πραγματικά</title>
+      <link>https://smartgarden.gr/article/aftomato-potisma-choris-vrysi-5-lyseis-20261018</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/aftomato-potisma-choris-vrysi-5-lyseis-20261018</guid>
+      <pubDate>Sun, 18 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Γιατί ο χρονοδιακόπτης της βρύσης δεν δουλεύει με δεξαμενή, πώς υπολογίζεις το νερό και τη δεξαμενή, και πέντε λύσεις: βαρύτητα με σταλάκτες χαμηλής πίεσης, αντλία 12 V με ηλιακό πάνελ, θρυαλλίδα, olla και αισθητήρας ESP32.</description>
+      <enclosure url="https://images.unsplash.com/photo-1659281608769-9af567d23294?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
     <item>
       <title>Πώς Ποτίζεις τα Φυτά του Μπαλκονιού όταν Λείπεις: 6 Μέθοδοι που Δουλεύουν Πραγματικά</title>
       <link>https://smartgarden.gr/article/potisma-fyton-otan-leipeis-diakopes-6-methodoi-20261017</link>
@@ -238,14 +246,6 @@
       <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
       <description>Πώς να πολλαπλασιάσετε φυτά δωρεάν με μοσχεύματα στελέχους. Σωστό σημείο κοπής, ριζοβολία σε νερό vs χώμα, ορμόνη ριζοβολίας και πότε χρειάζεται.</description>
       <enclosure url="https://images.unsplash.com/photo-1487700160041-babef9c3cb55?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
-    </item>
-    <item>
-      <title>Χριστουγεννιάτικα Φυτά: Αλεξανδρινό, Κάκτος Χριστουγέννων &amp; Καλανχόη</title>
-      <link>https://smartgarden.gr/article/xristougenniatika-fyta-alexandrino-kaktos-kalanchoe-20260909</link>
-      <guid isPermaLink="true">https://smartgarden.gr/article/xristougenniatika-fyta-alexandrino-kaktos-kalanchoe-20260909</guid>
-      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
-      <description>Φροντίδα των τριών πιο δημοφιλών χριστουγεννιάτικων φυτών: αλεξανδρινό (poinsettia), κάκτος Χριστουγέννων και καλανχόη. Πώς να τα κρατήσετε ζωντανά μετά τις γιορτές.</description>
-      <enclosure url="https://images.unsplash.com/photo-1759496330246-c2f8d23ae83d?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
     </item>
   </channel>
 </rss>
