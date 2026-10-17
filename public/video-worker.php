@@ -95,12 +95,14 @@ function sg_http_get($url, $timeout, &$status) {
 }
 
 /**
- * The Gemini TTS models, in the order they are tried when a video starts. Each has its own free allowance of
+ * The Gemini TTS models, in the order they are tried when a video starts. The first one is THE voice: the owner heard
+ * the 2026-10-16 test Short (gemini-3.8-flash-tts, Kore) and asked for every video to sound exactly like it; the others are
+ * only for the day that one has run out (the 3.8 lite model is the closest relative). Each has its own free allowance of
  * 10 requests a day (gemini-3.8-flash-tts also 3 a minute), so a model that has run out hands the next video
  * to the next one. Within one video the model never changes: it is the voice.
  */
 function sg_gemini_models() {
-    return array('gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts', 'gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts');
+    return array('gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts', 'gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts');
 }
 
 /**

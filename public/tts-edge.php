@@ -48,7 +48,7 @@ set_time_limit(50);
 // why there are four models below and why the worker picks one per video. A 429 comes back with
 // quota = "day" (this model is finished for today) or "minute" (wait retryAfter seconds).
 // The REST API has no word timings: ?meta=1 returns an empty "words" list, as the worker already copes with.
-const GEMINI_TTS_MODELS = array('gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts', 'gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts');
+const GEMINI_TTS_MODELS = array('gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts', 'gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts');
 const GEMINI_TTS_VOICE = 'Kore';
 
 function geminiTtsFail($info, $message) {
