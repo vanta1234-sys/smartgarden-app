@@ -1,6 +1,7 @@
 <?php
 /**
  * SmartGarden.gr — drop presentation slides into a finished long-form render.
+ * (Revision 2026-10-18: the host emptied the previous byte-identical copy of this file.)
  *
  * The slides REPLACE the picture for their stretch; the narration underneath keeps
  * playing. Cutting 30 seconds of silent slide into the timeline instead would push

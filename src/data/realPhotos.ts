@@ -312,5 +312,84 @@ export const REAL_PHOTOS: RealPhoto[] = [
       "κληματαρ"
     ],
     "source": "20260912_123106.jpg"
+  },
+  {
+    "file": "/photos/dipladenia-anthismeni-glastra.jpg",
+    "alt": "Δίπλαδένια με ροζ άνθη σε γλάστρα στο μπαλκόνι",
+    "match": [
+      "διπλαδεν",
+      "μαντεβιλ",
+      "mandevilla",
+      "dipladenia"
+    ],
+    "source": "balkoni-2026-10/dipladenia-anthismeni-glastra.jpg"
+  },
+  {
+    "file": "/photos/dipladenia-spalier.jpg",
+    "alt": "Δίπλαδένια που αναρριχάται σε καλάμια προς δικτυωτό στο μπαλκόνι",
+    "match": [
+      "διπλαδεν",
+      "μαντεβιλ",
+      "mandevilla",
+      "dipladenia"
+    ],
+    "source": "balkoni-2026-10/dipladenia-spalier.jpg",
+    "crop": "top"
+  },
+  {
+    "file": "/photos/dipladenia-balkoni-spalier.jpg",
+    "alt": "Ροζ άνθη δίπλαδένιας πάνω σε δικτυωτό μπαλκονιού",
+    "match": [
+      "διπλαδεν",
+      "μαντεβιλ",
+      "mandevilla",
+      "dipladenia"
+    ],
+    "source": "balkoni-2026-10/dipladenia-balkoni-spalier.jpg"
+  },
+  {
+    "file": "/photos/kolokasia-glastra.jpg",
+    "alt": "Κολοκάσια με μεγάλα φύλλα σε πήλινη γλάστρα στο μπαλκόνι",
+    "match": [
+      "κολοκασ",
+      "αλοκασ",
+      "colocasia",
+      "alocasia"
+    ],
+    "source": "balkoni-2026-10/kolokasia-glastra.jpg"
+  },
+  {
+    "file": "/photos/pachyfyta-balkoni.jpg",
+    "alt": "Παχύφυτα σε γλάστρες δίπλα στο κάγκελο του μπαλκονιού",
+    "match": [
+      "παχυφυτ"
+    ],
+    "source": "balkoni-2026-10/pachyfyta-balkoni.jpg"
+  },
+  {
+    "file": "/photos/koniforo-glastra.jpg",
+    "alt": "Κωνοφόρο σε μεγάλη πήλινη γλάστρα στο μπαλκόνι",
+    "match": [
+      "κωνοφορ"
+    ],
+    "source": "balkoni-2026-10/koniforo-glastra.jpg"
+  },
+  {
+    "file": "/photos/ferni-glastra-balkoni.jpg",
+    "alt": "Φτέρη σε γλάστρα σε σκιερή γωνιά του μπαλκονιού",
+    "match": [
+      "φτερη",
+      "φτερες"
+    ],
+    "source": "balkoni-2026-10/ferni-glastra-balkoni.jpg"
+  },
+  {
+    "file": "/photos/dracaena-esoteriko.jpg",
+    "alt": "Δράκαινα σε λευκή γλάστρα σε εσωτερικό χώρο",
+    "match": [
+      "δρακαιν",
+      "dracaena"
+    ],
+    "source": "balkoni-2026-10/dracaena-esoteriko.jpg"
   }
 ];

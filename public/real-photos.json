@@ -260,5 +260,76 @@
       "αμπελ",
       "κληματαρ"
     ]
+  },
+  {
+    "file": "/photos/dipladenia-anthismeni-glastra.jpg",
+    "alt": "Δίπλαδένια με ροζ άνθη σε γλάστρα στο μπαλκόνι",
+    "match": [
+      "διπλαδεν",
+      "μαντεβιλ",
+      "mandevilla",
+      "dipladenia"
+    ]
+  },
+  {
+    "file": "/photos/dipladenia-spalier.jpg",
+    "alt": "Δίπλαδένια που αναρριχάται σε καλάμια προς δικτυωτό στο μπαλκόνι",
+    "match": [
+      "διπλαδεν",
+      "μαντεβιλ",
+      "mandevilla",
+      "dipladenia"
+    ],
+    "crop": "top"
+  },
+  {
+    "file": "/photos/dipladenia-balkoni-spalier.jpg",
+    "alt": "Ροζ άνθη δίπλαδένιας πάνω σε δικτυωτό μπαλκονιού",
+    "match": [
+      "διπλαδεν",
+      "μαντεβιλ",
+      "mandevilla",
+      "dipladenia"
+    ]
+  },
+  {
+    "file": "/photos/kolokasia-glastra.jpg",
+    "alt": "Κολοκάσια με μεγάλα φύλλα σε πήλινη γλάστρα στο μπαλκόνι",
+    "match": [
+      "κολοκασ",
+      "αλοκασ",
+      "colocasia",
+      "alocasia"
+    ]
+  },
+  {
+    "file": "/photos/pachyfyta-balkoni.jpg",
+    "alt": "Παχύφυτα σε γλάστρες δίπλα στο κάγκελο του μπαλκονιού",
+    "match": [
+      "παχυφυτ"
+    ]
+  },
+  {
+    "file": "/photos/koniforo-glastra.jpg",
+    "alt": "Κωνοφόρο σε μεγάλη πήλινη γλάστρα στο μπαλκόνι",
+    "match": [
+      "κωνοφορ"
+    ]
+  },
+  {
+    "file": "/photos/ferni-glastra-balkoni.jpg",
+    "alt": "Φτέρη σε γλάστρα σε σκιερή γωνιά του μπαλκονιού",
+    "match": [
+      "φτερη",
+      "φτερες"
+    ]
+  },
+  {
+    "file": "/photos/dracaena-esoteriko.jpg",
+    "alt": "Δράκαινα σε λευκή γλάστρα σε εσωτερικό χώρο",
+    "match": [
+      "δρακαιν",
+      "dracaena"
+    ]
   }
 ]
