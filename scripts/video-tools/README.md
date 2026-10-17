@@ -1,0 +1,37 @@
+# Video and ops tooling
+
+These scripts used to live only in a temporary session folder, and a context reset once lost the slide-timing script. They are kept here
+so any later session can repeat the work. They were written to run from a scratch folder with `node_modules` (basic-ftp, php-parser) and
+Python with Pillow; paths inside them point at that layout, so copy a folder next to `node_modules` and adjust the few constants at the top.
+Nothing here is wired into the site build.
+
+## Making a long (about 16 minute) video, in order
+
+1. **Script**: `lemon/make_script_lemon.cjs` (also `garlic/make_script.cjs`, `lavender/make_script_lav.cjs`). Hand-written scenes
+   `[photo name, heading, spoken text]`. The builder refuses Latin letters, symbols (`( ) « » % + °`), scenes over 460 characters, the same
+   photo twice in a row and Unsplash+ photos. Output `<name>-long.json` goes to `public/video-scripts/` and to `/httpdocs/video-scripts/`.
+2. **Photos**: Unsplash search pages in the browser pane (the `/napi` API now answers with a bot check, do not script it), thumbnails with
+   curl, labelled contact sheets (`lemon/sheets.py`), look at every one. `cand_raw.txt` is the id list of each video.
+3. **Dry run**: `video-render.php?action=start&slug=..&mode=long&script=NAME&dry=1&full=1&key=..` (the server must see 53 scenes and distinct photos).
+4. **Slides**: `lemon/build_slides_lemon.py` + `slides_lemon_body.py` build twelve 1920x1080 PNGs from `garlic/slides_garlic.py` (machinery).
+   Preview over the photos with `lemon/preview_slides.py`. Upload to `public/_slides/` (new names for every new version: the overlay resumes by
+   spec and will not re-encode a changed PNG with an old name).
+5. **Render**: one job at a time (two at once die with exit 137). The Gemini narration needs about 14 requests of the 10-a-day-per-key allowance;
+   `lemon/start_after_reset.sh` waits for the 00:00 UTC reset. 53 scenes take about 25 minutes of narration and 35 of encoding.
+6. **After the render**: `lemon/post_render_lemon.cjs` computes the slide spec from the real scene starts, runs the overlay (restarting only
+   while it says "Κομμάτι", never during the join), downloads both versions and checks duration, audio md5 and motion under the slides.
+7. **Look at it** (contact sheet, listen) and only then, on the owner's word, `lemon/yt_upload_lemon.cjs` (private by default).
+   The token cannot change visibility; the owner does that in Studio.
+
+## Daily article pool
+
+`pool/build_pool.cjs` turns hand-written markdown into `topicPool` entries (nowdoc, CRLF) inside `public/cron-publish.php`; `proofread_fixes.py`
+shows how to patch both the markdown and the PHP with exact replacements. Check `cron-publish.php?shapes=1` (header `X-Cron-Key`) after a deploy.
+
+## Ops
+
+- `ops/compare_public.cjs`: dry compare of every top-level `public/` file against the live copy. Run before a full deploy.
+- `ops/bisect_zero.cjs`: uploads line ranges of a file under throw-away names to find what the host blanks (see memory video-inserts-zeroed).
+- `ops/upload_with_baseline.cjs`, `upload_files.cjs`, `ftp_put.cjs`: guarded single-file uploads (live must equal what we last uploaded / HEAD).
+- `ops/lint.cjs`: PHP syntax check without PHP (php-parser). Beware: backslashes in heredocs through the shell are halved; use `chr(92)` or an editor.
+- `ops/split_proto.py`: the prototype of the pace-based silence splitter now ported to PHP (`sg_split_points` in `public/video-worker.php`).
