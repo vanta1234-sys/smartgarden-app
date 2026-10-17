@@ -62,28 +62,38 @@ $payload = json_encode(array(
 ));
 
 $lastStatus = 0;
-foreach (array('gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest') as $model) {
-    foreach (asr_keys() as $apiKey) {
+$trace = array();
+@set_time_limit(115);
+// 3.1-flash-lite answers reliably (a 503 "overloaded" now and then, hence the retries); on 2026-10-18 the other two made the origin answer 502.
+$models = array('gemini-3.1-flash-lite', 'gemini-3.5-flash');
+if (is_array($in) && isset($in['model']) && in_array($in['model'], $models, true)) $models = array($in['model']);
+foreach ($models as $model) {
+    $keys = asr_keys();
+    for ($attempt = 0; $attempt < 8 && count($keys); $attempt++) {
+        $apiKey = $keys[$attempt % count($keys)];
+        if ($attempt > 0) usleep(1200000);
         $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent');
         curl_setopt_array($ch, array(
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 80,
+            CURLOPT_TIMEOUT => 45,
             CURLOPT_HTTPHEADER => array('Content-Type: application/json', 'x-goog-api-key: ' . $apiKey),
         ));
+        $t0 = microtime(true);
         $body = curl_exec($ch);
         $lastStatus = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+        $trace[] = $model . ':' . $lastStatus . ':' . round((microtime(true) - $t0) * 1000) . 'ms';
         $j = json_decode((string) $body, true);
         if ($lastStatus === 200 && isset($j['candidates'][0]['content']['parts'])) {
             $text = '';
             foreach ($j['candidates'][0]['content']['parts'] as $p) if (isset($p['text'])) $text .= $p['text'];
-            echo json_encode(array('success' => true, 'text' => trim($text), 'model' => $model), JSON_UNESCAPED_UNICODE);
+            echo json_encode(array('success' => true, 'text' => trim($text), 'model' => $model, 'trace' => $trace), JSON_UNESCAPED_UNICODE);
             exit;
         }
-        if ($lastStatus !== 429 && $lastStatus !== 403 && $lastStatus !== 503) break; // a real error: try the next model, not the next key
+        if ($lastStatus !== 429 && $lastStatus !== 403 && $lastStatus !== 503 && $lastStatus !== 500) break; // a real error: no point in retrying
     }
 }
-http_response_code(502);
-echo json_encode(array('success' => false, 'error' => 'no model answered', 'upstreamStatus' => $lastStatus));
+// 200 on purpose: Cloudflare replaces the body of an origin 502 with its own page, which hides the trace.
+echo json_encode(array('success' => false, 'error' => 'no model answered', 'upstreamStatus' => $lastStatus, 'trace' => $trace));

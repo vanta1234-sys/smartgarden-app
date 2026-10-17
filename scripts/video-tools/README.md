@@ -22,7 +22,7 @@ Nothing here is wired into the site build.
    transcription of the garlic video showed the guess one or two sentences late on one chunk (scenes 17-20). `ops/verify_narration.cjs` re-checks a
    finished render scene by scene.
 6. **Render**: one job at a time (two at once die with exit 137). The Gemini narration needs about 14 requests of the 10-a-day-per-key allowance;
-   `lemon/start_after_reset.sh` waits for the 00:00 UTC reset. 53 scenes take about 25 minutes of narration and 35 of encoding.
+   `lemon/start_lemon_prep.sh` waits for the day, prepares the narration (step 5) and starts the render. 53 scenes take about 25 minutes of narration and 35 of encoding.
 7. **After the render**: `lemon/post_render_lemon.cjs` computes the slide spec from the real scene starts, runs the overlay (restarting only
    while it says "Κομμάτι", never during the join), downloads both versions and checks duration, audio md5 and motion under the slides.
 8. **Look at it** (contact sheet, listen) and only then, on the owner's word, `lemon/yt_upload_lemon.cjs` (private by default).
