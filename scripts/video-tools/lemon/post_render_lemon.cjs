@@ -81,3 +81,12 @@ spawnSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', sl, '-vf', 'fps=1/46,scal
 const ok = Math.abs(dB - dS) < 0.5 && mB === mS && moving === 12;
 fs.writeFileSync(path.join(here, 'post_render_result.json'), JSON.stringify({ ok, job, baseDuration: dB, slidesDuration: dS, audioMd5Equal: mB === mS, moving, restarts, spec }, null, 1));
 say(ok ? 'ALL CHECKS PASSED' : 'CHECKS FAILED');
+
+// Word-level check of the narration: every scene's audio is transcribed (asr-check.php, Gemini) and compared with the script.
+// It is what shows whether the pause-matching cuts of the chunked narration fell on the right sentences.
+fs.writeFileSync(path.join(out, 'durs.json'), JSON.stringify(durs));
+say('verifying the narration scene by scene (about 10 minutes)...');
+const vr = spawnSync('node', ['C:/Users/me/Desktop/smartgarden.gr_fixed/scripts/video-tools/ops/verify_narration.cjs', base, path.join(out, 'durs.json'),
+  'C:/Users/me/Desktop/smartgarden.gr_fixed/public/video-scripts/lemonia-long.json', path.join(here, 'verify_result.json')], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+console.log((vr.stdout || '').split('\n').filter((l) => /suspicious|START\?|END\?|NO TEXT/.test(l)).join('\n'));
+say('narration check finished');
