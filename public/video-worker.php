@@ -113,6 +113,17 @@ function sg_gemini_models() {
 function sg_gemini_scene($clean, $dest, $model, $dir, &$dayOut) {
     static $nextOk = array();
     $dayOut = false;
+    // A line that was narrated before, by this model, is not asked for again: a re-render after a wording fix then
+    // costs one request per changed scene instead of one per scene, which matters when a model has 10 a day.
+    // Kept in video-jobs/_tts-cache (the 48-hour sweep of old job folders takes it too, after two days of no use).
+    $cacheDir = dirname($dir) . '/_tts-cache';
+    $cacheFile = $cacheDir . '/' . sha1($model . '|Kore|' . $clean) . '.wav';
+    if (is_file($cacheFile) && filesize($cacheFile) > 4000 && @copy($cacheFile, $dest)) {
+        @touch($cacheFile);
+        @touch($cacheDir);
+        sg_log($dir, 'gemini ' . $model . ': scene narration reused from the cache');
+        return true;
+    }
     $perMinuteGap = strpos($model, 'gemini-3.8') === 0 ? 21 : 7; // 3.8 flash: 3 requests a minute
     for ($attempt = 0; $attempt < 5; $attempt++) {
         $wait = (isset($nextOk[$model]) ? $nextOk[$model] : 0) - microtime(true);
@@ -128,6 +139,8 @@ function sg_gemini_scene($clean, $dest, $model, $dir, &$dayOut) {
                 // Spaced by the per-minute limit and, whatever that is, by 1.3 x the scene's own length:
                 // generation is faster than that and the free tier throttles on audio produced.
                 $nextOk[$model] = $started + max($perMinuteGap, 1.3 * (strlen($bytes) / 48000));
+                if (!is_dir($cacheDir)) @mkdir($cacheDir, 0755, true);
+                @file_put_contents($cacheFile, $bytes);
                 return true;
             }
         }

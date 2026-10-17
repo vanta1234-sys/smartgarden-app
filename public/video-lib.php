@@ -416,7 +416,7 @@ function sg_build_script($article) {
             // Short falls off a cliff and the payoff never gets seen.
             // Spoken only. The caption keeps "3-5", which reads correctly on screen; it is
             // just the synthesiser that needs the word.
-            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($contextSource, 120)))),
+            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_gender(sg_speak_ranges(sg_scene_line($contextSource, 120))))),
             'onScreenText' => $angle['problemText'],
             'step' => 0,
         ),
@@ -429,7 +429,7 @@ function sg_build_script($article) {
             'tag' => 'ΒΗΜΑ ' . ($i + 1),
             // No spoken "Πρώτον/Δεύτερον" any more: the numbered badge on screen already
             // says which step this is, and the word cost most of a second each time.
-            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_ranges(sg_scene_line($bullet, 120)))),
+            'voiceover' => sg_speak_elements(sg_speak_decimals(sg_speak_gender(sg_speak_ranges(sg_scene_line($bullet, 120))))),
             // Generous, because the renderer wraps to four lines and shrinks the type to fit.
             // Cutting at 95 chars put an ellipsis in the middle of most takeaways.
             'onScreenText' => sg_scene_line($bullet, 120),
@@ -494,6 +494,18 @@ function sg_speak_ranges($text) {
         '$1 έως $2',
         (string) $text
     );
+}
+
+/**
+ * "1 εβδομάδα" was read "ένα εβδομάδα" (2026-10-17, the owner heard it in the watering-while-away Short): the voice
+ * says the neuter "ένα" for a bare digit 1. Greek wants the feminine "μία" before the feminine nouns these guides
+ * are full of, and "1 έως 2 εβδομάδες" starts with the same wrong 1. Runs AFTER sg_speak_ranges, so a range is
+ * already "1 έως 2". Only the digit 1 is touched: 2 is "δύο" in every gender, and 3 and 4 were read correctly
+ * ("τρεις έως πέντε ημέρες"). The article text and the on-screen caption keep their digits.
+ */
+function sg_speak_gender($text) {
+    $fem = '(?:εβδομάδ|βδομάδ|ημέρ|μέρ|ώρ|φορ|δόσ|γλάστρ|νύχτ|ρίζ|χούφτ|ποσότητ|ποικιλ|σκελίδ|κεφαλ|λεπτ[ήη])';
+    return preg_replace('/(?<![\p{L}\p{N}.,\-])1(?=(?:\s+(?:έως|ή)\s+\d+)?\s+' . $fem . ')/u', 'μία', (string) $text);
 }
 
 /**
@@ -576,7 +588,7 @@ function sg_speech_text($md) {
         if (!preg_match('/[.!;:]$/u', $t)) $t .= '.';
         $out[] = $t;
     }
-    return sg_speak_elements(sg_speak_decimals(sg_speak_ranges(implode(' ', $out))));
+    return sg_speak_elements(sg_speak_decimals(sg_speak_gender(sg_speak_ranges(implode(' ', $out)))));
 }
 
 /**
