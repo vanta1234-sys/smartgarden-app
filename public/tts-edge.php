@@ -11,7 +11,8 @@
  * (Google Translate TTS) instead.
  */
 
-$text = isset($_GET['text']) ? trim($_GET['text']) : '';
+// POST for long narration: a 1,500-character Greek chunk is ~9 KB once URL-encoded, and the web server answers 414 beyond ~8 KB.
+$text = isset($_POST['text']) ? trim($_POST['text']) : (isset($_GET['text']) ? trim($_GET['text']) : '');
 $voice = isset($_GET['voice']) ? trim($_GET['voice']) : 'el-GR-AthinaNeural';
 $rate = isset($_GET['rate']) ? trim($_GET['rate']) : '+0%';
 // ?meta=1 returns JSON with per-word timings alongside the audio, for caption tracks.
@@ -175,7 +176,9 @@ if ($engineParam !== 'edge' && ($engineParam === 'gemini' || $wantMeta) && count
     $gVoice = isset($_GET['gvoice']) && preg_match('/^[A-Za-z]{3,20}$/', $_GET['gvoice']) ? $_GET['gvoice'] : GEMINI_TTS_VOICE;
     $gModel = isset($_GET['gmodel']) && in_array($_GET['gmodel'], GEMINI_TTS_MODELS, true) ? $_GET['gmodel'] : GEMINI_TTS_MODELS[0];
     $gInfo = array();
-    $gWav = geminiTtsSynthesize($text, $gVoice, $gModel, $engineParam === 'gemini' ? 45 : 25, $gInfo);
+    // A chunk of several scenes (long videos, ~1,300 characters) takes 30-45 s to generate; Cloudflare gives up on a request at 100 s.
+    if ($engineParam === 'gemini') set_time_limit(100);
+    $gWav = geminiTtsSynthesize($text, $gVoice, $gModel, $engineParam === 'gemini' ? 90 : 25, $gInfo);
     if ($gWav !== null) {
         header('X-TTS-Engine: gemini');
         if ($wantMeta) {

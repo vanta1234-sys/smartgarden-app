@@ -79,6 +79,22 @@ function sg_audio_decoded_duration($ffmpeg, $file) {
     return ((int) $last[1]) * 3600 + ((int) $last[2]) * 60 + (float) $last[3];
 }
 
+/** POST form fields and return the body (empty string on failure), with the HTTP status in $status. */
+function sg_http_post($url, $fields, $timeout, &$status) {
+    $ch = curl_init($url);
+    curl_setopt_array($ch, array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => http_build_query($fields),
+        CURLOPT_TIMEOUT => $timeout,
+        CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; SmartGardenBot/1.0; +https://smartgarden.gr)',
+    ));
+    $body = curl_exec($ch);
+    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    return is_string($body) ? $body : '';
+}
+
 /** GET a URL and return the body (empty string on failure), with the HTTP status in $status. */
 function sg_http_get($url, $timeout, &$status) {
     $ch = curl_init($url);
@@ -135,9 +151,10 @@ function sg_gemini_scene($clean, $dest, $model, $dir, &$dayOut) {
         $wait = (isset($nextOk[$model]) ? $nextOk[$model] : 0) - microtime(true);
         if ($wait > 0) sleep((int) ceil($wait));
         $started = microtime(true);
-        $url = 'https://smartgarden.gr/tts-edge.php?meta=1&engine=gemini&gmodel=' . rawurlencode($model) . '&text=' . rawurlencode($clean);
+        $url = 'https://smartgarden.gr/tts-edge.php?meta=1&engine=gemini&gmodel=' . rawurlencode($model);
         $status = 0;
-        $body = sg_http_get($url, 70, $status);
+        // POST: a chunk of several scenes does not fit in a URL. 100 s: Cloudflare cuts a request off at 100.
+        $body = sg_http_post($url, array('text' => $clean), 100, $status);
         $decoded = json_decode($body, true);
         if ($status === 200 && is_array($decoded) && !empty($decoded['audioBase64'])) {
             $bytes = base64_decode($decoded['audioBase64'], true);
@@ -242,6 +259,162 @@ function sg_fetch_tts($text, $dest, $dir, &$words = null, $only = null) {
 }
 
 /**
+ * Long videos: the narration of several scenes at a time.
+ *
+ * A Gemini model gives 10 free requests a day per Google project, and a 15-minute video has 50+ scenes, so
+ * consecutive scenes are narrated in ONE request (about 1,300 characters, a minute and a half of speech;
+ * 1,500 worked, 2,050 failed) and the audio is cut back into scenes afterwards.
+ *
+ * The cut points are silences. Greek is spoken at a fairly steady pace, but not an exact one, so the silences are not
+ * matched by position: every sentence is charged for how far its speed is from the chunk's average pace (a sentence
+ * cannot be faster than 24.5 or slower than 6.5 characters a second), a long pause earns a little, and the cheapest
+ * monotone assignment of silences to sentence ends wins. Checked on 2026-10-17 against four real chunks (one of
+ * 106 s, one of 127 s): every sentence came out between 9 and 17 characters a second.
+ */
+function sg_chunk_plan($scenes, $maxChars) {
+    $chunks = array();
+    $cur = array();
+    $len = 0;
+    foreach ($scenes as $i => $sc) {
+        $l = mb_strlen(trim((string) $sc['voiceover']), 'UTF-8') + 2;
+        if (count($cur) && $len + $l > $maxChars) { $chunks[] = $cur; $cur = array(); $len = 0; }
+        $cur[] = $i;
+        $len += $l;
+    }
+    if (count($cur)) $chunks[] = $cur;
+    return $chunks;
+}
+
+/** Silences of an audio file: array of array(start, end, duration, mid), away from the very start and end. */
+function sg_find_silences($ffmpeg, $wav, $duration) {
+    $cmd = escapeshellarg($ffmpeg) . ' -hide_banner -nostats -i ' . escapeshellarg($wav)
+         . ' -af silencedetect=n=-42dB:d=0.10 -f null - 2>&1';
+    $out = (string) @shell_exec($cmd);
+    preg_match_all('/silence_start: ([0-9.]+)/', $out, $st);
+    preg_match_all('/silence_end: ([0-9.]+) \| silence_duration: ([0-9.]+)/', $out, $en, PREG_SET_ORDER);
+    $sil = array();
+    foreach ($st[1] as $k => $s) {
+        if (!isset($en[$k])) continue;
+        $e = (float) $en[$k][1];
+        $d = (float) $en[$k][2];
+        $mid = ((float) $s + $e) / 2;
+        if ($mid > 0.4 && $mid < $duration - 0.4) $sil[] = array((float) $s, $e, $d, $mid);
+    }
+    return $sil;
+}
+
+/**
+ * The time at which each scene ends in the chunk audio, or null when no consistent split exists.
+ * $texts: the scenes' spoken texts in order. Returns array of cut times (one per scene boundary, count = scenes - 1).
+ */
+function sg_split_points($sil, $texts, $duration) {
+    $sent = array(); // array(sceneIndex, length)
+    foreach ($texts as $i => $t) {
+        foreach ((array) preg_split('/(?<=[.!;?])\s+/u', trim((string) $t), -1, PREG_SPLIT_NO_EMPTY) as $p) {
+            $p = trim($p);
+            if ($p !== '') $sent[] = array($i, mb_strlen($p, 'UTF-8'));
+        }
+    }
+    $S = count($sent);
+    $M = count($sil);
+    if ($S < 2 || $M < $S - 1) return null;
+    $total = 0;
+    foreach ($sent as $s) $total += $s[1];
+    $rbar = $total / max(0.1, $duration);
+    $INF = 1e18;
+    $trans = function ($k, $t0, $t1, $endSil) use ($sent, $rbar, $INF) {
+        $d = $t1 - $t0;
+        $len = $sent[$k][1];
+        if ($d <= 0 || $d < $len / 24.5 || $d > $len / 6.5) return $INF;
+        return abs(log(($len / $d) / $rbar)) - 0.6 * min($endSil, 0.7);
+    };
+    $f = array();
+    $back = array();
+    for ($k = 0; $k < $S - 1; $k++) { $f[$k] = array_fill(0, $M, $INF); $back[$k] = array_fill(0, $M, -1); }
+    for ($m = 0; $m < $M; $m++) $f[0][$m] = $trans(0, 0.0, $sil[$m][3], $sil[$m][2]);
+    for ($k = 1; $k < $S - 1; $k++) {
+        for ($m = 0; $m < $M; $m++) {
+            $best = $INF;
+            $bi = -1;
+            for ($m2 = 0; $m2 < $m; $m2++) {
+                if ($f[$k - 1][$m2] >= $INF) continue;
+                $c = $f[$k - 1][$m2] + $trans($k, $sil[$m2][3], $sil[$m][3], $sil[$m][2]);
+                if ($c < $best) { $best = $c; $bi = $m2; }
+            }
+            if ($bi >= 0) { $f[$k][$m] = $best; $back[$k][$m] = $bi; }
+        }
+    }
+    $bestTotal = $INF;
+    $bm = -1;
+    for ($m = 0; $m < $M; $m++) {
+        if ($f[$S - 2][$m] >= $INF) continue;
+        $c = $trans($S - 1, $sil[$m][3], $duration, 0.0);
+        if ($c >= $INF) continue;
+        if ($f[$S - 2][$m] + $c < $bestTotal) { $bestTotal = $f[$S - 2][$m] + $c; $bm = $m; }
+    }
+    if ($bm < 0) return null;
+    $pick = array_fill(0, $S - 1, 0);
+    $m = $bm;
+    for ($k = $S - 2; $k >= 0; $k--) { $pick[$k] = $m; $m = $back[$k][$m]; }
+    // sentence boundaries that are also scene boundaries
+    $cuts = array();
+    for ($k = 0; $k < $S - 1; $k++) {
+        if ($sent[$k][0] !== $sent[$k + 1][0]) $cuts[] = $sil[$pick[$k]][3];
+    }
+    return count($cuts) === count($texts) - 1 ? $cuts : null;
+}
+
+/**
+ * Narrate scenes $idx (indices into $scenes) with ONE request and write scene{i}.mp3 (WAV content, like the Shorts') for each.
+ * Returns true, or false when this model cannot (out for the day, or the audio does not split consistently).
+ */
+function sg_narrate_chunk($scenes, $idx, $dir, $model, $ffmpeg, $ffprobe, &$dayOut) {
+    $texts = array();
+    foreach ($idx as $i) $texts[] = trim(str_replace(array('«', '»'), '', (string) $scenes[$i]['voiceover']));
+    $wav = $dir . '/chunk_' . $idx[0] . '.wav';
+    if (!sg_gemini_scene(implode("
+
+", $texts), $wav, $model, $dir, $dayOut)) return false;
+    if (count($idx) === 1) { @rename($wav, $dir . '/scene' . $idx[0] . '.mp3'); return true; }
+    $duration = max(sg_duration($ffprobe, $wav), sg_audio_decoded_duration($ffmpeg, $wav));
+    $cuts = $duration > 1 ? sg_split_points(sg_find_silences($ffmpeg, $wav, $duration), $texts, $duration) : null;
+    if ($cuts === null) {
+        sg_log($dir, 'chunk at scene ' . $idx[0] . ': the audio does not split consistently into ' . count($idx) . ' scenes');
+        @unlink($wav);
+        return false;
+    }
+    $bounds = array_merge(array(0.0), $cuts, array($duration));
+    $total = 0;
+    foreach ($texts as $t) $total += mb_strlen($t, 'UTF-8');
+    $avg = $total / $duration;
+    // A scene whose pace is far from its chunk's was cut in the wrong place: better no video than narration that is a sentence off.
+    foreach ($idx as $n => $i) {
+        $rate = mb_strlen($texts[$n], 'UTF-8') / max(0.1, $bounds[$n + 1] - $bounds[$n]);
+        if ($rate < $avg * 0.5 || $rate > $avg * 1.5) {
+            sg_log($dir, sprintf('chunk at scene %d: scene %d would be %.1f chars/s against %.1f for the chunk, not trusting the cut', $idx[0], $i, $rate, $avg));
+            @unlink($wav);
+            return false;
+        }
+    }
+    foreach ($idx as $n => $i) {
+        $out = $dir . '/scene' . $i . '.mp3';
+        $cmd = escapeshellarg($ffmpeg) . ' -y -hide_banner -loglevel error -i ' . escapeshellarg($wav)
+             . ' -ss ' . sprintf('%.3f', $bounds[$n]) . ' -to ' . sprintf('%.3f', $bounds[$n + 1])
+             . ' -c:a pcm_s16le -f wav ' . escapeshellarg($out) . ' 2>&1';
+        @shell_exec($cmd);
+        if (!is_file($out) || filesize($out) < 4000) {
+            sg_log($dir, 'chunk at scene ' . $idx[0] . ': cutting scene ' . $i . ' failed');
+            @unlink($wav);
+            return false;
+        }
+        $secs = $bounds[$n + 1] - $bounds[$n];
+        sg_log($dir, sprintf('scene %d: %.1fs, %.1f chars/s (cut from a chunk of %d scenes)', $i, $secs, mb_strlen($texts[$n], 'UTF-8') / max(0.1, $secs), count($idx)));
+    }
+    @unlink($wav);
+    return true;
+}
+
+/**
  * All the narration of a video, fetched BEFORE anything is encoded.
  *
  * One voice for the whole video, by construction: either every scene comes from the same Gemini model, or every
@@ -252,29 +425,39 @@ function sg_fetch_tts($text, $dest, $dir, &$words = null, $only = null) {
  * Returns array('engine' => 'gemini'|'edge', 'words' => array(sceneIndex => word timings)) with
  * scene{i}.mp3 written for every scene, or null when no neural voice could narrate the whole video.
  */
-function sg_prefetch_narration($scenes, $dir) {
+function sg_prefetch_narration($scenes, $dir, $ffmpeg, $ffprobe) {
     $n = count($scenes);
     $clean = function ($t) { return trim(str_replace(array('«', '»'), '', (string) $t)); };
     $drop = function () use ($n, $dir) { for ($k = 0; $k < $n; $k++) @unlink($dir . '/scene' . $k . '.mp3'); };
 
-    // Ten requests a day per model on the free tier: a video with more scenes than that cannot be narrated by Gemini at
-    // all, and trying would only burn today's allowance of every model (and tomorrow's Short would find them empty).
-    $geminiModels = $n <= 9 ? sg_gemini_models() : array();
-    if ($n > 9) sg_log($dir, 'voice: ' . $n . ' scenes is more than the free Gemini allowance of 10 requests a day, skipping Gemini');
-    foreach ($geminiModels as $model) {
+    // Ten requests a day per model and key on the free tier. A Short (up to 9 scenes) asks for one scene at a time,
+    // which keeps every scene's timing exact. A longer video asks for about 1,400 characters (several scenes) per
+    // request and cuts the audio back into scenes at the pauses (sg_narrate_chunk): 12 requests for a 16-minute video.
+    $chunks = $n <= 9 ? null : sg_chunk_plan($scenes, 1400);
+    foreach (sg_gemini_models() as $model) {
         $ok = true;
-        for ($i = 0; $i < $n; $i++) {
-            sg_status($dir, 'running', 4, 'Αφήγηση ' . ($i + 1) . ' από ' . $n . ' (' . $model . ')');
-            $dayOut = false;
-            if (!sg_gemini_scene($clean($scenes[$i]['voiceover']), $dir . '/scene' . $i . '.mp3', $model, $dir, $dayOut)) { $ok = false; break; }
+        $stoppedAt = '';
+        if ($chunks === null) {
+            for ($i = 0; $i < $n; $i++) {
+                sg_status($dir, 'running', 4, 'Αφήγηση ' . ($i + 1) . ' από ' . $n . ' (' . $model . ')');
+                $dayOut = false;
+                if (!sg_gemini_scene($clean($scenes[$i]['voiceover']), $dir . '/scene' . $i . '.mp3', $model, $dir, $dayOut)) { $ok = false; $stoppedAt = 'scene ' . $i; break; }
+            }
+        } else {
+            foreach ($chunks as $c => $idx) {
+                sg_status($dir, 'running', 4, 'Αφήγηση: τμήμα ' . ($c + 1) . ' από ' . count($chunks) . ' (' . $model . ')');
+                $dayOut = false;
+                if (!sg_narrate_chunk($scenes, $idx, $dir, $model, $ffmpeg, $ffprobe, $dayOut)) { $ok = false; $stoppedAt = 'chunk ' . ($c + 1) . ' of ' . count($chunks) . ($dayOut ? ', daily allowance used up' : ''); break; }
+            }
         }
         if ($ok) {
-            sg_log($dir, 'voice: gemini model ' . $model . ' for all ' . $n . ' scenes');
+            sg_log($dir, 'voice: gemini model ' . $model . ' for all ' . $n . ' scenes' . ($chunks === null ? '' : ' (' . count($chunks) . ' requests)'));
             return array('engine' => 'gemini', 'words' => array());
         }
         $drop();
-        sg_log($dir, 'voice: ' . $model . ' could not narrate the whole video' . (isset($i) ? ' (stopped at scene ' . $i . ')' : '') . ', trying the next model');
+        sg_log($dir, 'voice: ' . $model . ' could not narrate the whole video (stopped at ' . $stoppedAt . '), trying the next model');
     }
+    // A long video has no Edge fallback worth the name today (Edge is down), but if it is back it narrates scene by scene as before.
 
     $words = array();
     $ok = true;
@@ -333,7 +516,7 @@ function sg_run_job($dir) {
     // each piece of narration turned out to be.
     // The narration of the whole video first (see sg_prefetch_narration): one voice by construction, and a
     // job that cannot get one fails here, in a minute, instead of after twenty minutes of encoding.
-    $narration = sg_prefetch_narration($scenes, $dir);
+    $narration = sg_prefetch_narration($scenes, $dir, $ffmpeg, $ffprobe);
     if ($narration === null) {
         sg_log($dir, 'no neural voice (Gemini/Edge) could narrate the whole video, refusing to render with the Google voice');
         sg_status($dir, 'error', 4, 'Καμία νευρωνική φωνή (Gemini/Edge) δεν ήταν διαθέσιμη: το βίντεο δεν παράγεται με την παλιά φωνή');
