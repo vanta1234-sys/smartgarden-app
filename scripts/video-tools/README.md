@@ -16,11 +16,16 @@ Nothing here is wired into the site build.
 4. **Slides**: `lemon/build_slides_lemon.py` + `slides_lemon_body.py` build twelve 1920x1080 PNGs from `garlic/slides_garlic.py` (machinery).
    Preview over the photos with `lemon/preview_slides.py`. Upload to `public/_slides/` (new names for every new version: the overlay resumes by
    spec and will not re-encode a changed PNG with an old name).
-5. **Render**: one job at a time (two at once die with exit 137). The Gemini narration needs about 14 requests of the 10-a-day-per-key allowance;
+5. **Narration first** (since 2026-10-18): `ops/narration_prep.py <script.json> --upload` asks Gemini for every ~1,400 character chunk (paced), cuts it into
+   scenes with the worker's pause-matching and then CHECKS every cut by transcribing each scene (`public/asr-check.php`), moving cuts that are words too
+   late or early. Audio and `<sha1>.cuts.json` go into the server cache; the worker uses the hint file instead of its own guess. Reason: the
+   transcription of the garlic video showed the guess one or two sentences late on one chunk (scenes 17-20). `ops/verify_narration.cjs` re-checks a
+   finished render scene by scene.
+6. **Render**: one job at a time (two at once die with exit 137). The Gemini narration needs about 14 requests of the 10-a-day-per-key allowance;
    `lemon/start_after_reset.sh` waits for the 00:00 UTC reset. 53 scenes take about 25 minutes of narration and 35 of encoding.
-6. **After the render**: `lemon/post_render_lemon.cjs` computes the slide spec from the real scene starts, runs the overlay (restarting only
+7. **After the render**: `lemon/post_render_lemon.cjs` computes the slide spec from the real scene starts, runs the overlay (restarting only
    while it says "Κομμάτι", never during the join), downloads both versions and checks duration, audio md5 and motion under the slides.
-7. **Look at it** (contact sheet, listen) and only then, on the owner's word, `lemon/yt_upload_lemon.cjs` (private by default).
+8. **Look at it** (contact sheet, listen) and only then, on the owner's word, `lemon/yt_upload_lemon.cjs` (private by default).
    The token cannot change visibility; the owner does that in Studio.
 
 ## Daily article pool

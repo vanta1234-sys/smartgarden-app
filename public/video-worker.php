@@ -372,12 +372,25 @@ function sg_narrate_chunk($scenes, $idx, $dir, $model, $ffmpeg, $ffprobe, &$dayO
     $texts = array();
     foreach ($idx as $i) $texts[] = trim(str_replace(array('«', '»'), '', (string) $scenes[$i]['voiceover']));
     $wav = $dir . '/chunk_' . $idx[0] . '.wav';
-    if (!sg_gemini_scene(implode("
-
-", $texts), $wav, $model, $dir, $dayOut)) return false;
+    $joined = implode("\n\n", $texts);
+    if (!sg_gemini_scene($joined, $wav, $model, $dir, $dayOut)) return false;
     if (count($idx) === 1) { @rename($wav, $dir . '/scene' . $idx[0] . '.mp3'); return true; }
     $duration = max(sg_duration($ffprobe, $wav), sg_audio_decoded_duration($ffmpeg, $wav));
-    $cuts = $duration > 1 ? sg_split_points(sg_find_silences($ffmpeg, $wav, $duration), $texts, $duration) : null;
+    // Cut points that were checked against what is actually heard (scripts/video-tools: repair.py + asr-check.php) sit beside the cached
+    // chunk audio as <hash>.cuts.json. The pause-matching below is right for most chunks, but on 2026-10-18 the transcription of the garlic
+    // video showed it one or two sentences late on a 4-scene chunk of numbered steps, and a hint file is how that is fixed without asking
+    // Gemini for the audio again.
+    $cuts = null;
+    $hintFile = dirname($dir) . '/_tts-cache/' . sha1($model . '|Kore|' . $joined) . '.cuts.json';
+    if (is_file($hintFile)) {
+        $hint = json_decode((string) @file_get_contents($hintFile), true);
+        if (is_array($hint) && isset($hint['cuts']) && count($hint['cuts']) === count($idx) - 1) {
+            $prev = 0.0; $okHint = true;
+            foreach ($hint['cuts'] as $c) { $c = (float) $c; if ($c <= $prev + 1.0 || $c >= $duration - 1.0) { $okHint = false; break; } $prev = $c; }
+            if ($okHint) { $cuts = array_map('floatval', $hint['cuts']); sg_log($dir, 'chunk at scene ' . $idx[0] . ': cut points taken from the checked hint file'); }
+        }
+    }
+    if ($cuts === null) $cuts = $duration > 1 ? sg_split_points(sg_find_silences($ffmpeg, $wav, $duration), $texts, $duration) : null;
     if ($cuts === null) {
         sg_log($dir, 'chunk at scene ' . $idx[0] . ': the audio does not split consistently into ' . count($idx) . ' scenes');
         @unlink($wav);
