@@ -59,6 +59,7 @@ function geminiTtsFail($info, $message) {
     echo json_encode(array(
         'error' => $message, 'engine' => 'gemini', 'upstreamStatus' => $code,
         'quota' => isset($info['quota']) ? $info['quota'] : '', 'retryAfter' => isset($info['retryAfter']) ? (int) $info['retryAfter'] : 0,
+        'detail' => isset($info['detail']) ? $info['detail'] : '',
     ));
     exit;
 }
@@ -143,7 +144,11 @@ function geminiTtsSynthesizeWithKey($key, $text, $voiceName, $model, $timeout, &
         $info['quota'] = (stripos($raw, 'per day') !== false || stripos($raw, 'PerDay') !== false || $info['retryAfter'] >= 900) ? 'day' : 'minute';
         return null;
     }
-    if ($info['status'] !== 200) return null;
+    if ($info['status'] !== 200) {
+        // what the API said (never the key: anything that looks like one is blanked), so a 400 is not a mystery
+        $info['detail'] = mb_substr(preg_replace('/AIza[0-9A-Za-z_-]{20,}/', '[key]', preg_replace('/\s+/', ' ', $raw)), 0, 260);
+        return null;
+    }
     $j = json_decode($raw, true);
     $audio = false;
     if ($interactions) {
