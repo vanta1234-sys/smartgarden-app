@@ -62,11 +62,45 @@ function geminiTtsFail($info, $message) {
     exit;
 }
 
+// Every Google project has its own free allowance (10 requests a day per model), so extra keys made in NEW projects
+// multiply it: GEMINI_API_KEY (the site's own), GEMINI_API_KEY_2.., and one key per line in /gemini_keys.txt above
+// the web root. A key whose allowance for this model is gone for the day hands over to the next one; the model, and
+// so the voice, stays the same.
+function geminiKeys() {
+    $keys = array();
+    foreach (array('GEMINI_API_KEY', 'GEMINI_API_KEY_2', 'GEMINI_API_KEY_3', 'GEMINI_API_KEY_4', 'GEMINI_API_KEY_5') as $name) {
+        $v = trim((string) getenv($name));
+        if ($v !== '') $keys[] = $v;
+    }
+    $file = dirname(__DIR__) . '/gemini_keys.txt';
+    if (is_file($file)) {
+        foreach ((array) file($file, FILE_IGNORE_NEW_LINES) as $line) {
+            $line = trim($line);
+            if ($line !== '' && $line[0] !== '#') $keys[] = $line;
+        }
+    }
+    return array_values(array_unique($keys));
+}
+
 // Returns WAV bytes, or null with $info = array(status, quota, retryAfter) describing what went wrong.
 function geminiTtsSynthesize($text, $voiceName, $model, $timeout, &$info) {
     $info = array('status' => 0, 'quota' => '', 'retryAfter' => 0);
-    $key = (string) getenv('GEMINI_API_KEY');
-    if ($key === '') return null;
+    $keys = geminiKeys();
+    if (!count($keys)) return null;
+    $dayOutEverywhere = true;
+    foreach ($keys as $key) {
+        $wav = geminiTtsSynthesizeWithKey($key, $text, $voiceName, $model, $timeout, $info);
+        if ($wav !== null) return $wav;
+        if ($info['status'] === 429 && $info['quota'] === 'day') continue; // this project is done for today: next key
+        $dayOutEverywhere = false;
+        break;
+    }
+    if ($dayOutEverywhere) { $info['status'] = 429; $info['quota'] = 'day'; }
+    return null;
+}
+
+function geminiTtsSynthesizeWithKey($key, $text, $voiceName, $model, $timeout, &$info) {
+    $info = array('status' => 0, 'quota' => '', 'retryAfter' => 0);
     $interactions = strpos($model, 'gemini-3.8') === 0;
     if ($interactions) {
         $url = 'https://generativelanguage.googleapis.com/v1beta/interactions';
@@ -99,12 +133,13 @@ function geminiTtsSynthesize($text, $voiceName, $model, $timeout, &$info) {
     curl_close($ch);
     if (!is_string($raw)) { $info['status'] = 0; return null; }
     if ($info['status'] === 429) {
-        $info['quota'] = strpos($raw, 'PerDay') !== false ? 'day' : 'minute';
         if (preg_match('/retry in (?:(\d+)h)?(?:(\d+)m)?(\d+)(?:\.\d+)?s/i', $raw, $m)) {
             $info['retryAfter'] = (int) $m[1] * 3600 + (int) $m[2] * 60 + (int) $m[3];
         } elseif (preg_match('/"retryDelay":\s*"(\d+)s"/', $raw, $m)) {
             $info['retryAfter'] = (int) $m[1];
         }
+        // "limit: 10 requests per day" (3.8 models) or quotaId ...PerDay... (older ones), or a wait of a quarter of an hour or more
+        $info['quota'] = (stripos($raw, 'per day') !== false || stripos($raw, 'PerDay') !== false || $info['retryAfter'] >= 900) ? 'day' : 'minute';
         return null;
     }
     if ($info['status'] !== 200) return null;
@@ -136,7 +171,7 @@ function geminiTtsSynthesize($text, $voiceName, $model, $timeout, &$info) {
 }
 
 $engineParam = isset($_GET['engine']) ? strtolower(trim($_GET['engine'])) : 'auto';
-if ($engineParam !== 'edge' && ($engineParam === 'gemini' || $wantMeta) && getenv('GEMINI_API_KEY') !== false && getenv('GEMINI_API_KEY') !== '') {
+if ($engineParam !== 'edge' && ($engineParam === 'gemini' || $wantMeta) && count(geminiKeys()) > 0) {
     $gVoice = isset($_GET['gvoice']) && preg_match('/^[A-Za-z]{3,20}$/', $_GET['gvoice']) ? $_GET['gvoice'] : GEMINI_TTS_VOICE;
     $gModel = isset($_GET['gmodel']) && in_array($_GET['gmodel'], GEMINI_TTS_MODELS, true) ? $_GET['gmodel'] : GEMINI_TTS_MODELS[0];
     $gInfo = array();

@@ -102,7 +102,13 @@ function sg_http_get($url, $timeout, &$status) {
  * to the next one. Within one video the model never changes: it is the voice.
  */
 function sg_gemini_models() {
-    return array('gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts', 'gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts');
+    // The owner wants every video in the voice of the 2026-10-16 test Short, and the other models sound different, so by default
+    // ONLY that model is used: when it is out for the day the video is not made (and the owner is told) rather than made in
+    // another voice. Set SG_TTS_ALLOW_OTHER_VOICES to true in notify.php to allow the others as a fallback.
+    if (defined('SG_TTS_ALLOW_OTHER_VOICES') && SG_TTS_ALLOW_OTHER_VOICES) {
+        return array('gemini-3.8-flash-tts', 'gemini-3.8-flash-lite-tts', 'gemini-3.1-flash-tts-preview', 'gemini-2.5-flash-preview-tts');
+    }
+    return array('gemini-3.8-flash-tts');
 }
 
 /**
