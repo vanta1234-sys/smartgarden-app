@@ -199,6 +199,13 @@ function sg_scene_line($text, $max) {
         if ($upto >= $max * 0.5) return mb_substr($t, 0, $upto, 'UTF-8');
     }
 
+    // A line only a little over the limit is kept whole instead of being cut mid-phrase. On 2026-10-17 a 122-character
+    // takeaway lost its last three words ("…θέλουν στάγδην ή άνθρωπο [που θα περάσει]") because the limit was 120, and
+    // what was left sounded like a sentence without being one. The scene runs a second longer; that is cheaper.
+    if (mb_strlen($t, 'UTF-8') <= (int) round($max * 1.3)) {
+        return preg_replace('/[\s,·;:\-—–]+$/u', '', rtrim($t, '.')) . '.';
+    }
+
     $cut = mb_substr($t, 0, $max, 'UTF-8');
     // Clause boundaries, in order of how cleanly they close a thought.
     foreach (array('—', '–', ':', ',') as $sep) {
