@@ -6,7 +6,15 @@
     <atom:link href="https://smartgarden.gr/feed.xml" rel="self" type="application/rss+xml" />
     <description>Επιστημονικοί οδηγοί κηπουρικής για μπαλκόνι και κήπο -- φροντίδα φυτών, άρδευση, λαχανόκηπος και πολλά ακόμα.</description>
     <language>el-GR</language>
-    <lastBuildDate>Fri, 16 Oct 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 17 Oct 2026 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Πώς Ποτίζεις τα Φυτά του Μπαλκονιού όταν Λείπεις: 6 Μέθοδοι που Δουλεύουν Πραγματικά</title>
+      <link>https://smartgarden.gr/article/potisma-fyton-otan-leipeis-diakopes-6-methodoi-20261017</link>
+      <guid isPermaLink="true">https://smartgarden.gr/article/potisma-fyton-otan-leipeis-diakopes-6-methodoi-20261017</guid>
+      <pubDate>Sat, 17 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Έξι μέθοδοι ποτίσματος για διακοπές, από βαθύ πότισμα με εδαφοκάλυψη μέχρι θρυαλλίδα, αυτοποτιζόμενες γλάστρες, olla και στάγδην με χρονοδιακόπτη, με υπολογισμό αποθέματος νερού και δοκιμή 7 ημερών.</description>
+      <enclosure url="https://images.unsplash.com/photo-1719871766569-622dabd367e0?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
+    </item>
     <item>
       <title>Βουκαμβίλια σε Γλάστρα: Φροντίδα, Κλάδεμα και Πώς Περνάει τον Χειμώνα</title>
       <link>https://smartgarden.gr/article/voukamvilia-se-glastra-frontida-kladema-ximonas-20261016</link>
@@ -238,14 +246,6 @@
       <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
       <description>Φροντίδα των τριών πιο δημοφιλών χριστουγεννιάτικων φυτών: αλεξανδρινό (poinsettia), κάκτος Χριστουγέννων και καλανχόη. Πώς να τα κρατήσετε ζωντανά μετά τις γιορτές.</description>
       <enclosure url="https://images.unsplash.com/photo-1759496330246-c2f8d23ae83d?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
-    </item>
-    <item>
-      <title>Τεστ Εδάφους στο Σπίτι: Υφή, pH &amp; Αποστράγγιση Χωρίς Εργαστήριο</title>
-      <link>https://smartgarden.gr/article/test-edafous-sto-spiti-pi-ipoifi-apostraggisi-20260909</link>
-      <guid isPermaLink="true">https://smartgarden.gr/article/test-edafous-sto-spiti-pi-ipoifi-apostraggisi-20260909</guid>
-      <pubDate>Wed, 09 Sep 2026 00:00:00 +0000</pubDate>
-      <description>Τρία απλά τεστ για να καταλάβετε τι χώμα έχετε, χωρίς εργαστήριο: το τεστ βάζου για υφή, το τεστ οξέος-βάσης για κατά προσέγγιση pH, και το τεστ αποστράγγισης.</description>
-      <enclosure url="https://images.unsplash.com/photo-1611843467160-25afb8df1074?w=1200&amp;auto=format&amp;fit=crop&amp;q=80" type="image/jpeg" />
     </item>
   </channel>
 </rss>
