@@ -36,7 +36,9 @@ if (!probe.trim()) { say('ABORT: video-inserts.php answers with an empty body (h
 const dry = JSON.parse(curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&dry=1', 90));
 if (!dry.success || (dry.inserts || []).length !== 12) { say('ABORT: dry run said', JSON.stringify(dry).slice(0, 200)); process.exit(5); }
 say('dry run ok: 12 inserts');
-curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&run=1', 100);
+{ let cur = null; try { cur = JSON.parse(curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&status=1', 60)); } catch (e) {}
+  if (cur && cur.state === 'running') say('overlay already running on the server:', cur.message);
+  else { try { curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&run=1', 100); } catch (e) { say('start call timed out (the overlay keeps running on the server)'); } } }
 
 // wait; restart (force=1, same spec) ONLY while the message says "Κομμάτι" and nothing moved for 4 minutes; never during the join
 const t0 = Date.now(); let last = '', restarts = 0, final = null;
@@ -49,7 +51,7 @@ while (Date.now() - t0 < 90 * 60000) {
     const age = s.updated ? Date.now() - Date.parse(s.updated) : 0, encoding = /Κομμάτι/.test(s.message || '');
     if (s.state === 'running' && encoding && age > 4 * 60000) {
       if (restarts >= 8) { say('too many restarts'); process.exit(7); }
-      restarts++; say('restart', restarts); curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&run=1&force=1', 100);
+      restarts++; say('restart', restarts); try { curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&run=1&force=1', 100); } catch (e) { say('restart call timed out (keeps running)'); }
     }
     if (s.state === 'running' && !encoding && age > 20 * 60000) { say('join stalled for 20 minutes'); process.exit(8); }
   }
