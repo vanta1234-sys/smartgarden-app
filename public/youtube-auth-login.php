@@ -35,6 +35,10 @@ $params = http_build_query([
         // screen, so one approval covers both. Asking twice means a second chance to
         // never get round to it.
         'https://www.googleapis.com/auth/webmasters.readonly',
+        // Added 2026-10-19 at the owner's request: lets videos.update change a video's visibility after the upload
+        // (youtube-set-status.php) and videos.delete work (youtube-delete.php, key-protected). Without it a Short
+        // uploaded private stayed private until the owner clicked in Studio.
+        'https://www.googleapis.com/auth/youtube.force-ssl',
     )),
     'state' => $state,
     // offline + consent (not just "select_account") is required to actually get a

@@ -10,9 +10,20 @@
  * wider grant. Written to confirm that empirically rather than guess.
  *
  * POST JSON: { videoId: "..." }
+ *
+ * Needs the cron key (X-Cron-Key header or ?key=): when the token is widened this file really deletes videos,
+ * so it must not answer anyone who finds the URL. Nothing in the pipeline calls it; use it only when the owner asks.
  */
 header('Content-Type: application/json; charset=utf-8');
 set_time_limit(60);
+
+$VALID_KEYS = array('smartgarden_cron_x7K9pQ2026', 'smartgarden_cron_secret_2026');
+$given = isset($_SERVER['HTTP_X_CRON_KEY']) ? $_SERVER['HTTP_X_CRON_KEY'] : (isset($_GET['key']) ? $_GET['key'] : '');
+if (!in_array($given, $VALID_KEYS, true)) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+    exit;
+}
 
 $clientId = getenv('YOUTUBE_CLIENT_ID') ?: '';
 $clientSecret = getenv('YOUTUBE_CLIENT_SECRET') ?: '';

@@ -53,9 +53,13 @@ file_put_contents(__DIR__ . '/youtube_tokens.json', json_encode([
     'access_token' => $data['access_token'],
     'refresh_token' => $data['refresh_token'] ?? null,
     'expires_at' => time() + (int)($data['expires_in'] ?? 3600),
+    // what Google actually granted: the consent screen lets the owner untick single permissions
+    'scope' => isset($data['scope']) ? $data['scope'] : null,
 ], JSON_PRETTY_PRINT));
 
-if (empty($data['refresh_token'])) {
+if (!empty($data['refresh_token']) && isset($data['scope']) && strpos($data['scope'], 'youtube.force-ssl') === false) {
+    echo '⚠️ Συνδέθηκε, αλλά δεν δόθηκε η άδεια «Προβολή, επεξεργασία και διαγραφή βίντεο» (youtube.force-ssl). Άνοιξε ξανά το login link και άφησε όλα τα πλαίσια τσεκαρισμένα.';
+} elseif (empty($data['refresh_token'])) {
     echo '⚠️ Συνδέθηκε, αλλά δεν επιστράφηκε refresh token και δεν υπήρχε ήδη αποθηκευμένο. Πήγαινε στο <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>, αφαίρεσε την πρόσβαση του SmartGarden app, και ξαναδοκίμασε το login link από την αρχή.';
 } else {
     echo '✅ Ο λογαριασμός YouTube συνδέθηκε επιτυχώς! Μπορείς να κλείσεις αυτή την καρτέλα.';
