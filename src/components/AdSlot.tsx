@@ -54,8 +54,19 @@ export const AdSlot: React.FC<AdSlotProps> = ({ slot, label = 'Διαφήμισ�
 
   if (!slot) return null;
 
+  // 2026-10-20: AdSense gives this unit a fixed height (280px) the moment it is pushed, whether or not it ever finds an ad, and on this site it has so
+  // far never filled: every article carried two empty white blocks, one above the text and one below it. Until the unit really holds an ad
+  // the wrapper therefore takes NO space at all (height 0, clipped). The <ins> inside keeps its width, so AdSense can still measure and fill it,
+  // and the block opens by itself the moment data-ad-status says "filled".
+  const collapsed = !filled;
+
   return (
-    <div className={`my-6 ${className}`} hidden={unfilled}>
+    <div
+      className={collapsed ? className : `my-6 ${className}`}
+      style={collapsed ? { height: 0, overflow: 'hidden', margin: 0 } : undefined}
+      aria-hidden={collapsed}
+      hidden={unfilled}
+    >
       <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1" hidden={!filled}>{label}</div>
       <ins
         ref={insRef}

@@ -270,7 +270,7 @@
 .sg-prose li::marker { color: var(--accent); }
 .sg-prose .sg-sep { height: 2em; }
 .sg-prose figure { margin: 2em 0; }
-.sg-prose figure img { display: block; width: 100%; height: auto; border-radius: 0; border: 0; }
+.sg-prose figure img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 0; border: 0; background: var(--paper-2); }
 .sg-prose figcaption { margin-top: 8px; font-size: 0.9375rem; line-height: 1.45; color: var(--muted); }
 .sg-prose .sg-table { margin: 1.6em 0; overflow-x: auto; background: var(--paper-2); }
 .sg-prose table { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: 1rem; line-height: 1.45; }
