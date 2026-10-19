@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Περιγραφές TikTok</title>
+<style>
+  :root { --bg: #f6f8f4; --card: #ffffff; --ink: #1d2a1d; --muted: #5d6b5d; --line: #d6dfd2; --brand: #1e5f3a; --brand-ink: #ffffff; --ok: #0b6b2e; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #121812; --card: #1b241b; --ink: #e8efe6; --muted: #9fb09f; --line: #2f3d2f; --brand: #4cae72; --brand-ink: #0c1a10; --ok: #7fd89c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 1.4rem; margin: 4px 0 6px; }
+  .how { color: var(--muted); margin: 0 0 20px; }
+  .how ol { margin: 8px 0 0; padding-left: 1.3em; }
+  article { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin: 0 0 16px; }
+  h2 { font-size: 1rem; margin: 0 0 2px; line-height: 1.35; }
+  .date { color: var(--muted); font-size: .85rem; margin: 0 0 10px; }
+  textarea { width: 100%; min-height: 9.5em; resize: vertical; font: inherit; font-size: .92rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+  button { display: block; width: 100%; margin-top: 10px; min-height: 52px; font: inherit; font-weight: 600; color: var(--brand-ink); background: var(--brand); border: 0; border-radius: 12px; cursor: pointer; }
+  button.done { background: var(--ok); }
+  #msg { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Περιγραφές για το TikTok</h1>
+  <div class="how">
+    Πάτα <b>Αντιγραφή</b> και μετά άνοιξε το TikTok → Εισερχόμενα → το βίντεο → πάτησε στο πεδίο περιγραφής, κράτα πατημένο και διάλεξε <b>Επικόλληση</b> → Post.
+  </div>
+  <div id="list"><p id="msg">Φορτώνει…</p></div>
+</main>
+<script>
+(function () {
+  var HASHTAGS = '#smartgarden #plants #gardening #gardentips #balconygarden #fyp #foryou #foryoupage #viralgreece #fygr #φυτα #μπαλκονι #κηπουρικη #λουλουδια #αθηνα';
+  // same wording the video worker puts in a held job: title without ( ) and :, then the article link, then the hashtags
+  function caption(a) {
+    var title = String((a.title && a.title.el) || a.title || '').replace(/[():]/g, '').replace(/\s+/g, ' ').trim();
+    return '🌿 ' + title + ' | Μυστικά & Tips για το Μπαλκόνι!\n👇 Διαβάστε τον πλήρη επιστημονικό οδηγό στο: https://smartgarden.gr/article/' + a.slug + '\n\n' + HASHTAGS;
+  }
+  function copy(ta, btn) {
+    var ok = function () { btn.textContent = '✓ Αντιγράφηκε'; btn.className = 'done'; setTimeout(function () { btn.textContent = 'Αντιγραφή περιγραφής'; btn.className = ''; }, 2500); };
+    // if the browser refuses to copy, the text stays selected and the button says what to do by hand
+    var fail = function () { btn.textContent = 'Κράτα πατημένο στο κείμενο → Αντιγραφή'; setTimeout(function () { btn.textContent = 'Αντιγραφή περιγραφής'; }, 6000); };
+    var legacy = function () { var good = false; try { good = document.execCommand('copy'); } catch (e) {} if (good) ok(); else fail(); };
+    ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(ok, legacy);
+    else legacy();
+  }
+  fetch('/articles-index.php', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (arts) {
+    var box = document.getElementById('list'); box.innerHTML = '';
+    arts.slice(0, 10).forEach(function (a) {
+      var el = document.createElement('article');
+      var h = document.createElement('h2'); h.textContent = (a.title && a.title.el) || a.slug;
+      var df = a.dateFormatted;
+      var d = document.createElement('p'); d.className = 'date'; d.textContent = (df && typeof df === 'object' ? df.el : df) || a.date || '';
+      var ta = document.createElement('textarea'); ta.readOnly = true; ta.value = caption(a);
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = 'Αντιγραφή περιγραφής';
+      b.addEventListener('click', function () { copy(ta, b); });
+      el.appendChild(h); el.appendChild(d); el.appendChild(ta); el.appendChild(b); box.appendChild(el);
+      ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight + 4) + 'px'; // show the whole caption, no inner scrolling
+    });
+  }).catch(function () { document.getElementById('msg').textContent = 'Δεν φόρτωσε η λίστα. Δοκίμασε ξανά σε λίγο.'; });
+})();
+</script>
+</body>
+</html>
