@@ -21,6 +21,18 @@ if (!in_array($given, $VALID_KEYS, true)) {
     exit;
 }
 
+// A second secret that exists only on the server (above the web root) and in the owner's git-ignored .env.deploy:
+// the cron key above is written in files of a PUBLIC repository, so on its own it must not be able to change a video's visibility.
+// Send it as the X-YT-Admin header. Fails closed when the secret file is missing.
+$adminSecretFile = dirname(__DIR__) . '/yt_admin_secret.txt';
+$adminSecret = is_file($adminSecretFile) ? trim((string) @file_get_contents($adminSecretFile)) : '';
+$adminGiven = isset($_SERVER['HTTP_X_YT_ADMIN']) ? (string) $_SERVER['HTTP_X_YT_ADMIN'] : '';
+if ($adminSecret === '' || !hash_equals($adminSecret, $adminGiven)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Forbidden']);
+    exit;
+}
+
 $clientId = getenv('YOUTUBE_CLIENT_ID') ?: '';
 $clientSecret = getenv('YOUTUBE_CLIENT_SECRET') ?: '';
 $tokensPath = __DIR__ . '/youtube_tokens.json';
@@ -91,6 +103,8 @@ foreach (array('embeddable', 'license', 'publicStatsViewable', 'selfDeclaredMade
     if (isset($curResp['items'][0]['status'][$field])) $keep[$field] = $curResp['items'][0]['status'][$field];
 }
 $keep['privacyStatus'] = $privacyStatus;
+// a scheduled video that is re-saved as private keeps its schedule; making it public or unlisted now ends the schedule
+if ($privacyStatus === 'private' && !empty($curResp['items'][0]['status']['publishAt'])) $keep['publishAt'] = $curResp['items'][0]['status']['publishAt'];
 
 $updateCh = curl_init('https://www.googleapis.com/youtube/v3/videos?part=status');
 curl_setopt_array($updateCh, [
