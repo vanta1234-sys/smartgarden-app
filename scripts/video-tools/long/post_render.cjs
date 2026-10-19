@@ -1,10 +1,20 @@
-// After the lavender long render is done: slide timings from the real scene starts, overlay run (restart only while encoding pieces),
-// download of both versions, checks (duration, audio md5, motion under slides) and contact sheets. NEVER uploads to YouTube.
-// usage: node post_render_lav.cjs        (reads job_lav.txt in this folder; progress in post_render.log by the caller)
+// After a long (about 16 minute) render is done: slide timings from the real scene starts, overlay run (restart only while encoding pieces),
+// download of both versions, checks (duration, audio md5, motion under the slides), contact sheets and a word-level check of the narration.
+// NEVER uploads to YouTube.
+//
+// usage (cwd = the run folder, where the job file, out/ and the results live):
+//   node post_render.cjs <config.json> [--dry]
+// --dry stops after the slide spec and the overlay dry run (nothing is started on the server).
+// The per-video facts (scene count, which scenes each slide covers, file names) are in the config, see lemon/lemon.config.json.
 const fs = require('fs'), path = require('path'), { execSync, spawnSync } = require('child_process');
-const here = __dirname;
+const cfgFile = process.argv[2];
+if (!cfgFile) { console.log('usage: node post_render.cjs <config.json> [--dry]'); process.exit(1); }
+const cfg = JSON.parse(fs.readFileSync(cfgFile, 'utf8'));
+const dry = process.argv.includes('--dry');
+const here = process.cwd();
+const repo = path.join(__dirname, '..', '..', '..');
 const K = 'smartgarden_cron_x7K9pQ2026';
-const job = fs.readFileSync(path.join(here, 'job_lav.txt'), 'utf8').trim();
+const job = fs.readFileSync(path.join(here, cfg.jobFile || ('job_' + cfg.name + '.txt')), 'utf8').trim();
 const out = path.join(here, 'out'); fs.mkdirSync(out, { recursive: true });
 const curl = (url, t = 120) => execSync('curl -s -m ' + t + ' "' + url + '"', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
 const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
@@ -19,23 +29,24 @@ const durs = []; const engines = new Set(); const rates = [];
 });
 say('scenes', durs.length, 'engines', [...engines].join(','), 'duration', st.duration, 'chunk rates min/max',
   Math.min(...rates.filter(Boolean)), Math.max(...rates.filter(Boolean)));
-if (durs.length !== 52 || durs.some((d) => !(d > 0)) || engines.size !== 1 || !engines.has('gemini')) { say('ABORT: unexpected narration result'); process.exit(3); }
+if (durs.length !== cfg.scenes || durs.some((d) => !(d > 0)) || engines.size !== 1 || !engines.has('gemini')) { say('ABORT: unexpected narration result'); process.exit(3); }
 const starts = []; let t = 0; durs.forEach((d) => { starts.push(t); t += d; });
 
-// slide -> first and last scene it covers (checked against the script text)
-const HOLDS = [['levanta-01', 2, 4], ['levanta-02', 5, 8], ['levanta-03', 11, 13], ['levanta-04', 15, 18], ['levanta-05', 19, 21], ['levanta-06', 25, 27],
-  ['levanta-07', 30, 32], ['levanta-08', 34, 36], ['levanta-09', 37, 39], ['levanta-10', 40, 42], ['levanta-11', 43, 45], ['levanta-12', 50, 50]];
+// slide -> first and last scene it covers (checked against the script text when the config was written)
 let cov = 0;
-const spec = HOLDS.map(([n, a, b]) => { const s = starts[a] + 0.06, e = starts[b] + durs[b] + 0.06; cov += e - s; return n + ':' + s.toFixed(2) + ':' + (e - s).toFixed(2); }).join(',');
-fs.writeFileSync(path.join(here, 'spec_lav.txt'), spec);
+const spec = cfg.holds.map(([n, a, b]) => { const s = starts[a] + 0.06, e = starts[b] + durs[b] + 0.06; cov += e - s; return n + ':' + s.toFixed(2) + ':' + (e - s).toFixed(2); }).join(',');
+fs.writeFileSync(path.join(here, 'spec_' + cfg.name + '.txt'), spec);
 say('slide spec covers', Math.round(cov), 's of', Math.round(t), 's');
 
 // the endpoint must not be the empty file the host once left behind
 const probe = curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&status=1', 60);
 if (!probe.trim()) { say('ABORT: video-inserts.php answers with an empty body (host blanked it again?)'); process.exit(4); }
-const dry = JSON.parse(curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&dry=1', 90));
-if (!dry.success || (dry.inserts || []).length !== 12) { say('ABORT: dry run said', JSON.stringify(dry).slice(0, 200)); process.exit(5); }
-say('dry run ok: 12 inserts');
+const dryRun = JSON.parse(curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&dry=1', 90));
+if (!dryRun.success || (dryRun.inserts || []).length !== cfg.holds.length) { say('ABORT: dry run said', JSON.stringify(dryRun).slice(0, 200)); process.exit(5); }
+say('dry run ok:', cfg.holds.length, 'inserts');
+if (dry) { say('--dry: stopping before the overlay is started'); process.exit(0); }
+
+// The start call can time out at 100 s while the work carries on at the server: look first, and never start a second run beside a running one.
 { let cur = null; try { cur = JSON.parse(curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&status=1', 60)); } catch (e) {}
   if (cur && cur.state === 'running') say('overlay already running on the server:', cur.message);
   else { try { curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&run=1', 100); } catch (e) { say('start call timed out (the overlay keeps running on the server)'); } } }
@@ -51,7 +62,8 @@ while (Date.now() - t0 < 90 * 60000) {
     const age = s.updated ? Date.now() - Date.parse(s.updated) : 0, encoding = /Κομμάτι/.test(s.message || '');
     if (s.state === 'running' && encoding && age > 4 * 60000) {
       if (restarts >= 8) { say('too many restarts'); process.exit(7); }
-      restarts++; say('restart', restarts); try { curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&run=1&force=1', 100); } catch (e) { say('restart call timed out (keeps running)'); }
+      restarts++; say('restart', restarts);
+      try { curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&run=1&force=1', 100); } catch (e) { say('restart call timed out (keeps running)'); }
     }
     if (s.state === 'running' && !encoding && age > 20 * 60000) { say('join stalled for 20 minutes'); process.exit(8); }
   }
@@ -60,7 +72,7 @@ while (Date.now() - t0 < 90 * 60000) {
 if (!final) { say('overlay timeout'); process.exit(9); }
 say('overlay done:', JSON.stringify(final).slice(0, 200));
 
-const base = path.join(out, 'lav_base.mp4'), sl = path.join(out, 'lav_slides.mp4');
+const base = path.join(out, cfg.name + '_base.mp4'), sl = path.join(out, cfg.name + '_slides.mp4');
 execSync('curl -s -m 900 -o "' + base + '" "https://smartgarden.gr/video-render.php?action=file&job=' + job + '&key=' + K + '"');
 execSync('curl -s -m 900 -o "' + sl + '" "https://smartgarden.gr/video-render.php?action=file&variant=slides&job=' + job + '&key=' + K + '"');
 const dur = (f) => parseFloat(execSync('ffprobe -v error -show_entries format=duration -of csv=p=0 "' + f + '"', { encoding: 'utf8' }));
@@ -77,18 +89,20 @@ spec.split(',').forEach((p, i) => {
   });
   if (h[0] !== h[1]) moving++;
 });
-say('slides with motion underneath:', moving, 'of 12');
+say('slides with motion underneath:', moving, 'of', cfg.holds.length);
 spawnSync('ffmpeg', ['-loglevel', 'error', '-y', '-framerate', '1', '-i', path.join(out, 'm_%02d_0.png'), '-vf', 'tile=4x3', '-frames:v', '1', path.join(out, 'sheet_slides.png')]);
 spawnSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', sl, '-vf', 'fps=1/46,scale=384:216,tile=6x4', '-frames:v', '1', path.join(out, 'sheet_all.jpg')]);
-const ok = Math.abs(dB - dS) < 0.5 && mB === mS && moving === 12;
+const ok = Math.abs(dB - dS) < 0.5 && mB === mS && moving === cfg.holds.length;
 fs.writeFileSync(path.join(here, 'post_render_result.json'), JSON.stringify({ ok, job, baseDuration: dB, slidesDuration: dS, audioMd5Equal: mB === mS, moving, restarts, spec }, null, 1));
 say(ok ? 'ALL CHECKS PASSED' : 'CHECKS FAILED');
 
 // Word-level check of the narration: every scene's audio is transcribed (asr-check.php, Gemini) and compared with the script.
-// It is what shows whether the pause-matching cuts of the chunked narration fell on the right sentences.
+// It is what shows whether the pause-matching cuts of the chunked narration fell on the right sentences. A scene it flags is not a verdict:
+// the transcriber also errs, so re-transcribe a flagged scene with a second model (asr-check.php accepts {"model": "gemini-3.6-flash"})
+// and look at the neighbouring scene for the missing words before believing it.
 fs.writeFileSync(path.join(out, 'durs.json'), JSON.stringify(durs));
 say('verifying the narration scene by scene (about 10 minutes)...');
-const vr = spawnSync('node', ['C:/Users/me/Desktop/smartgarden.gr_fixed/scripts/video-tools/ops/verify_narration.cjs', base, path.join(out, 'durs.json'),
-  'C:/Users/me/Desktop/smartgarden.gr_fixed/public/video-scripts/levanta-long.json', path.join(here, 'verify_result.json')], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+const vr = spawnSync('node', [path.join(repo, 'scripts', 'video-tools', 'ops', 'verify_narration.cjs'), base, path.join(out, 'durs.json'),
+  path.join(repo, cfg.scriptFile), path.join(here, 'verify_result.json')], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
 console.log((vr.stdout || '').split('\n').filter((l) => /suspicious|START\?|END\?|NO TEXT/.test(l)).join('\n'));
 say('narration check finished');

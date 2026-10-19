@@ -21,12 +21,17 @@ Nothing here is wired into the site build.
    late or early. Audio and `<sha1>.cuts.json` go into the server cache; the worker uses the hint file instead of its own guess. Reason: the
    transcription of the garlic video showed the guess one or two sentences late on one chunk (scenes 17-20). `ops/verify_narration.cjs` re-checks a
    finished render scene by scene.
-6. **Render**: one job at a time (two at once die with exit 137). The Gemini narration needs about 14 requests of the 10-a-day-per-key allowance;
-   `lemon/start_lemon_prep.sh` waits for the day, prepares the narration (step 5) and starts the render. 53 scenes take about 25 minutes of narration and 35 of encoding.
-7. **After the render**: `lemon/post_render_lemon.cjs` computes the slide spec from the real scene starts, runs the overlay (restarting only
-   while it says "Κομμάτι", never during the join), downloads both versions and checks duration, audio md5 and motion under the slides.
-8. **Look at it** (contact sheet, listen) and only then, on the owner's word, `lemon/yt_upload_lemon.cjs` (private by default).
-   The token cannot change visibility; the owner does that in Studio.
+6. **Render**: one job at a time (two at once die with exit 137). The Gemini narration needs about 12-14 requests of the 10-a-day-per-key allowance.
+   `long/start.sh <config.json>` (run from an empty scratch folder) waits for `startAfterUtc` if the config has one, prepares the narration (step 5), starts the
+   render, waits for it and runs step 7. The per-video facts live in a small config (`lemon/lemon.config.json`, `lavender/lav.config.json`): scene count,
+   which scenes each slide covers (`holds`), the YouTube title, description lead, hashtags, chapters (first scene of each), thumbnail, article slug.
+   A new video = a new config, not a copy of the scripts. 52-53 scenes take about 25 minutes of narration and 35 of encoding.
+7. **After the render**: `long/post_render.cjs <config.json>` (cwd = the run folder; `--dry` stops before the overlay) computes the slide spec from the real scene
+   starts, runs the overlay (restarting only while it says "Κομμάτι", never during the join; a start call that times out is not a failure, the work
+   continues on the server), downloads both versions and checks duration, audio md5 and motion under the slides, then transcribes every scene.
+   A scene the check flags is not a verdict: re-transcribe it with `gemini-3.6-flash` and read the neighbouring scene for the missing words.
+8. **Look at it** (contact sheet, listen) and only then, on the owner's word, `long/yt_upload.cjs <config.json>` (`--dry` prints title, description and chapters;
+   private by default). To make it public afterwards use `youtube-set-status.php` (needs the cron key AND the X-YT-Admin secret, see memory), only on the owner's word.
 
 ## Daily article pool
 
