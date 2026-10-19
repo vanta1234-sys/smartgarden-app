@@ -15,6 +15,15 @@ function fail($code, $payload) {
     exit;
 }
 
+// Only the pipeline's own calls (video-worker.php, or the owner's tools reading INTERNAL_SECRET from .env.deploy) may put a draft into the
+// owner's TikTok inbox: the secret is in internal_secret.txt above the web root, never in the repository (its cron key is public). Without
+// it anyone could fill the inbox queue (spam_risk_too_many_pending_share) or make this server fetch an address of their choosing.
+$internalSecretFile = dirname(__DIR__) . '/internal_secret.txt';
+$internalSecret = is_file($internalSecretFile) ? trim((string) @file_get_contents($internalSecretFile)) : '';
+if ($internalSecret === '' || !isset($_SERVER['HTTP_X_INTERNAL']) || !hash_equals($internalSecret, (string) $_SERVER['HTTP_X_INTERNAL'])) {
+    fail(403, ['success' => false, 'error' => 'Forbidden']);
+}
+
 $isSandbox = isset($_GET['sandbox']) && $_GET['sandbox'] === '1';
 $clientKey = $isSandbox ? (getenv('TIKTOK_SANDBOX_CLIENT_KEY') ?: '') : (getenv('TIKTOK_CLIENT_KEY') ?: '');
 $clientSecret = $isSandbox ? (getenv('TIKTOK_SANDBOX_CLIENT_SECRET') ?: '') : (getenv('TIKTOK_CLIENT_SECRET') ?: '');
@@ -72,6 +81,10 @@ if ($videoBase64) {
     $videoBytes = base64_decode($clean);
 } elseif ($videoUrl) {
     $absoluteUrl = strpos($videoUrl, 'http') === 0 ? $videoUrl : ('https://smartgarden.gr' . $videoUrl);
+    // only this site's own files: the server must not fetch an address of someone else's choosing
+    if (strpos($absoluteUrl, 'https://smartgarden.gr/') !== 0) {
+        fail(400, ['success' => false, 'error' => 'videoUrl must be on https://smartgarden.gr/']);
+    }
     $videoBytes = @file_get_contents($absoluteUrl);
 } else {
     fail(400, ['success' => false, 'error' => 'Missing videoBase64 or videoUrl. TikTok Studio needs an actual rendered .mp4, not a placeholder image.']);

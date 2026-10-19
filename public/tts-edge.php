@@ -25,6 +25,19 @@ if ($text === '') {
     exit;
 }
 
+// The Gemini path spends a free daily allowance (10 requests per model and key) that the video pipeline needs, so it is for the
+// pipeline's own calls only: they prove themselves with the secret in internal_secret.txt, which lives above the web root and
+// never in the repository (the cron key is public there). Anyone else who asks for Gemini is refused instead of burning the day's quota.
+$internalSecretFile = dirname(__DIR__) . '/internal_secret.txt';
+$internalSecret = is_file($internalSecretFile) ? trim((string) @file_get_contents($internalSecretFile)) : '';
+$internalOk = $internalSecret !== '' && isset($_SERVER['HTTP_X_INTERNAL']) && hash_equals($internalSecret, (string) $_SERVER['HTTP_X_INTERNAL']);
+if (mb_strlen($text, 'UTF-8') > 4000) {
+    http_response_code(413);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(array('error' => 'text too long'));
+    exit;
+}
+
 // PHP's own default max_execution_time (commonly 30s on shared hosting) was shorter than
 // the receive-loop deadline below, so a long synthesis got killed by PHP itself before
 // that deadline -- or this script's own error handling -- ever ran, surfacing as a bare
@@ -90,14 +103,25 @@ function geminiTtsSynthesize($text, $voiceName, $model, $timeout, &$info) {
     $keys = geminiKeys();
     if (!count($keys)) return null;
     $dayOutEverywhere = true;
+    $minuteInfo = null;
     foreach ($keys as $key) {
         $wav = geminiTtsSynthesizeWithKey($key, $text, $voiceName, $model, $timeout, $info);
         if ($wav !== null) return $wav;
-        if ($info['status'] === 429 && $info['quota'] === 'day') continue; // this project is done for today: next key
+        if ($info['status'] === 429) {
+            // Every key (project) has its own per-day AND per-minute allowance: a 429 on one hands over to the next key, whichever
+            // limit it was. Only when all of them are limited is the answer a 429 (and a per-minute one if any key still has its day).
+            if ($info['quota'] !== 'day') {
+                $dayOutEverywhere = false;
+                if ($minuteInfo === null || $info['retryAfter'] < $minuteInfo['retryAfter']) $minuteInfo = $info;
+            }
+            continue;
+        }
         $dayOutEverywhere = false;
+        $minuteInfo = null;
         break;
     }
     if ($dayOutEverywhere) { $info['status'] = 429; $info['quota'] = 'day'; }
+    elseif ($minuteInfo !== null) $info = $minuteInfo;
     return null;
 }
 
@@ -177,7 +201,13 @@ function geminiTtsSynthesizeWithKey($key, $text, $voiceName, $model, $timeout, &
 }
 
 $engineParam = isset($_GET['engine']) ? strtolower(trim($_GET['engine'])) : 'auto';
-if ($engineParam !== 'edge' && ($engineParam === 'gemini' || $wantMeta) && count(geminiKeys()) > 0) {
+if ($engineParam === 'gemini' && !$internalOk) {
+    http_response_code(403);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(array('error' => 'Forbidden', 'engine' => 'gemini'));
+    exit;
+}
+if ($engineParam !== 'edge' && ($engineParam === 'gemini' || $wantMeta) && $internalOk && count(geminiKeys()) > 0) {
     $gVoice = isset($_GET['gvoice']) && preg_match('/^[A-Za-z]{3,20}$/', $_GET['gvoice']) ? $_GET['gvoice'] : GEMINI_TTS_VOICE;
     $gModel = isset($_GET['gmodel']) && in_array($_GET['gmodel'], GEMINI_TTS_MODELS, true) ? $_GET['gmodel'] : GEMINI_TTS_MODELS[0];
     $gInfo = array();

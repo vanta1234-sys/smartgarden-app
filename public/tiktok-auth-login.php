@@ -22,6 +22,9 @@ if (!$clientKey) {
 }
 
 $state = ($isSandbox ? 'sandbox_' : 'prod_') . bin2hex(random_bytes(8));
+// The state is also kept in a short-lived cookie so the callback can tell that THIS browser started the login (without it anyone could
+// complete a consent of their own and have the server store their tokens in place of ours).
+setcookie('sg_tt_state', $state, array('expires' => time() + 900, 'path' => '/', 'secure' => true, 'httponly' => true, 'samesite' => 'Lax'));
 
 $query = [
     'client_key' => $clientKey,

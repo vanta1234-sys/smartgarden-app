@@ -160,6 +160,18 @@ function sg_wrap_lines($text, $size, $maxWidth) {
     return $lines;
 }
 
+/**
+ * The TikTok caption of an article (the draft upload has no caption field, so the owner pastes this in the app). ONE place for
+ * the wording: sg_build_script puts it in the job, and tiktok-captions.php (behind public/tt.html, the phone page with the copy
+ * buttons) serves the same text for any article.
+ */
+function sg_tiktok_caption($cleanTitle, $slug) {
+    return "🌿 {$cleanTitle} | Μυστικά & Tips για το Μπαλκόνι!\n"
+        . "👇 Διαβάστε τον πλήρη επιστημονικό οδηγό στο: https://smartgarden.gr/article/{$slug}\n\n"
+        . '#smartgarden #plants #gardening #gardentips #balconygarden #fyp #foryou #foryoupage '
+        . '#viralgreece #fygr #φυτα #μπαλκονι #κηπουρικη #λουλουδια #αθηνα';
+}
+
 /** Trim to a whole word near $max characters. */
 function sg_shorten($text, $max) {
     $text = trim((string) $text);
@@ -452,10 +464,7 @@ function sg_build_script($article) {
     if ($hookTail !== '') $scenes[0]['captionDisplay'] = $hookTail;
 
     $slug = (string) ($article['slug'] ?? '');
-    $tiktokCaption = "🌿 {$cleanTitle} | Μυστικά & Tips για το Μπαλκόνι!\n"
-        . "👇 Διαβάστε τον πλήρη επιστημονικό οδηγό στο: https://smartgarden.gr/article/{$slug}\n\n"
-        . '#smartgarden #plants #gardening #gardentips #balconygarden #fyp #foryou #foryoupage '
-        . '#viralgreece #fygr #φυτα #μπαλκονι #κηπουρικη #λουλουδια #αθηνα';
+    $tiktokCaption = sg_tiktok_caption($cleanTitle, $slug);
 
     $youtubeDescription = "{$cleanTitle} — Πλήρης οδηγός βήμα-βήμα από το SmartGarden.gr 🌿\n\n"
         . sg_shorten($summary, 200) . "\n\n"
@@ -504,7 +513,7 @@ function sg_speak_ranges($text) {
  * ("τρεις έως πέντε ημέρες"). The article text and the on-screen caption keep their digits.
  */
 function sg_speak_gender($text) {
-    $fem = '(?:εβδομάδ|βδομάδ|ημέρ|μέρ|ώρ|φορ|δόσ|γλάστρ|νύχτ|ρίζ|χούφτ|ποσότητ|ποικιλ|σκελίδ|κεφαλ|λεπτ[ήη])';
+    $fem = '(?:(?:εβδομάδ|βδομάδ|ημέρ|μέρ|ώρ|φορ|δόσ|γλάστρ|νύχτ|ρίζ|χούφτ|ποσότητ|σκελίδ)(?:α|ες)|(?:φορ)(?:ά|ές)|(?:δόση|δόσεις|ποικιλία|ποικιλίες|κεφαλή|κεφαλές|λεπτή|λεπτές))(?![\p{L}])';
     return preg_replace('/(?<![\p{L}\p{N}.,\-])1(?=(?:\s+(?:έως|ή)\s+\d+)?\s+' . $fem . ')/u', 'μία', (string) $text);
 }
 

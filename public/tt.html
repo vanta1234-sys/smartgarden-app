@@ -35,12 +35,7 @@
 </main>
 <script>
 (function () {
-  var HASHTAGS = '#smartgarden #plants #gardening #gardentips #balconygarden #fyp #foryou #foryoupage #viralgreece #fygr #φυτα #μπαλκονι #κηπουρικη #λουλουδια #αθηνα';
-  // same wording the video worker puts in a held job: title without ( ) and :, then the article link, then the hashtags
-  function caption(a) {
-    var title = String((a.title && a.title.el) || a.title || '').replace(/[():]/g, '').replace(/\s+/g, ' ').trim();
-    return '🌿 ' + title + ' | Μυστικά & Tips για το Μπαλκόνι!\n👇 Διαβάστε τον πλήρη επιστημονικό οδηγό στο: https://smartgarden.gr/article/' + a.slug + '\n\n' + HASHTAGS;
-  }
+  // The captions come from tiktok-captions.php, which uses the same PHP function as the video worker: one wording for both.
   function copy(ta, btn) {
     var ok = function () { btn.textContent = '✓ Αντιγράφηκε'; btn.className = 'done'; setTimeout(function () { btn.textContent = 'Αντιγραφή περιγραφής'; btn.className = ''; }, 2500); };
     // if the browser refuses to copy, the text stays selected and the button says what to do by hand
@@ -50,14 +45,14 @@
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(ok, legacy);
     else legacy();
   }
-  fetch('/articles-index.php', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (arts) {
+  fetch('/tiktok-captions.php', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data || !data.success) throw new Error('no captions');
     var box = document.getElementById('list'); box.innerHTML = '';
-    arts.slice(0, 10).forEach(function (a) {
+    data.items.forEach(function (a) {
       var el = document.createElement('article');
-      var h = document.createElement('h2'); h.textContent = (a.title && a.title.el) || a.slug;
-      var df = a.dateFormatted;
-      var d = document.createElement('p'); d.className = 'date'; d.textContent = (df && typeof df === 'object' ? df.el : df) || a.date || '';
-      var ta = document.createElement('textarea'); ta.readOnly = true; ta.value = caption(a);
+      var h = document.createElement('h2'); h.textContent = a.title || a.slug;
+      var d = document.createElement('p'); d.className = 'date'; d.textContent = a.date ? new Date(a.date + 'T12:00:00').toLocaleDateString('el-GR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+      var ta = document.createElement('textarea'); ta.readOnly = true; ta.value = a.caption;
       var b = document.createElement('button'); b.type = 'button'; b.textContent = 'Αντιγραφή περιγραφής';
       b.addEventListener('click', function () { copy(ta, b); });
       el.appendChild(h); el.appendChild(d); el.appendChild(ta); el.appendChild(b); box.appendChild(el);

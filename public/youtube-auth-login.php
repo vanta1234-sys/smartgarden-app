@@ -19,6 +19,9 @@ if (!$clientId) {
 }
 
 $state = bin2hex(random_bytes(8));
+// The state is also kept in a short-lived cookie so the callback can tell that THIS browser started the login (without it anyone could
+// complete a consent of their own and have the server store their tokens in place of ours).
+setcookie('sg_yt_state', $state, array('expires' => time() + 900, 'path' => '/', 'secure' => true, 'httponly' => true, 'samesite' => 'Lax'));
 $params = http_build_query([
     'client_id' => $clientId,
     'redirect_uri' => $redirectUri,

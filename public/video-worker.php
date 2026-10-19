@@ -79,14 +79,25 @@ function sg_audio_decoded_duration($ffmpeg, $file) {
     return ((int) $last[1]) * 3600 + ((int) $last[2]) * 60 + (float) $last[3];
 }
 
-/** POST form fields and return the body (empty string on failure), with the HTTP status in $status. */
-function sg_http_post($url, $fields, $timeout, &$status) {
+/**
+ * The secret that proves a call to tts-edge.php (Gemini) or tiktok-publish.php comes from this server's own pipeline. It lives in
+ * internal_secret.txt above the web root and is never in the repository, whose cron key is public. Empty string when the file is
+ * missing: those endpoints then refuse the call, which fails the job loudly instead of leaving them open.
+ */
+function sg_internal_secret() {
+    $f = dirname(__DIR__) . '/internal_secret.txt';
+    return is_file($f) ? trim((string) @file_get_contents($f)) : '';
+}
+
+/** POST form fields and return the body (empty string on failure), with the HTTP status in $status. $headers: extra header lines. */
+function sg_http_post($url, $fields, $timeout, &$status, $headers = array()) {
     $ch = curl_init($url);
     curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => http_build_query($fields),
         CURLOPT_TIMEOUT => $timeout,
+        CURLOPT_HTTPHEADER => $headers,
         CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; SmartGardenBot/1.0; +https://smartgarden.gr)',
     ));
     $body = curl_exec($ch);
@@ -154,7 +165,7 @@ function sg_gemini_scene($clean, $dest, $model, $dir, &$dayOut) {
         $url = 'https://smartgarden.gr/tts-edge.php?meta=1&engine=gemini&gmodel=' . rawurlencode($model);
         $status = 0;
         // POST: a chunk of several scenes does not fit in a URL. 100 s: Cloudflare cuts a request off at 100.
-        $body = sg_http_post($url, array('text' => $clean), 100, $status);
+        $body = sg_http_post($url, array('text' => $clean), 100, $status, array('X-Internal: ' . sg_internal_secret()));
         $decoded = json_decode($body, true);
         if ($status === 200 && is_array($decoded) && !empty($decoded['audioBase64'])) {
             $bytes = base64_decode($decoded['audioBase64'], true);
@@ -163,7 +174,10 @@ function sg_gemini_scene($clean, $dest, $model, $dir, &$dayOut) {
                 // generation is faster than that and the free tier throttles on audio produced.
                 $nextOk[$model] = $started + max($perMinuteGap, 1.3 * (strlen($bytes) / 48000));
                 if (!is_dir($cacheDir)) @mkdir($cacheDir, 0755, true);
-                @file_put_contents($cacheFile, $bytes);
+                // Written under a temporary name and renamed: a job killed halfway through the write (the host does that, exit 137)
+                // must not leave a truncated WAV that every later render would reuse as a good scene.
+                $tmpCache = $cacheFile . '.' . getmypid() . '.tmp';
+                if (@file_put_contents($tmpCache, $bytes) === strlen($bytes)) @rename($tmpCache, $cacheFile); else @unlink($tmpCache);
                 return true;
             }
         }
@@ -290,15 +304,20 @@ function sg_find_silences($ffmpeg, $wav, $duration) {
     $cmd = escapeshellarg($ffmpeg) . ' -hide_banner -nostats -i ' . escapeshellarg($wav)
          . ' -af silencedetect=n=-42dB:d=0.10 -f null - 2>&1';
     $out = (string) @shell_exec($cmd);
-    preg_match_all('/silence_start: ([0-9.]+)/', $out, $st);
-    preg_match_all('/silence_end: ([0-9.]+) \| silence_duration: ([0-9.]+)/', $out, $en, PREG_SET_ORDER);
+    // Read the start and end lines in the order ffmpeg prints them and pair each end with the start just before it. A silence at the very
+    // start of the audio is printed with a NEGATIVE start ("silence_start: -0.0023"); matching starts and ends in two separate lists
+    // dropped that one start and then paired every later start with the previous silence's end.
+    preg_match_all('/silence_(start|end): (-?[0-9.]+)(?: \| silence_duration: ([0-9.]+))?/', $out, $ev, PREG_SET_ORDER);
     $sil = array();
-    foreach ($st[1] as $k => $s) {
-        if (!isset($en[$k])) continue;
-        $e = (float) $en[$k][1];
-        $d = (float) $en[$k][2];
-        $mid = ((float) $s + $e) / 2;
-        if ($mid > 0.4 && $mid < $duration - 0.4) $sil[] = array((float) $s, $e, $d, $mid);
+    $open = null;
+    foreach ($ev as $m) {
+        if ($m[1] === 'start') { $open = max(0.0, (float) $m[2]); continue; }
+        if ($open === null) continue;
+        $e = (float) $m[2];
+        $d = isset($m[3]) ? (float) $m[3] : max(0.0, $e - $open);
+        $mid = ($open + $e) / 2;
+        if ($mid > 0.4 && $mid < $duration - 0.4) $sil[] = array($open, $e, $d, $mid);
+        $open = null;
     }
     return $sil;
 }
@@ -381,13 +400,14 @@ function sg_narrate_chunk($scenes, $idx, $dir, $model, $ffmpeg, $ffprobe, &$dayO
     // video showed it one or two sentences late on a 4-scene chunk of numbered steps, and a hint file is how that is fixed without asking
     // Gemini for the audio again.
     $cuts = null;
+    $fromHint = false;
     $hintFile = dirname($dir) . '/_tts-cache/' . sha1($model . '|Kore|' . $joined) . '.cuts.json';
     if (is_file($hintFile)) {
         $hint = json_decode((string) @file_get_contents($hintFile), true);
         if (is_array($hint) && isset($hint['cuts']) && count($hint['cuts']) === count($idx) - 1) {
             $prev = 0.0; $okHint = true;
             foreach ($hint['cuts'] as $c) { $c = (float) $c; if ($c <= $prev + 1.0 || $c >= $duration - 1.0) { $okHint = false; break; } $prev = $c; }
-            if ($okHint) { $cuts = array_map('floatval', $hint['cuts']); sg_log($dir, 'chunk at scene ' . $idx[0] . ': cut points taken from the checked hint file'); }
+            if ($okHint) { $cuts = array_map('floatval', $hint['cuts']); $fromHint = true; sg_log($dir, 'chunk at scene ' . $idx[0] . ': cut points taken from the checked hint file'); }
         }
     }
     if ($cuts === null) $cuts = $duration > 1 ? sg_split_points(sg_find_silences($ffmpeg, $wav, $duration), $texts, $duration) : null;
@@ -401,7 +421,10 @@ function sg_narrate_chunk($scenes, $idx, $dir, $model, $ffmpeg, $ffprobe, &$dayO
     foreach ($texts as $t) $total += mb_strlen($t, 'UTF-8');
     $avg = $total / $duration;
     // A scene whose pace is far from its chunk's was cut in the wrong place: better no video than narration that is a sentence off.
+    // Cuts from the hint file were checked against what is actually heard, which is a better test than this pace guess: a short scene of long
+    // words can legitimately sit outside +-50%, and rejecting it would throw away a chunk that already cost a day's request.
     foreach ($idx as $n => $i) {
+        if ($fromHint) break;
         $rate = mb_strlen($texts[$n], 'UTF-8') / max(0.1, $bounds[$n + 1] - $bounds[$n]);
         if ($rate < $avg * 0.5 || $rate > $avg * 1.5) {
             sg_log($dir, sprintf('chunk at scene %d: scene %d would be %.1f chars/s against %.1f for the chunk, not trusting the cut', $idx[0], $i, $rate, $avg));
@@ -479,7 +502,10 @@ function sg_prefetch_narration($scenes, $dir, $ffmpeg, $ffprobe) {
         $dest = $dir . '/scene' . $i . '.mp3';
         $got = null;
         $w = array();
-        for ($try = 0; $try < 3 && $got !== 'edge'; $try++) {
+        // The first scene is a probe: Edge has been down since 2026-10-13, and three tries of 60 s plus pauses on every failed video
+        // only delay the error. Once Edge has answered for scene 0 the later scenes get the usual three tries.
+        $tries = $i === 0 ? 1 : 3;
+        for ($try = 0; $try < $tries && $got !== 'edge'; $try++) {
             if ($try > 0) sleep(6);
             $got = sg_fetch_tts($clean($scenes[$i]['voiceover']), $dest, $dir, $w, 'edge');
         }
@@ -1013,13 +1039,13 @@ function sg_run_job($dir) {
 }
 
 /** POST a JSON body to one of our own endpoints and decode the reply. */
-function sg_post_json($url, $payload, $timeout = 180) {
+function sg_post_json($url, $payload, $timeout = 180, $extraHeaders = array()) {
     $ch = curl_init($url);
     curl_setopt_array($ch, array(
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
         CURLOPT_TIMEOUT => $timeout,
-        CURLOPT_HTTPHEADER => array('Content-Type: application/json'),
+        CURLOPT_HTTPHEADER => array_merge(array('Content-Type: application/json'), $extraHeaders),
         CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE),
     ));
     $body = curl_exec($ch);
@@ -1224,7 +1250,7 @@ function sg_publish($job, $dir, $jobId, $chapters = array(), $duration = 0.0, $f
             'caption' => $script['tiktokCaption'],
             'title' => $script['youtubeTitle'],
             'articleId' => $article['id'],
-        ));
+        ), 180, array('X-Internal: ' . sg_internal_secret()));
         $result['tiktok'] = array(
             'ok' => !empty($tt['body']['success']),
             'error' => isset($tt['body']['error']) ? $tt['body']['error'] : null,

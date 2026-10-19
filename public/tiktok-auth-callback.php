@@ -12,6 +12,15 @@ if (!isset($_GET['code'])) {
     exit;
 }
 
+// The login set this cookie in the same browser: a callback without a matching state did not come from our login.
+$sgState = isset($_GET['state']) ? (string) $_GET['state'] : '';
+if ($sgState === '' || !isset($_COOKIE['sg_tt_state']) || !hash_equals((string) $_COOKIE['sg_tt_state'], $sgState)) {
+    http_response_code(400);
+    echo 'Authorization refused: the login state does not match. Start again from the login link.';
+    exit;
+}
+setcookie('sg_tt_state', '', array('expires' => time() - 3600, 'path' => '/'));
+
 $code = $_GET['code'];
 $state = $_GET['state'] ?? '';
 $isSandbox = strpos($state, 'sandbox_') === 0;

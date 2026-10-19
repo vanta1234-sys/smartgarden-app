@@ -16,6 +16,15 @@ if (!isset($_GET['code'])) {
     exit;
 }
 
+// The login set this cookie in the same browser: a callback without a matching state did not come from our login.
+$sgState = isset($_GET['state']) ? (string) $_GET['state'] : '';
+if ($sgState === '' || !isset($_COOKIE['sg_pin_state']) || !hash_equals((string) $_COOKIE['sg_pin_state'], $sgState)) {
+    http_response_code(400);
+    echo 'Authorization refused: the login state does not match. Start again from the login link.';
+    exit;
+}
+setcookie('sg_pin_state', '', array('expires' => time() - 3600, 'path' => '/'));
+
 $ch = curl_init('https://api.pinterest.com/v5/oauth/token');
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
