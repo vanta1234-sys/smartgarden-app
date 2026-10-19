@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { sizedImage } from './utils/imageSize';
+import { ArrowLeft, Heart } from 'lucide-react';
 // The botanical generator and the article templates behind it are ~250KB, and they only
 // ever run in the editor when Gemini is unreachable. Readers were downloading the machinery
 // that writes the site's articles in order to read one, so it is fetched on demand.
@@ -1226,9 +1227,12 @@ pause
                     <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                     SmartGarden Digital Magazine & Media Hub
                   </div>
-                  <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight leading-tight">
+                  {/* The article page has its own h1 (its title); while it is open this headline is a plain block so the page keeps one h1. */}
+                  {(() => { const Head = isReadingModalOpen ? 'div' : 'h1'; return (
+                  <Head className="text-3xl sm:text-4xl font-extrabold text-slate-100 tracking-tight leading-tight">
                     Οδηγοί για <span className="text-emerald-400">Μπαλκόνι & Κήπο</span> με Τεχνητή Νοημοσύνη.
-                  </h1>
+                  </Head>
+                  ); })()}
                   <p className="text-sm text-slate-300 leading-relaxed">
                     Ψηφιακό περιοδικό για το ελληνικό μπαλκόνι, τις γλάστρες, τον λαχανόκηπο και τον κήπο. Καθημερινή ανάλυση καιρού, reviews κορυφαίου εξοπλισμού και έτοιμο περιεχόμενο.
                   </p>
@@ -2103,367 +2107,287 @@ pause
         </div>
       )}
 
-      {/* READING MODAL FOR 2200-WORD ARTICLES */}
+      {/* READING VIEW FOR 2200-WORD ARTICLES.
+          Redesigned 2026-10-20 (tasteskill "split stage"): the article is a page, not a floating card. On a desktop the plant's own photograph
+          stays fixed on the left while the guide scrolls past it on the right; on a phone the photograph is a band above the text. No motion
+          beyond the colour change of a hover: nothing fades, scales or slides in, so the first paint is the finished page. The data, the
+          handlers and the route are the same as before; only the markup and the classes changed. Styles: .sg-read in src/index.css. */}
       {isReadingModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            {/* Modal Header */}
-            <div
-              className="relative h-64 bg-slate-950 shrink-0 cursor-pointer"
-              onMouseEnter={() => setIsModalImageHovered(true)}
-              onMouseLeave={() => setIsModalImageHovered(false)}
-            >
-              <AnimatedShortVideo
-                title={selectedArticle.title.el}
-                category={selectedArticle.category}
-                summary={selectedArticle.summary.el}
-                staticImage={selectedArticle.image}
-                isHovered={isModalImageHovered}
-                priority={true}
+        <div className="sg-read fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="sg-read-title">
+          <div className="sg-read-grid min-h-full lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+            {/* The stage */}
+            <div className="sg-read-stage lg:sticky lg:top-0 lg:h-screen lg:self-start">
+              <img
+                src={sizedImage(selectedArticle.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", 720, 900)}
+                alt={selectedArticle.title.el}
+                width={720}
+                height={900}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                referrerPolicy="no-referrer"
+                className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent pointer-events-none"></div>
-              <div className="absolute top-4 left-4 flex gap-2 pointer-events-none z-10">
-                <span className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider shadow">
-                  {selectedArticle.categoryLabel.el}
-                </span>
-                <span className="px-3 py-1 rounded-lg bg-slate-950/80 text-slate-200 text-xs font-semibold backdrop-blur">
-                  ⏱️ {selectedArticle.readTime}
-                </span>
-              </div>
+            </div>
+
+            {/* The column */}
+            <article className="sg-read-col">
               <button
+                type="button"
                 onClick={() => {
                   stopWebSpeech();
                   setIsArticleReadingAudioActive(false);
                   setIsReadingModalOpen(false);
                 }}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-950/80 text-slate-300 hover:text-slate-100 flex items-center justify-center text-sm font-bold border border-slate-700 cursor-pointer z-20"
+                className="sg-read-back"
               >
-                ✕
+                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+                <span>Κλείσιμο</span>
               </button>
-              <div className="absolute bottom-4 left-4 right-4 pointer-events-none z-10">
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-100 leading-snug">{selectedArticle.title.el}</h2>
-              </div>
-            </div>
 
-            {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-200 text-sm leading-relaxed">
-              {/* Author & Audio Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={selectedArticle.author.avatar}
-                    alt=""
-                    referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80";
+              <h1 id="sg-read-title" className="sg-read-title">{selectedArticle.title.el}</h1>
+
+              <div className="sg-read-meta">
+                <img
+                  src={selectedArticle.author.avatar}
+                  alt=""
+                  width={44}
+                  height={44}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80";
+                  }}
+                  className="sg-read-avatar"
+                />
+                <div>
+                  <a
+                    href="/syntaktis"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.history.pushState(null, '', '/syntaktis');
+                      window.location.reload();
                     }}
-                    className="w-10 h-10 rounded-full object-cover border border-slate-700"
-                  />
-                  <div>
-                    <a
-                      href="/syntaktis"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        window.history.pushState(null, '', '/syntaktis');
-                        window.location.reload();
-                      }}
-                      className="font-bold text-slate-100 text-xs hover:text-emerald-400 transition-colors cursor-pointer"
-                    >
-                      {selectedArticle.author.name}
-                    </a>
-                    <div className="text-[11px] text-slate-400">{selectedArticle.author.role.el} • {selectedArticle.date}</div>
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    onClick={() => handleToggleArticleSpeech(articleSpeechText(selectedArticle))}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                      isArticleReadingAudioActive
-                        ? 'bg-emerald-500 text-white border-emerald-400 font-bold animate-pulse shadow-md shadow-emerald-500/30'
-                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
-                    }`}
-                    title={isArticleReadingAudioActive ? 'Διακοπή εκφώνησης' : 'Άκουσε το άρθρο με AI φωνή'}
+                    className="sg-read-author"
                   >
-                    <Volume2 className={`w-3.5 h-3.5 ${isArticleReadingAudioActive ? 'text-slate-100' : 'text-emerald-400'}`} />
-                    {isArticleReadingAudioActive ? 'Παύση Ήχου' : 'Άκουσε το'}
-                  </button>
-
-                  <button
-                    onClick={() => setShowReadingVoiceSettings(!showReadingVoiceSettings)}
-                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
-                      showReadingVoiceSettings
-                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                        : 'bg-slate-800/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border-slate-700/80'
-                    }`}
-                    title="Ρυθμίσεις Φωνής & Ταχύτητας"
-                  >
-                    <Sliders className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="hidden sm:inline">Ρυθμίσεις Φωνής</span>
-                  </button>
-
-                  <span className="text-xs text-rose-400 font-semibold flex items-center gap-1 bg-rose-500/10 px-2.5 py-1.5 rounded-lg border border-rose-500/20">
-                    ❤️ {selectedArticle.likes}
-                  </span>
+                    {selectedArticle.author.name}
+                  </a>
+                  <p className="sg-read-meta-line">
+                    {selectedArticle.author.role.el} · {selectedArticle.date} · {selectedArticle.categoryLabel.el} · {selectedArticle.readTime}
+                  </p>
                 </div>
               </div>
 
-              {/* Voice & Speed Settings Box */}
+              <p className="sg-read-lead">{selectedArticle.summary.el}</p>
+
+              <div className="sg-read-actions">
+                <button
+                  type="button"
+                  onClick={() => handleToggleArticleSpeech(articleSpeechText(selectedArticle))}
+                  className="sg-btn sg-btn-primary"
+                  aria-pressed={isArticleReadingAudioActive}
+                  title={isArticleReadingAudioActive ? 'Διακοπή εκφώνησης' : 'Άκουσε το άρθρο με AI φωνή'}
+                >
+                  <Volume2 className="h-5 w-5" aria-hidden="true" />
+                  {isArticleReadingAudioActive ? 'Παύση Ήχου' : 'Άκουσε το'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowReadingVoiceSettings(!showReadingVoiceSettings)}
+                  className="sg-btn sg-btn-quiet"
+                  aria-expanded={showReadingVoiceSettings}
+                  title="Ρυθμίσεις Φωνής & Ταχύτητας"
+                >
+                  <Sliders className="h-5 w-5" aria-hidden="true" />
+                  <span>Ρυθμίσεις Φωνής</span>
+                </button>
+
+                <span className="sg-read-likes" aria-label={`${selectedArticle.likes} αρέσει`}>
+                  <Heart className="h-5 w-5" aria-hidden="true" />
+                  {selectedArticle.likes}
+                </span>
+              </div>
+
+              {/* Voice & speed settings */}
               {showReadingVoiceSettings && (
-                <div className="bg-slate-950/80 border border-slate-800/90 rounded-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-                    {/* Voice Profile Selector */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-400 font-semibold flex items-center gap-1">
-                        🎙️ Φωνή:
-                      </span>
-                      <div className="inline-flex rounded-lg bg-slate-900 p-0.5 border border-slate-800">
+                <div className="sg-read-panel">
+                  <div className="sg-read-choice">
+                    <span className="sg-read-choice-label">Φωνή:</span>
+                    <div className="sg-read-choice-set">
+                      {([
+                        ['deep_male', 'Ανδρική Βαθιά'],
+                        ['light_female', 'Γυναικεία Clear'],
+                        ['warm_female', 'Γυναικεία Ζεστή'],
+                      ] as const).map(([profile, label]) => (
                         <button
+                          key={profile}
                           type="button"
                           onClick={() => {
-                            setReadingVoiceProfile('deep_male');
+                            setReadingVoiceProfile(profile);
                             if (isArticleReadingAudioActive) {
-                              handleToggleArticleSpeech(
-                                articleSpeechText(selectedArticle),
-                                'deep_male',
-                                readingSpeed
-                              );
+                              handleToggleArticleSpeech(articleSpeechText(selectedArticle), profile, readingSpeed);
                             }
                           }}
-                          className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all cursor-pointer ${
-                            readingVoiceProfile === 'deep_male'
-                              ? 'bg-emerald-500 text-white font-bold shadow-sm'
-                              : 'text-slate-300 hover:text-slate-100'
-                          }`}
+                          className={`sg-chip ${readingVoiceProfile === profile ? 'is-on' : ''}`}
+                          aria-pressed={readingVoiceProfile === profile}
                         >
-                          🧔 Ανδρική Βαθιά
+                          {label}
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setReadingVoiceProfile('light_female');
-                            if (isArticleReadingAudioActive) {
-                              handleToggleArticleSpeech(
-                                articleSpeechText(selectedArticle),
-                                'light_female',
-                                readingSpeed
-                              );
-                            }
-                          }}
-                          className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all cursor-pointer ${
-                            readingVoiceProfile === 'light_female'
-                              ? 'bg-emerald-500 text-white font-bold shadow-sm'
-                              : 'text-slate-300 hover:text-slate-100'
-                          }`}
-                        >
-                          👩 Γυναικεία Clear
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setReadingVoiceProfile('warm_female');
-                            if (isArticleReadingAudioActive) {
-                              handleToggleArticleSpeech(
-                                articleSpeechText(selectedArticle),
-                                'warm_female',
-                                readingSpeed
-                              );
-                            }
-                          }}
-                          className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all cursor-pointer ${
-                            readingVoiceProfile === 'warm_female'
-                              ? 'bg-emerald-500 text-white font-bold shadow-sm'
-                              : 'text-slate-300 hover:text-slate-100'
-                          }`}
-                        >
-                          🎙️ Γυναικεία Ζεστή
-                        </button>
-                      </div>
+                      ))}
                     </div>
-
-                    {/* Speed Selector */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-400 font-semibold flex items-center gap-1">
-                        ⚡ Ταχύτητα:
-                      </span>
-                      <div className="inline-flex rounded-lg bg-slate-900 p-0.5 border border-slate-800 gap-0.5">
-                        {[0.8, 1.0, 1.2, 1.5, 2.0].map((speed) => (
-                          <button
-                            key={speed}
-                            type="button"
-                            onClick={() => {
-                              setReadingSpeed(speed);
-                              if (isArticleReadingAudioActive) {
-                                handleToggleArticleSpeech(
-                                  articleSpeechText(selectedArticle),
-                                  readingVoiceProfile,
-                                  speed
-                                );
-                              }
-                            }}
-                            className={`px-2 py-0.5 rounded font-mono text-[11px] font-semibold transition-all cursor-pointer ${
-                              readingSpeed === speed
-                                ? 'bg-emerald-500 text-white shadow-sm'
-                                : 'text-slate-300 hover:text-slate-100'
-                            }`}
-                          >
-                            {speed}x
-                          </button>
-                        ))}
-                      </div>
+                  </div>
+                  <div className="sg-read-choice">
+                    <span className="sg-read-choice-label">Ταχύτητα:</span>
+                    <div className="sg-read-choice-set">
+                      {[0.8, 1.0, 1.2, 1.5, 2.0].map((speed) => (
+                        <button
+                          key={speed}
+                          type="button"
+                          onClick={() => {
+                            setReadingSpeed(speed);
+                            if (isArticleReadingAudioActive) {
+                              handleToggleArticleSpeech(articleSpeechText(selectedArticle), readingVoiceProfile, speed);
+                            }
+                          }}
+                          className={`sg-chip ${readingSpeed === speed ? 'is-on' : ''}`}
+                          aria-pressed={readingSpeed === speed}
+                        >
+                          {speed}x
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Connected Video Guide (if available) */}
+              {/* Connected video guide (if available) */}
               {selectedArticle.videoUrl && (
-                <div className="bg-black/90 border border-pink-500/40 rounded-2xl overflow-hidden shadow-xl">
-                  <div className="bg-gradient-to-r from-pink-600 via-rose-600 to-amber-500 px-4 py-2 flex items-center justify-between text-white text-xs font-bold">
-                    <span className="flex items-center gap-2">
-                      <Film className="w-4 h-4 text-slate-100 animate-pulse" />
-                      🎬 Επίσημο Βίντεο Οδηγός (Smart Garden Video)
-                    </span>
-                    <span className="bg-black/40 px-2 py-0.5 rounded text-[10px] uppercase font-mono">
-                      MP4 HD
-                    </span>
-                  </div>
-                  <div className="p-3 flex justify-center bg-slate-950">
-                    <video
-                      src={selectedArticle.videoUrl}
-                      controls
-                      autoPlay
-                      muted
-                      playsInline
-                      className="max-h-80 w-auto rounded-xl shadow-lg"
-                    />
-                  </div>
+                <div className="sg-read-video">
+                  <p className="sg-read-video-title">Επίσημο Βίντεο Οδηγός (Smart Garden Video)</p>
+                  <video src={selectedArticle.videoUrl} controls autoPlay muted playsInline className="max-h-96 w-auto max-w-full" />
                 </div>
               )}
 
-              {/* Summary Blockquote */}
-              <blockquote className="border-l-4 border-emerald-500 pl-4 italic text-slate-300 text-sm bg-emerald-950/10 py-2 rounded-r-lg">
-                "{selectedArticle.summary.el}"
-              </blockquote>
-
-              {/* Placed ad units. The article is read inside a fixed overlay with its own
-                  scroll container, which Auto Ads will not reliably place into — these sit
-                  in the reader's normal flow instead. Both render nothing until a slot ID
-                  is filled in at src/config/ads.ts. */}
+              {/* Placed ad units. They sit in the reader's normal flow, because Auto Ads will not reliably place into a fixed overlay with its own
+                  scroll container. Both render nothing until a slot ID is filled in at src/config/ads.ts. */}
               <AdSlot slot={AD_SLOTS.articleTop} />
 
-              {/* Full Content */}
+              {/* Full content */}
               <ArticleMarkdown
                 content={insertRealPhoto(selectedArticle.content.el, pickRealPhoto(selectedArticle))}
               />
 
               <AdSlot slot={AD_SLOTS.articleEnd} />
 
-              {/* Key Takeaways Card */}
-              <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-2xl p-5 space-y-3">
-                <div className="font-bold text-emerald-300 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  ΒΑΣΙΚΑ ΣΥΜΠΕΡΑΣΜΑΤΑ & ΟΔΗΓΙΕΣ
-                </div>
-                <ul className="space-y-2 text-xs text-slate-200">
+              {/* Key takeaways */}
+              <section className="sg-read-takeaways" aria-labelledby="sg-read-takeaways-h">
+                <h2 id="sg-read-takeaways-h">Βασικά συμπεράσματα & οδηγίες</h2>
+                <ul>
                   {selectedArticle.keyTakeaways.el.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0"></span>
-                      <span>{item}</span>
-                    </li>
+                    <li key={i}>{item}</li>
                   ))}
                 </ul>
-              </div>
+              </section>
 
-              {/* 1-Click Social Sharing Bar */}
+              {/* 1-click social sharing bar */}
+              <div className="sg-read-block">
               <SocialShareBar
                 title={selectedArticle.title.el}
                 summary={selectedArticle.summary.el}
                 image={selectedArticle.image}
                 url={typeof window !== 'undefined' ? `${window.location.origin}/article/${selectedArticle.slug}` : `https://smartgarden.gr/article/${selectedArticle.slug}`}
               />
+              </div>
 
+              <div className="sg-read-block">
               <ArticleToolLinks
                 title={selectedArticle.title.el}
                 summary={selectedArticle.summary.el}
                 content={selectedArticle.content.el}
               />
 
-              <FaqAccordion faqs={getFaqsForArticle(selectedArticle)} />
+              </div>
 
-              {/* Related Articles: keeps readers on-site longer + spreads internal link equity */}
+              <div className="sg-read-block">
+              <FaqAccordion faqs={getFaqsForArticle(selectedArticle)} />
+              </div>
+
+              {/* Related articles: keeps readers on-site longer + spreads internal link equity */}
               {(() => {
                 const related = articles
                   .filter(a => a.id !== selectedArticle.id && a.category === selectedArticle.category)
                   .slice(0, 3);
                 if (related.length === 0) return null;
                 return (
-                  <div className="pt-4 border-t border-slate-800 space-y-3">
-                    <div className="font-bold text-slate-200 text-xs flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-emerald-400" />
-                      ΣΧΕΤΙΚΑ ΑΡΘΡΑ
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <section className="sg-read-related" aria-labelledby="sg-read-related-h">
+                    <h2 id="sg-read-related-h">Σχετικά άρθρα</h2>
+                    <div className="sg-read-related-grid">
                       {related.map(r => (
                         <button
                           key={r.id}
+                          type="button"
                           onClick={() => openArticle(r)}
-                          className="text-left bg-slate-950 border border-slate-800 hover:border-emerald-500/50 rounded-xl overflow-hidden transition-colors group"
+                          className="sg-read-card"
                         >
                           <img
-                            src={sizedImage(r.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&auto=format&fit=crop&q=80", 300, 80)}
-                            alt={r.title?.el || ''}
+                            src={sizedImage(r.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&auto=format&fit=crop&q=80", 300, 190)}
+                            alt=""
+                            width={300}
+                            height={190}
                             loading="lazy"
+                            decoding="async"
                             referrerPolicy="no-referrer"
-                            className="w-full h-20 object-cover group-hover:scale-105 transition-transform duration-300"
                           />
-                          <div className="p-2.5">
-                            <div className="text-xs font-semibold text-slate-200 line-clamp-2">{r.title?.el}</div>
-                          </div>
+                          <span>{r.title?.el}</span>
                         </button>
                       ))}
                     </div>
-                  </div>
+                  </section>
                 );
               })()}
-            </div>
 
-            {/* Modal Footer */}
-            <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between">
-              <button
-                onClick={() => {
-                  stopWebSpeech();
-                  setIsArticleReadingAudioActive(false);
-                  setIsReadingModalOpen(false);
-                }}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold cursor-pointer"
-              >
-                Κλείσιμο
-              </button>
-              {isAdmin && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      setIsReadingModalOpen(false);
-                      setViewMode('tiktok_studio');
-                    }}
-                    className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-pink-500/20 cursor-pointer transition-all hover:scale-105"
-                  >
-                    <Film className="w-3.5 h-3.5" />
-                    Δημιουργία TikTok Video
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsReadingModalOpen(false);
-                      setViewMode('article_editor');
-                    }}
-                    className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-100 text-xs font-bold flex items-center gap-1.5 shadow cursor-pointer"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    Επεξεργασία αυτού του άρθρου
-                  </button>
-                </div>
-              )}
-            </div>
+              {/* Footer: the way out, and the editor's tools */}
+              <div className="sg-read-foot">
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopWebSpeech();
+                    setIsArticleReadingAudioActive(false);
+                    setIsReadingModalOpen(false);
+                  }}
+                  className="sg-btn sg-btn-quiet"
+                >
+                  <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+                  Κλείσιμο
+                </button>
+                {isAdmin && (
+                  <div className="sg-read-admin">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsReadingModalOpen(false);
+                        setViewMode('tiktok_studio');
+                      }}
+                      className="sg-btn sg-btn-quiet"
+                    >
+                      <Film className="h-5 w-5" aria-hidden="true" />
+                      Δημιουργία TikTok Video
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsReadingModalOpen(false);
+                        setViewMode('article_editor');
+                      }}
+                      className="sg-btn sg-btn-primary"
+                    >
+                      <Edit3 className="h-5 w-5" aria-hidden="true" />
+                      Επεξεργασία αυτού του άρθρου
+                    </button>
+                  </div>
+                )}
+              </div>
+            </article>
           </div>
         </div>
       )}

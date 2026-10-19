@@ -1013,6 +1013,19 @@ app.post("/api/google-index-all", async (req, res) => {
 
 async function start() {
   if (process.env.NODE_ENV !== "production") {
+    // Dev only. The live host answers these two addresses with PHP (articles-index.php, article-json.php) and the dev server has no PHP,
+    // so an article page could not be opened locally. Same shapes, read from public/latest_articles.json.
+    const readArticles = (): any[] => {
+      try { return JSON.parse(fs.readFileSync(path.join(process.cwd(), "public", "latest_articles.json"), "utf8")); } catch { return []; }
+    };
+    app.get("/articles-index.php", (_req, res) => {
+      res.json(readArticles().map((a) => ({ ...a, content: { el: "", en: "" } })));
+    });
+    app.get("/article-json.php", (req, res) => {
+      const found = readArticles().find((a) => a.slug === String(req.query.slug || ""));
+      if (!found) return res.status(404).json({ error: "not found" });
+      res.json(found);
+    });
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
