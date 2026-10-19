@@ -54,21 +54,33 @@ if ($article) {
     // benefit (confirmed via PageSpeed 2026-09-30: LCP got worse, 9.5s -> 10.2s, after
     // adding the mismatched preload). Keeping this in exact sync with that file's own
     // math, not just today's numbers, is what makes the preload actually hit.
-    $heroImageForPreload = $image;
-    if (strpos($heroImageForPreload, 'images.unsplash.com') !== false) {
-        $cardW = 700;
-        $cardH = (int) round($cardW / 1.95);
-        if (preg_match('/[?&]w=\d+/', $heroImageForPreload)) {
-            $heroImageForPreload = preg_replace('/([?&])w=\d+/', '${1}w=' . $cardW, $heroImageForPreload, 1);
+    //
+    // 2026-10-20: the article page was redesigned (App.tsx, "READING VIEW"). Its photograph is now the tall one beside the text, requested
+    // in two sizes with srcset: sizedImage(image, 400, 450) -> w=800&h=900 and sizedImage(image, 650, 800) -> w=1300&h=1600, with
+    // sizes="(min-width: 1024px) 45vw, 100vw". This block mirrors sizedImage() in src/utils/imageSize.ts and those two numbers pairs;
+    // change them together or the preload is wasted again.
+    $sizedImage = function ($src, $width, $height) {
+        if (strpos($src, 'images.unsplash.com') === false) return $src;
+        $w = (int) round($width * 2);
+        $h = (int) round($height * 2);
+        if (preg_match('/[?&]w=\d+/', $src)) {
+            $out = preg_replace('/([?&])w=\d+/', '${1}w=' . $w, $src, 1);
         } else {
-            $heroImageForPreload .= (strpos($heroImageForPreload, '?') !== false ? '&' : '?') . 'w=' . $cardW;
+            $out = $src . (strpos($src, '?') !== false ? '&' : '?') . 'w=' . $w;
         }
-        if (preg_match('/[?&]h=\d+/', $heroImageForPreload)) {
-            $heroImageForPreload = preg_replace('/([?&])h=\d+/', '${1}h=' . $cardH, $heroImageForPreload, 1);
+        if (preg_match('/[?&]h=\d+/', $out)) {
+            $out = preg_replace('/([?&])h=\d+/', '${1}h=' . $h, $out, 1);
         } else {
-            $heroImageForPreload = preg_replace('/([?&])w=\d+/', '${1}w=' . $cardW . '&h=' . $cardH, $heroImageForPreload, 1);
+            $out = preg_replace('/([?&])w=\d+/', '${1}w=' . $w . '&h=' . $h, $out, 1);
         }
-    }
+        return $out;
+    };
+    $heroSmall = $sizedImage($image, 400, 450);
+    $heroLarge = $sizedImage($image, 650, 800);
+    $heroImageForPreload = $heroSmall;
+    $heroPreloadSet = $heroSmall !== $heroLarge
+        ? ' imagesrcset="' . htmlspecialchars($heroSmall . ' 800w, ' . $heroLarge . ' 1300w', ENT_QUOTES) . '" imagesizes="(min-width: 1024px) 45vw, 100vw"'
+        : '';
 
     $replacements = [
         '/<title>.*?<\/title>/s' => '<title>' . htmlspecialchars($seoTitle, ENT_QUOTES) . '</title>',
@@ -115,7 +127,7 @@ if ($article) {
     // build the <img> tag before the browser even knows the image exists.
     $html = preg_replace(
         '/<\/head>/',
-        '<link rel="preload" as="image" fetchpriority="high" href="' . htmlspecialchars($heroImageForPreload, ENT_QUOTES) . '" /></head>',
+        '<link rel="preload" as="image" fetchpriority="high" href="' . htmlspecialchars($heroImageForPreload, ENT_QUOTES) . '"' . $heroPreloadSet . ' /></head>',
         $html,
         1
     );

@@ -2117,8 +2117,12 @@ pause
           <div className="sg-read-grid min-h-full lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
             {/* The stage */}
             <div className="sg-read-stage lg:sticky lg:top-0 lg:h-screen lg:self-start">
+              {/* Two sizes, chosen by the browser: 800px wide for a phone or a 1x desktop, 1300px for a sharp screen. public/article.php preloads
+                  exactly these two addresses with the same sizes rule, so the fetch starts from the HTML head; change both together. */}
               <img
-                src={sizedImage(selectedArticle.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", 720, 900)}
+                src={sizedImage(selectedArticle.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", 400, 450)}
+                srcSet={`${sizedImage(selectedArticle.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", 400, 450)} 800w, ${sizedImage(selectedArticle.image || "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&auto=format&fit=crop&q=80", 650, 800)} 1300w`}
+                sizes="(min-width: 1024px) 45vw, 100vw"
                 alt={selectedArticle.title.el}
                 width={720}
                 height={900}
