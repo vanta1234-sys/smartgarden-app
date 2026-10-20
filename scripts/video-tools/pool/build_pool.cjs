@@ -78,7 +78,7 @@ const T = [
     slug: 'triantafylla-fthinoporo-ximonas-fyteysi-gymnoriza-mavri-kilidosi-kladema',
     title: 'Τριαντάφυλλα το Φθινόπωρο και τον Χειμώνα: Φύτευση Γυμνόριζων, Μαύρη Κηλίδωση και Κλάδεμα',
     category: 'Μπαλκόνι & Γλάστρες', category_slug: 'balcony', readTime: '14 min', difficulty: 'Μέτριο',
-    image: 'photo-1687226687661-a43b102944b6',
+    image: 'https://smartgarden.gr/photos/hero/triantafyllo-kitrino.jpg',
     summary: 'Τι κάνεις με τα τριαντάφυλλα από τον Οκτώβριο ως τον Μάρτιο: φύτευση γυμνόριζων και γλαστρών, μέγεθος γλάστρας, πότισμα, μαύρη κηλίδωση, ποιο κλάδεμα γίνεται τώρα και ποιο τον Φεβρουάριο, λίπανση και προστασία από το κρύο.',
     botanical: 'Rosa spp.', ph: '6.0 - 6.5', ec: '1.0 - 1.6', temp: '0 - 28',
     keyTakeaways: [
@@ -129,7 +129,7 @@ const T = [
     slug: 'pachyfyta-kaktoi-ximonas-potisma-sapia-fos-pote-mpainoun-mesa',
     title: 'Παχύφυτα και Κάκτοι τον Χειμώνα: Πότισμα, Σήψη, Φως και Πότε Μπαίνουν Μέσα',
     category: 'Μπαλκόνι & Γλάστρες', category_slug: 'balcony', readTime: '13 min', difficulty: 'Εύκολο',
-    image: 'photo-1586275381277-ef645628e280',
+    image: 'https://smartgarden.gr/photos/hero/echeveria-rosetta.jpg',
     summary: 'Πώς περνούν τον χειμώνα τα παχύφυτα και οι κάκτοι: πόσο κρύο αντέχει το καθένα, γιατί το υγρό κρύο σκοτώνει, ποιο υπόστρωμα και ποιο πότισμα, φως και ετιολισμός, πώς σώζεις φυτό που σαπίζει και η χειμερινή ξεκούραση που φέρνει άνθη.',
     botanical: 'Sempervivum, Echeveria, Aloe, Opuntia, Mammillaria κ.ά.', ph: '6.0 - 7.0', ec: '0.5 - 1.0', temp: '0 - 25',
     keyTakeaways: [
@@ -160,7 +160,7 @@ for (const t of T) {
     + '        "readTime" => ' + q(t.readTime) + ',\n'
     + '        "difficulty" => ' + q(t.difficulty) + ',\n'
     + '        "difficultyLabel" => ' + q(t.difficulty) + ',\n'
-    + '        "image" => ' + q('https://images.unsplash.com/' + t.image + '?w=1200&auto=format&fit=crop&q=80') + ',\n'
+    + '        "image" => ' + q(/^https?:/.test(t.image) ? t.image : 'https://images.unsplash.com/' + t.image + '?w=1200&auto=format&fit=crop&q=80') + ',\n'
     + '        "summary" => ' + q(t.summary) + ',\n'
     + '        "botanical" => ' + q(t.botanical) + ',\n'
     + '        "ph" => ' + q(t.ph) + ',\n'
