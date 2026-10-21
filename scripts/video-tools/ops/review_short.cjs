@@ -24,7 +24,12 @@ fs.mkdirSync(SHORTS, { recursive: true });
 let job = process.argv[2];
 const jobs = JSON.parse(sh('curl -s -m 60 "https://smartgarden.gr/video-render.php?action=jobs&limit=12&key=' + K + '"')).jobs;
 if (!job) {
-  const c = jobs.find((j) => j.state === 'done' && j.published && j.published.held && !fs.existsSync(path.join(SHORTS, 'uploaded_' + j.job + '.json')));
+  // only today's Short: the article date in the slug (…-YYYYMMDD) must be yesterday, today or tomorrow (local). Older held renders are parked on purpose or were uploaded
+  // before the uploaded_<job>.json marker existed (the 10-20 ficus Short), and must never be picked up again.
+  const dayNo = (d) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+  const today = dayNo(new Date());
+  const fresh = (j) => { const m = String(j.article || '').match(/-(\d{4})(\d{2})(\d{2})$/); if (!m) return false; const n = Math.floor(Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000); return n >= today - 1 && n <= today + 1; };
+  const c = jobs.find((j) => j.state === 'done' && j.published && j.published.held && fresh(j) && !fs.existsSync(path.join(SHORTS, 'uploaded_' + j.job + '.json')));
   if (!c) { console.log('NO HELD SHORT WAITING (nothing finished and held without an upload marker)'); process.exit(10); }
   job = c.job;
 }
