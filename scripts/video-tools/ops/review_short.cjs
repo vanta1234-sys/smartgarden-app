@@ -98,7 +98,12 @@ function judge(i, text) {
   let hit = 0; want.forEach((w) => { if (gotCount.get(w) > 0) { hit++; gotCount.set(w, gotCount.get(w) - 1); } });
   const recall = want.length ? hit / want.length : 1, extra = got.length ? Math.max(0, got.length - hit) / got.length : 0;
   const joined = got.join(' ');
-  const startsRight = joined.startsWith(want.slice(0, 2).join(' ')) || got.slice(0, 4).join(' ').includes(want[0] || '');
+  // the first word is often a rare plant name or a verb the transcribers spell differently but that SOUNDS the same ("Γκαϊλάρδια" heard as "Γαϊλάρδια", "Ανέχεται" heard as
+  // "Αν έχετε"): accept it when it is within a small edit distance of the first script word, alone or merged with the next heard word
+  const lev = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length]; };
+  const simW = (a, b) => (a && b ? 1 - lev(a, b) / Math.max(a.length, b.length) : 0);
+  const firstClose = want[0] && (simW(want[0], got[0]) >= 0.7 || simW(want[0], (got[0] || '') + (got[1] || '')) >= 0.7);
+  const startsRight = joined.startsWith(want.slice(0, 2).join(' ')) || got.slice(0, 4).join(' ').includes(want[0] || '') || !!firstClose;
   const endsRight = got.slice(-5).join(' ').includes(want[want.length - 1] || '');
   return { recall: +recall.toFixed(2), extra: +extra.toFixed(2), startsRight, endsRight, clean: !!text && recall >= 0.85 && extra <= 0.2 && startsRight && endsRight };
 }
