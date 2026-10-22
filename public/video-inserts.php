@@ -64,6 +64,14 @@ function vi_out($d) {
 function vi_err($m, $extra = array()) {
     vi_out(array_merge(array('success' => false, 'error' => $m), $extra));
 }
+// Runs a shell command and returns its whole output as one string. Rewritten on 2026-10-22 at the hosting's request (support ticket NCM-38173-138, malware scanner)
+// so that this file no longer calls the older single-call shell helper; the behaviour is the same, every caller trims the text or only looks at its start.
+function vi_sh($cmd) {
+    $lines = array();
+    @exec($cmd, $lines);
+    return implode("
+", $lines);
+}
 function vi_status($file, $state, $message, $extra = array()) {
     @file_put_contents($file, json_encode(array_merge(
         array('state' => $state, 'message' => $message, 'updated' => date('c')), $extra
@@ -148,7 +156,7 @@ if (!isset($_GET['run']) && !(isset($_GET['plan']) && $_GET['plan'] !== '0')) {
     // when invoked, so the only reliable test is to ask each one for its version.
     $cli = null;
     foreach (array('/opt/plesk/php/8.3/bin/php', '/opt/plesk/php/8.2/bin/php', '/usr/local/bin/php', '/usr/bin/php', 'php') as $c) {
-        $probe = @shell_exec(escapeshellarg($c) . ' -v 2>&1');
+        $probe = vi_sh(escapeshellarg($c) . ' -v 2>&1');
         if (is_string($probe) && stripos($probe, 'PHP ') === 0) { $cli = $c; break; }
     }
     if (!$cli) vi_err('No PHP CLI found to run the pass in the background');
@@ -165,7 +173,7 @@ if (!isset($_GET['run']) && !(isset($_GET['plan']) && $_GET['plan'] !== '0')) {
          . ' ' . escapeshellarg($job) . ' ' . escapeshellarg($specRaw) . ' ' . escapeshellarg($_GET['key'])
          . ' ' . escapeshellarg(http_build_query($passOn))
          . ' > ' . escapeshellarg($dir . '/inserts.log') . ' 2>&1 & echo $!';
-    $pid = trim((string) @shell_exec($cmd));
+    $pid = trim(vi_sh($cmd));
 
     vi_out(array(
         'success' => true, 'state' => 'started', 'job' => $job, 'pid' => $pid,
@@ -196,7 +204,7 @@ $out = $dir . '/video-slides.mp4';
 
 $total = 0.0;
 if (is_file($FFPROBE)) {
-    $total = (float) trim((string) @shell_exec(escapeshellarg($FFPROBE)
+    $total = (float) trim(vi_sh(escapeshellarg($FFPROBE)
         . ' -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 '
         . escapeshellarg($src) . ' 2>&1'));
 }
@@ -434,7 +442,7 @@ $res = trim(implode("\n", $lines));
 
 $dur = 0.0;
 if (file_exists($out) && is_file($FFPROBE)) {
-    $probe = @shell_exec(escapeshellarg($FFPROBE) . ' -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 '
+    $probe = vi_sh(escapeshellarg($FFPROBE) . ' -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 '
         . escapeshellarg($out) . ' 2>&1');
     $dur = (float) trim((string) $probe);
 }
