@@ -604,7 +604,7 @@ $sceneImages = $customImages !== null
     ? $customImages
     : ($mode === 'long'
     ? sg_scene_images_long($sceneTexts, $article['image'] ?? '', $articleTitleEl, (string) ($article['category'] ?? ''))
-    : sg_scene_images($sceneTexts, $article['image'] ?? '', $articleTitleEl, (string) ($article['category'] ?? '')));
+    : sg_scene_images($sceneTexts, $article['image'] ?? '', $articleTitleEl, (string) ($article['category'] ?? ''), (string) ($article['slug'] ?? '')));
 
 // &dry=1 returns the script and the chosen photos without creating a job or spawning the
 // worker. A long-form render costs twenty minutes of CPU; being able to read the narration

@@ -798,7 +798,39 @@ function sg_match_score($text, $keywords) {
  * gardening shots - never to a category lottery, which is how a weed-control video once
  * ended up showing lemons.
  */
-function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category) {
+/**
+ * Extra photographs of the SAME plant, hand-picked from the owner's own library, for articles that have an entry in short-photo-sets.json.
+ * Returns absolute URLs, or an empty array when the article has no set. The set is chosen by the article's slug (without its -YYYYMMDD date), never
+ * by keyword: matching words to photos is what once put corn under a garlic sentence, so a set only ever exists after a person has looked at every photo.
+ */
+function sg_photo_set($slug) {
+    $base = preg_replace('/-\d{8}$/', '', (string) $slug);
+    if ($base === '') return array();
+    $data = json_decode((string) @file_get_contents(__DIR__ . '/short-photo-sets.json'), true);
+    if (!is_array($data)) return array();
+    foreach ($data as $row) {
+        if (!isset($row['slug'], $row['photos']) || $row['slug'] !== $base || !is_array($row['photos'])) continue;
+        $urls = array();
+        foreach ($row['photos'] as $p) {
+            if (is_string($p) && strpos($p, '/photos/sets/') === 0) $urls[] = 'https://smartgarden.gr' . $p;
+        }
+        return $urls;
+    }
+    return array();
+}
+
+function sg_scene_images($sceneTexts, $articleImage, $articleTitle, $category, $slug = '') {
+    // 2026-10-22: an article with a hand-checked photo set (short-photo-sets.json) shows the article's own photo in the hook and in the closing scene
+    // and a different photograph of the same plant in every scene between, so a Short is no longer one still picture with a camera move.
+    $set = sg_photo_set($slug);
+    if ($articleImage && count($set) > 0) {
+        $res = array(); $k = 0; $last = count($sceneTexts) - 1;
+        foreach ($sceneTexts as $i => $t) {
+            if ($i === 0 || $i === $last) { $res[] = $articleImage; continue; }
+            $res[] = $set[$k++ % count($set)];
+        }
+        return $res;
+    }
     // 2026-10-12: every scene of a Short shows the article's own photo. Anything else was chosen
     // by keyword, and keywords put corn under a garlic sentence, pots under a planting date and an
     // olive grove under a leaf-mulch tip. The camera move changes per scene, so the picture still

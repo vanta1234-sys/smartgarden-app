@@ -1,0 +1,41 @@
+[
+ {
+  "slug": "triantafylla-fthinoporo-ximonas-fyteysi-gymnoriza-mavri-kilidosi-kladema",
+  "note": "roses: hero is the yellow rose A0891; these alternate yellow and pink",
+  "photos": [
+   "/photos/sets/triantafylla-1.jpg",
+   "/photos/sets/triantafylla-2.jpg",
+   "/photos/sets/triantafylla-3.jpg",
+   "/photos/sets/triantafylla-4.jpg"
+  ]
+ },
+ {
+  "slug": "ortansia-se-glastra-fthinoporo-ximonas-kladema-frontida",
+  "note": "hydrangea: hero is A0390",
+  "photos": [
+   "/photos/sets/ortansia-1.jpg",
+   "/photos/sets/ortansia-2.jpg",
+   "/photos/sets/ortansia-3.jpg",
+   "/photos/sets/ortansia-4.jpg"
+  ]
+ },
+ {
+  "slug": "pachyfyta-kaktoi-ximonas-potisma-sapia-fos-pote-mpainoun-mesa",
+  "note": "succulents in winter: hero is the echeveria C0196",
+  "photos": [
+   "/photos/sets/pachyfyta-1.jpg",
+   "/photos/sets/pachyfyta-2.jpg",
+   "/photos/sets/pachyfyta-3.jpg"
+  ]
+ },
+ {
+  "slug": "ibiskos-se-glastra-mpoumpoukia-pou-peftoun",
+  "note": "hibiscus (already published; used to test the Short renderer)",
+  "photos": [
+   "/photos/sets/ibiskos-1.jpg",
+   "/photos/sets/ibiskos-2.jpg",
+   "/photos/sets/ibiskos-3.jpg",
+   "/photos/sets/ibiskos-4.jpg"
+  ]
+ }
+]
