@@ -21,15 +21,25 @@ const words = (s) => norm(s).filter((w) => !/^\d+$/.test(w));
 const tri = (s) => { const t = words(s).join(''); const set = new Set(); for (let i = 0; i + 3 <= t.length; i++) set.add(t.slice(i, i + 3)); return set; };
 
 fs.mkdirSync(SHORTS, { recursive: true });
-let job = process.argv[2];
-const jobs = JSON.parse(sh('curl -s -m 60 "https://smartgarden.gr/video-render.php?action=jobs&limit=12&key=' + K + '"')).jobs;
+const argv = process.argv.slice(2);
+const waitMode = argv.includes('--wait');
+let job = argv.filter((a) => !a.startsWith('--'))[0];
+const fetchJobs = () => JSON.parse(sh('curl -s -m 60 "https://smartgarden.gr/video-render.php?action=jobs&limit=12&key=' + K + '"')).jobs;
+let jobs = fetchJobs();
 if (!job) {
   // only today's Short: the article date in the slug (…-YYYYMMDD) must be yesterday, today or tomorrow (local). Older held renders are parked on purpose or were uploaded
   // before the uploaded_<job>.json marker existed (the 10-20 ficus Short), and must never be picked up again.
   const dayNo = (d) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
   const today = dayNo(new Date());
   const fresh = (j) => { const m = String(j.article || '').match(/-(\d{4})(\d{2})(\d{2})$/); if (!m) return false; const n = Math.floor(Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000); return n >= today - 1 && n <= today + 1; };
-  const c = jobs.find((j) => j.state === 'done' && j.published && j.published.held && fresh(j) && !fs.existsSync(path.join(SHORTS, 'uploaded_' + j.job + '.json')));
+  const marked = (j) => fs.existsSync(path.join(SHORTS, 'uploaded_' + j.job + '.json'));
+  const pick = () => jobs.find((j) => j.state === 'done' && j.published && j.published.held && fresh(j) && !marked(j));
+  // --wait: the render may still be running (it starts at 00:00 Greek time and takes ~6 minutes): poll every minute for up to 45 minutes while a fresh, unmarked job is still being rendered
+  const started = Date.now();
+  let c = pick();
+  while (!c && waitMode && Date.now() - started < 45 * 60 * 1000 && jobs.some((j) => j.state !== 'done' && j.state !== 'error' && j.state !== 'failed' && fresh(j) && !marked(j))) {
+    console.log('render still running, waiting a minute ...'); sleep(60000); jobs = fetchJobs(); c = pick();
+  }
   if (!c) { console.log('NO HELD SHORT WAITING (nothing finished and held without an upload marker)'); process.exit(10); }
   job = c.job;
 }
@@ -149,4 +159,11 @@ console.log('\nASR', asrPass ? 'PASS' : 'FAIL', '| metadata', metaPass ? 'PASS' 
 console.log('AUTOMATIC CHECKS:', report.autoPass ? 'PASS (now LOOK at the sheets, then upload_short.cjs)' : 'FAIL (do not upload)');
 console.log('sheets:', sheets.join('  '));
 console.log('report:', path.join(out, 'report.json'));
+// the same files again under FIXED names, so that whoever reads them (the nightly task, which needs a one-time permission per path) never sees a new path
+try {
+  const latest = path.join(SHORTS, 'latest'); fs.mkdirSync(latest, { recursive: true });
+  for (const f of ['report.json', 'job.json', 'sheet_every3s.jpg', 'sheet_scene_edges.jpg']) if (fs.existsSync(path.join(out, f))) fs.copyFileSync(path.join(out, f), path.join(latest, f));
+  fs.writeFileSync(path.join(latest, 'job.txt'), job);
+  console.log('copied to', latest);
+} catch (e) { console.log('could not copy to latest:', e.message); }
 process.exit(report.autoPass ? 0 : 1);

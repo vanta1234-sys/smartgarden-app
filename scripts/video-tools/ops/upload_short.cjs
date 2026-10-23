@@ -6,7 +6,9 @@
 const fs = require('fs'), path = require('path'), { execSync } = require('child_process');
 const SHORTS = 'C:/Users/me/Desktop/smartgarden-videos/shorts';
 const K = 'smartgarden_cron_x7K9pQ2026';
-const [job, privacy] = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+let [job, privacy] = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+// "latest" = the job review_short.cjs reviewed last (shorts/latest/job.txt): lets the nightly task use one fixed command line every night
+if (job === 'latest') { try { job = fs.readFileSync(path.join(SHORTS, 'latest', 'job.txt'), 'utf8').trim(); } catch (e) { console.log('no latest job: run review_short.cjs first'); process.exit(1); } }
 const dry = process.argv.includes('--dry');
 if (!job || !['public', 'private'].includes(privacy)) { console.log('usage: node upload_short.cjs <jobId> <public|private> [--dry]'); process.exit(1); }
 const marker = path.join(SHORTS, 'uploaded_' + job + '.json');
@@ -38,6 +40,11 @@ if (r.success && r.privacyStatusActual === privacy) {
   fs.writeFileSync(marker, out);
   fs.appendFileSync(path.join(SHORTS, 'NIGHTLY-LOG.txt'), stamp + ' UPLOADED ' + privacy + ' ' + r.url + ' ' + body.title + '\n');
   console.log('UPLOADED', privacy, r.url);
+  // proof from the outside that the video exists and answers
+  try {
+    const o = JSON.parse(execSync('curl -s -m 30 "https://www.youtube.com/oembed?url=' + encodeURIComponent(r.url) + '&format=json"', { encoding: 'utf8' }));
+    console.log('OEMBED OK:', o.title);
+  } catch (e) { console.log('OEMBED NOT YET ANSWERING, check the link by hand'); }
 } else {
   fs.appendFileSync(path.join(SHORTS, 'NIGHTLY-LOG.txt'), stamp + ' UPLOAD FAILED ' + job + ' ' + out.slice(0, 200) + '\n');
   console.log('UPLOAD DID NOT COMPLETE AS REQUESTED'); process.exit(4);

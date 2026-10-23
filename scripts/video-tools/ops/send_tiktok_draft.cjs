@@ -9,7 +9,8 @@ const fs = require('fs'), path = require('path');
 const SHORTS = 'C:/Users/me/Desktop/smartgarden-videos/shorts';
 const LOG = path.join(SHORTS, 'TIKTOK-LOG.txt');
 const K = 'smartgarden_cron_x7K9pQ2026';
-const job = process.argv[2];
+let job = process.argv[2];
+if (job === 'latest') { try { job = fs.readFileSync(path.join(SHORTS, 'latest', 'job.txt'), 'utf8').trim(); } catch (e) { console.log('no latest job: run review_short.cjs first'); process.exit(1); } }
 const dry = process.argv.includes('--dry'), force = process.argv.includes('--force');
 if (!job || job.startsWith('--')) { console.log('usage: node send_tiktok_draft.cjs <jobId> [--dry] [--force]'); process.exit(1); }
 
