@@ -13,6 +13,8 @@ K=smartgarden_cron_x7K9pQ2026
 cfg() { node -e "const c=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));const v=c[process.argv[2]];console.log(v==null?'':v)" "$CFG" "$1"; }
 NAME=$(cfg name); SLUG=$(cfg articleSlug); SCRIPTNAME=$(cfg scriptName); SCRIPTFILE=$(cfg scriptFile); GATE=$(cfg startAfterUtc)
 JOBFILE=$(cfg jobFile); [ -z "$JOBFILE" ] && JOBFILE="job_$NAME.txt"
+# A shell without the usual tools (or a config that did not load) must stop here: with an empty slug the render endpoint starts a render of whatever article it finds.
+if [ -z "$NAME" ] || [ -z "$SLUG" ] || [ -z "$SCRIPTNAME" ] || [ -z "$SCRIPTFILE" ]; then echo "config incomplete (name/articleSlug/scriptName/scriptFile), not starting anything"; exit 1; fi
 
 if [ -n "$GATE" ]; then
   until [ "$(date -u +%Y%m%d%H%M)" -ge "$GATE" ]; do sleep 60; done
