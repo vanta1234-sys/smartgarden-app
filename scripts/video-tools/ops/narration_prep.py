@@ -180,7 +180,9 @@ def repair(wav, texts, cuts, dur, rounds=6):
 
 def gemini_chunk(text, dest):
     body = urllib.parse.urlencode({'text': text}).encode()
-    req = urllib.request.Request('https://smartgarden.gr/tts-edge.php?meta=1&engine=gemini&gmodel=' + MODEL, data=body, headers={'User-Agent': UA})
+    # since 2026-10-19 the Gemini branch of tts-edge.php answers 403 unless the call carries the server-side secret (INTERNAL_SECRET in .env.deploy)
+    req = urllib.request.Request('https://smartgarden.gr/tts-edge.php?meta=1&engine=gemini&gmodel=' + MODEL, data=body,
+                                 headers={'User-Agent': UA, 'X-Internal': env().get('INTERNAL_SECRET', '')})
     try:
         r = json.load(urllib.request.urlopen(req, timeout=110))
     except urllib.error.HTTPError as e:
