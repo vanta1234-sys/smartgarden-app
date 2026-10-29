@@ -112,7 +112,9 @@ function judge(i, text) {
   // "Αν έχετε"): accept it when it is within a small edit distance of the first script word, alone or merged with the next heard word
   const lev = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length]; };
   const simW = (a, b) => (a && b ? 1 - lev(a, b) / Math.max(a.length, b.length) : 0);
-  const firstClose = want[0] && (simW(want[0], got[0]) >= 0.7 || simW(want[0], (got[0] || '') + (got[1] || '')) >= 0.7);
+  // the final nu of a short word is a spelling variant that the transcribers choose freely ("Τον χειμώνα" heard as "Το χειμώνα"): equal once a final nu is dropped
+  const nuless = (w) => String(w || '').replace(/ν$/, '');
+  const firstClose = want[0] && (simW(want[0], got[0]) >= 0.7 || simW(want[0], (got[0] || '') + (got[1] || '')) >= 0.7 || (nuless(want[0]).length >= 2 && nuless(want[0]) === nuless(got[0])));
   const startsRight = joined.startsWith(want.slice(0, 2).join(' ')) || got.slice(0, 4).join(' ').includes(want[0] || '') || !!firstClose;
   const endsRight = got.slice(-5).join(' ').includes(want[want.length - 1] || '');
   return { recall: +recall.toFixed(2), extra: +extra.toFixed(2), startsRight, endsRight, clean: !!text && recall >= 0.85 && extra <= 0.2 && startsRight && endsRight };
