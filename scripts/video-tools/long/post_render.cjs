@@ -11,6 +11,10 @@ const cfgFile = process.argv[2];
 if (!cfgFile) { console.log('usage: node post_render.cjs <config.json> [--dry]'); process.exit(1); }
 const cfg = JSON.parse(fs.readFileSync(cfgFile, 'utf8'));
 const dry = process.argv.includes('--dry');
+// --local-overlay: the server's slide overlay stalled (roses 2026-11-02): out/<name>_base.mp4 and out/<name>_slides.mp4 were made on this PC with overlay_local.cjs,
+// so skip the server overlay and the downloads and run only the checks.
+const localOverlay = process.argv.includes('--local-overlay');
+let restarts = 0;
 const here = process.cwd();
 const repo = path.join(__dirname, '..', '..', '..');
 const K = 'smartgarden_cron_x7K9pQ2026';
@@ -38,6 +42,7 @@ const spec = cfg.holds.map(([n, a, b]) => { const s = starts[a] + 0.06, e = star
 fs.writeFileSync(path.join(here, 'spec_' + cfg.name + '.txt'), spec);
 say('slide spec covers', Math.round(cov), 's of', Math.round(t), 's');
 
+if (!localOverlay) {
 // the endpoint must not be the empty file the host once left behind
 const probe = curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&status=1', 60);
 if (!probe.trim()) { say('ABORT: video-inserts.php answers with an empty body (host blanked it again?)'); process.exit(4); }
@@ -52,15 +57,17 @@ if (dry) { say('--dry: stopping before the overlay is started'); process.exit(0)
   else { try { curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&run=1', 100); } catch (e) { say('start call timed out (the overlay keeps running on the server)'); } } }
 
 // wait; restart (force=1, same spec) ONLY while the message says "Κομμάτι" and nothing moved for 4 minutes; never during the join
-const t0 = Date.now(); let last = '', restarts = 0, final = null;
+const t0 = Date.now(); let last = '', final = null;
 while (Date.now() - t0 < 90 * 60000) {
   let s = null; try { s = JSON.parse(curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&status=1', 100)); } catch (e) {}
   if (s) {
     const line = s.state + ' ' + s.message; if (line !== last) { say(line); last = line; }
     if (s.state === 'done') { final = s; break; }
     if (s.state === 'error') { say('ERROR', JSON.stringify(s).slice(0, 300)); process.exit(6); }
+    // 10 minutes, the server's own "it died silently" rule (video-inserts.php): at 4 minutes the roses run was restarted while the
+    // first pass was only slow on a long piece, two passes shared the piece files and the slides video came out 243 s instead of 1109 s.
     const age = s.updated ? Date.now() - Date.parse(s.updated) : 0, encoding = /Κομμάτι/.test(s.message || '');
-    if (s.state === 'running' && encoding && age > 4 * 60000) {
+    if (s.state === 'running' && encoding && age > 10 * 60000) {
       if (restarts >= 8) { say('too many restarts'); process.exit(7); }
       restarts++; say('restart', restarts);
       try { curl('https://smartgarden.gr/video-inserts.php?key=' + K + '&job=' + job + '&spec=' + spec + '&overlay=1&run=1&force=1', 100); } catch (e) { say('restart call timed out (keeps running)'); }
@@ -72,9 +79,13 @@ while (Date.now() - t0 < 90 * 60000) {
 if (!final) { say('overlay timeout'); process.exit(9); }
 say('overlay done:', JSON.stringify(final).slice(0, 200));
 
+}
+
 const base = path.join(out, cfg.name + '_base.mp4'), sl = path.join(out, cfg.name + '_slides.mp4');
-execSync('curl -s -m 900 -o "' + base + '" "https://smartgarden.gr/video-render.php?action=file&job=' + job + '&key=' + K + '"');
-execSync('curl -s -m 900 -o "' + sl + '" "https://smartgarden.gr/video-render.php?action=file&variant=slides&job=' + job + '&key=' + K + '"');
+if (!localOverlay) {
+  execSync('curl -s -m 900 -o "' + base + '" "https://smartgarden.gr/video-render.php?action=file&job=' + job + '&key=' + K + '"');
+  execSync('curl -s -m 900 -o "' + sl + '" "https://smartgarden.gr/video-render.php?action=file&variant=slides&job=' + job + '&key=' + K + '"');
+} else if (!fs.existsSync(base) || !fs.existsSync(sl)) { say('--local-overlay needs', base, 'and', sl); process.exit(10); }
 const dur = (f) => parseFloat(execSync('ffprobe -v error -show_entries format=duration -of csv=p=0 "' + f + '"', { encoding: 'utf8' }));
 const md5 = (f) => execSync('ffmpeg -loglevel error -i "' + f + '" -vn -f md5 -', { encoding: 'utf8' }).trim();
 const dB = dur(base), dS = dur(sl), mB = md5(base), mS = md5(sl);
