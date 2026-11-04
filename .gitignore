@@ -17,3 +17,6 @@ public/.htaccess
 
 # Local recording, not part of the site
 pinterest-standard-access-demo.mp4
+
+# TikTok web posting: the video copied for the browser upload
+tiktok-out/

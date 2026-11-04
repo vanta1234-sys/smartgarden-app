@@ -15,9 +15,9 @@ const dry = process.argv.includes('--dry'), force = process.argv.includes('--for
 if (!job || job.startsWith('--')) { console.log('usage: node send_tiktok_draft.cjs <jobId> [--dry] [--force]'); process.exit(1); }
 
 const lines = fs.existsSync(LOG) ? fs.readFileSync(LOG, 'utf8').split(/\r?\n/).filter((l) => /^\d{4}-\d{2}-\d{2}T/.test(l)) : [];
-if (lines.some((l) => l.includes(' ' + job + ' ') && /\bDELIVERED\b|\bSENT\b/.test(l))) { console.log('SKIP: a draft for this job was already sent'); process.exit(0); }
+if (lines.some((l) => l.includes(' ' + job + ' ') && /\bDELIVERED\b|\bSENT\b|\bPOSTED_WEB\b/.test(l))) { console.log('SKIP: this job already went to TikTok (draft or web post)'); process.exit(0); }
 const dayNo = (d) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
-const last = lines.filter((l) => /\bDELIVERED\b|\bSENT\b/.test(l)).map((l) => new Date(l.split(' ')[0])).sort((a, b) => b - a)[0];
+const last = lines.filter((l) => /\bDELIVERED\b|\bSENT\b|\bPOSTED_WEB\b/.test(l)).map((l) => new Date(l.split(' ')[0])).sort((a, b) => b - a)[0];
 const gap = last ? dayNo(new Date()) - dayNo(last) : 99;
 console.log('last TikTok draft:', last ? last.toISOString() : 'none', '| days since:', gap);
 if (gap < 2 && !force) { console.log('SKIP: too soon, a TikTok draft goes out at most every 2 days (next one is due ' + (last ? new Date(dayNo(last) * 86400000 + 2 * 86400000).toISOString().slice(0, 10) : 'now') + ')'); process.exit(0); }
