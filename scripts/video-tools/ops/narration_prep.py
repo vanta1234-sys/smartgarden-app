@@ -198,7 +198,15 @@ def gemini_chunk(text, dest):
 
 
 def ftp():
-    e = env(); f = ftplib.FTP(); f.connect('185.29.24.7', 21, timeout=60); f.login(e['FTP_USER'], e['FTP_PASSWORD']); return f
+    # The host sometimes does not answer a connection for a minute or two (2026-11-05: WinError 10060 killed the whole preparation after three
+    # chunks): try again a few times before giving up.
+    e = env(); last = None
+    for k in range(6):
+        try:
+            f = ftplib.FTP(); f.connect('185.29.24.7', 21, timeout=60); f.login(e['FTP_USER'], e['FTP_PASSWORD']); return f
+        except Exception as ex:
+            last = ex; print('  ftp connection failed (%s), retry %d of 5 in 30 s' % (str(ex)[:80], k + 1)); time.sleep(30)
+    raise last
 
 
 def ftp_do(fn):

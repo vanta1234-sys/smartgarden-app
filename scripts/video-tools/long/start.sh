@@ -28,6 +28,7 @@ while [ $TRY -lt 80 ]; do
   grep -E "^chunk|cuts|GEMINI|no transcript|SUMMARY" ../prep_final.log | tail -20
   if grep -q "GEMINI FAILED" ../prep_final.log; then echo "Gemini TTS quota not back yet, waiting 5 minutes"; sleep 300
   elif grep -q "no transcript" ../prep_final.log; then echo "transcription not available, waiting 10 minutes"; sleep 600
+  elif grep -q "^Traceback" ../prep_final.log; then echo "preparation crashed (see prep_final.log), trying again in 3 minutes"; sleep 180
   else break; fi
 done
 cd ..
