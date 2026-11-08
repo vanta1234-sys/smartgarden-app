@@ -37,12 +37,32 @@ if (!fs.existsSync(path.join(SHORTS, 'uploaded_' + job + '.json'))) { console.lo
 const dir = path.join(SHORTS, job);
 if (!fs.existsSync(path.join(dir, 'video.mp4')) || !fs.existsSync(path.join(dir, 'job.json'))) { console.log('REFUSED: video.mp4 or job.json missing in the Short folder'); process.exit(2); }
 const j = JSON.parse(fs.readFileSync(path.join(dir, 'job.json'), 'utf8'));
-const size = fs.statSync(path.join(dir, 'video.mp4')).size;
-if (size > 9.5 * 1024 * 1024) { console.log('REFUSED: the video is ' + (size / 1048576).toFixed(1) + ' MB, the upload tool takes under 10 MB'); process.exit(2); }
+const src = path.join(dir, 'video.mp4');
+const srcSize = fs.statSync(src).size;
+let size = srcSize, note = '';
 fs.mkdirSync(OUT, { recursive: true });
-fs.copyFileSync(path.join(dir, 'video.mp4'), path.join(OUT, 'video.mp4'));
+const dest = path.join(OUT, 'video.mp4');
+if (srcSize > 9.5 * 1024 * 1024) {
+  // The browser upload tool takes under 10 MB. On 2026-11-06 the tomato Short (10.8 MB) was refused here and no TikTok went out for two days, so a TikTok
+  // copy is made instead: same picture size and audio, video bitrate chosen from the length so that the file lands near 8.8 MB (TikTok re-encodes anyway).
+  const { spawnSync } = require('child_process');
+  const dur = parseFloat(spawnSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', src], { encoding: 'utf8' }).stdout);
+  let ok = false;
+  if (dur > 1) {
+    let kbps = Math.floor((8.8 * 8 * 1024 * 1024 / dur) / 1000) - 132;
+    for (let k = 0; k < 4 && !ok; k++) {
+      try { fs.unlinkSync(dest); } catch (e) { /* none yet */ }
+      spawnSync('ffmpeg', ['-loglevel', 'error', '-y', '-i', src, '-c:v', 'libx264', '-preset', 'slow', '-b:v', kbps + 'k', '-maxrate', Math.floor(kbps * 1.25) + 'k',
+        '-bufsize', (kbps * 2) + 'k', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', dest]);
+      const s = fs.existsSync(dest) ? fs.statSync(dest).size : 0;
+      if (s > 0 && s <= 9.5 * 1024 * 1024) { ok = true; size = s; } else kbps = Math.floor(kbps * 0.85);
+    }
+  }
+  if (!ok) { console.log('REFUSED: the video is ' + (srcSize / 1048576).toFixed(1) + ' MB, the upload tool takes under 10 MB, and the smaller copy could not be made'); process.exit(2); }
+  note = ' (smaller copy for the upload tool, made from the ' + (srcSize / 1048576).toFixed(1) + ' MB original)';
+} else fs.copyFileSync(src, dest);
 fs.writeFileSync(path.join(OUT, 'caption.txt'), j.script.tiktokCaption, 'utf8');
 console.log('DUE: ' + job);
-console.log('video  :', path.resolve(OUT, 'video.mp4'), (size / 1048576).toFixed(1) + ' MB');
+console.log('video  :', path.resolve(OUT, 'video.mp4'), (size / 1048576).toFixed(1) + ' MB' + note);
 console.log('caption: ' + path.resolve(OUT, 'caption.txt') + ' (' + j.script.tiktokCaption.length + ' chars)');
 console.log('----- caption -----\n' + j.script.tiktokCaption + '\n-------------------');
