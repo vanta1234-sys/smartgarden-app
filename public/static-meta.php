@@ -33,6 +33,12 @@ if ($route === 'kategoria' && $slug) {
     if (file_exists($articlesPath)) {
         $articles = json_decode(file_get_contents($articlesPath), true);
         if (is_array($articles)) {
+            // archived articles (archive-lib.php) are still part of the category
+            try {
+                require_once __DIR__ . '/archive-lib.php';
+                foreach (sg_archive_index() as $archivedRecord) $articles[] = $archivedRecord;
+            } catch (\Throwable $archiveError) {
+            }
             foreach ($articles as $a) {
                 if (($a['category'] ?? '') === $slug) {
                     $count++;
@@ -143,6 +149,13 @@ if ($title && $description) {
 
 $articles = json_decode((string) @file_get_contents(__DIR__ . '/latest_articles.json'), true) ?: array();
 $articles = array_map('sg_repair_article', $articles);
+// Archived articles (archive-lib.php) come after the catalogue, so "newest" lists are unchanged
+// while the counts and the category pages include every article.
+try {
+    require_once __DIR__ . '/archive-lib.php';
+    foreach (sg_archive_index() as $archivedRecord) $articles[] = sg_repair_article($archivedRecord);
+} catch (\Throwable $archiveError) {
+}
 $body = '';
 $ld = null;
 $home = 'https://smartgarden.gr/';

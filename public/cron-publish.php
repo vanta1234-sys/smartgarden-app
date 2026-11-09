@@ -14819,10 +14819,15 @@ array_unshift($existingArticles, $newArticleObj);
 // Catalog cap. It was 100 "to prevent memory overflow", but once the catalog reached 100 (2026-10-27) every
 // nightly article silently pushed the OLDEST one off the end: 13 evergreen guides (guide-38 .. guide-50) vanished
 // and their URLs became soft 404s (HTTP 200 + the generic guides page). The whole file is json_decoded on every
-// article view (about 47 KB per entry), so the cap stays, but at 200 (~13 MB). Past that, an archive file is needed
-// instead of dropping entries.
-if (count($existingArticles) > 200) {
-    $existingArticles = array_slice($existingArticles, 0, 200);
+// article view (about 47 KB per entry), so the catalogue stays at the newest 200 (~13 MB), and what falls off the end
+// is MOVED to article-archive/ (archive-lib.php), where article.php, article-json.php, articles-index.php,
+// static-meta.php and the sitemap below still find it. If the archive cannot be written the article simply stays in
+// the catalogue: nothing is deleted any more.
+try {
+    require_once __DIR__ . '/archive-lib.php';
+    $existingArticles = sg_archive_overflow($existingArticles, 200);
+} catch (\Throwable $archiveError) {
+    error_log('archive overflow failed, catalogue left uncapped: ' . $archiveError->getMessage());
 }
 
 @file_put_contents($latestFile, json_encode($existingArticles, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
@@ -15111,7 +15116,15 @@ function sitemapNormalizeDate($raw) {
     return $ts !== false ? date('Y-m-d', $ts) : date('Y-m-d');
 }
 
-foreach ($existingArticles as $art) {
+// Archived articles (archive-lib.php) are live pages too, so they stay in the sitemap.
+$sitemapArticles = $existingArticles;
+try {
+    require_once __DIR__ . '/archive-lib.php';
+    foreach (sg_archive_index() as $archivedRecord) $sitemapArticles[] = $archivedRecord;
+} catch (\Throwable $archiveError) {
+    // no archive: the catalogue alone
+}
+foreach ($sitemapArticles as $art) {
     $artSlug = isset($art['slug']) ? $art['slug'] : (isset($art['id']) ? $art['id'] : '');
     if ($artSlug) {
         $artDate = sitemapNormalizeDate(isset($art['date']) ? $art['date'] : date('Y-m-d'));

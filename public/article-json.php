@@ -27,5 +27,18 @@ if (is_array($articles)) {
     }
 }
 
+// Not in the catalogue: it may have moved to the archive (archive-lib.php).
+try {
+    require_once __DIR__ . '/archive-lib.php';
+    $archivedArticle = sg_archive_get($slug);
+    if ($archivedArticle) {
+        require_once __DIR__ . '/ssr-lib.php';
+        echo json_encode(sg_repair_article($archivedArticle), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+} catch (\Throwable $archiveError) {
+    // fall through to the 404 below
+}
+
 http_response_code(404);
 echo json_encode(array('error' => 'not found'));

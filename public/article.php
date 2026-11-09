@@ -37,6 +37,17 @@ if ($slug && file_exists($articlesPath)) {
     }
 }
 
+if (!$article && $slug) {
+    // Past the catalogue cap an article lives in the archive (archive-lib.php), not in latest_articles.json.
+    try {
+        require_once __DIR__ . '/archive-lib.php';
+        $archivedArticle = sg_archive_get($slug);
+        if ($archivedArticle) $article = sg_repair_article($archivedArticle);
+    } catch (\Throwable $archiveError) {
+        // no archive, no article: the page falls through to the generic shell as before
+    }
+}
+
 if ($article) {
     $rawTitle = $article['title']['el'] ?? $article['title'] ?? 'Άρθρο';
     // Social cards have room for the whole headline; a search result does not.

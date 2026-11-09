@@ -28,7 +28,16 @@ if (!file_exists($src)) {
 // Rebuild when the data changes, and also when this script or ssr-lib.php does — the text
 // repair lives in ssr-lib, and a cache keyed on the data alone would serve the broken
 // version until the next publish.
-$newest = max(filemtime($src), filemtime(__FILE__), @filemtime(__DIR__ . '/ssr-lib.php') ?: 0);
+// The archive (archive-lib.php) holds the articles past the catalogue cap; they stay in the list so the
+// reader and the counts see every article. It changes the list too, so its files are part of the cache key.
+$archiveMtime = 0;
+try {
+    require_once __DIR__ . '/archive-lib.php';
+    $archiveMtime = max(sg_archive_index_mtime(), @filemtime(__DIR__ . '/archive-lib.php') ?: 0);
+} catch (\Throwable $archiveError) {
+    // no archive: the list is just the catalogue
+}
+$newest = max(filemtime($src), filemtime(__FILE__), @filemtime(__DIR__ . '/ssr-lib.php') ?: 0, $archiveMtime);
 if (file_exists($cache) && filemtime($cache) >= $newest) {
     readfile($cache);
     exit;
@@ -46,6 +55,19 @@ foreach ($articles as &$a) {
     $a['content'] = array('el' => '', 'en' => '');
 }
 unset($a);
+
+// Archived articles come after the catalogue: they are the oldest ones.
+if ($archiveMtime) {
+    try {
+        foreach (sg_archive_index() as $archived) {
+            $archived = sg_repair_article($archived);
+            $archived['content'] = array('el' => '', 'en' => '');
+            $articles[] = $archived;
+        }
+    } catch (\Throwable $archiveError) {
+        // the catalogue alone is still a complete list of what is live
+    }
+}
 
 $json = json_encode($articles, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 if ($json === false) {
