@@ -14816,9 +14816,13 @@ $newArticleObj = array(
 // Prepend to catalog and save
 array_unshift($existingArticles, $newArticleObj);
 
-// Limit catalog to 100 entries to prevent memory overflow
-if (count($existingArticles) > 100) {
-    $existingArticles = array_slice($existingArticles, 0, 100);
+// Catalog cap. It was 100 "to prevent memory overflow", but once the catalog reached 100 (2026-10-27) every
+// nightly article silently pushed the OLDEST one off the end: 13 evergreen guides (guide-38 .. guide-50) vanished
+// and their URLs became soft 404s (HTTP 200 + the generic guides page). The whole file is json_decoded on every
+// article view (about 47 KB per entry), so the cap stays, but at 200 (~13 MB). Past that, an archive file is needed
+// instead of dropping entries.
+if (count($existingArticles) > 200) {
+    $existingArticles = array_slice($existingArticles, 0, 200);
 }
 
 @file_put_contents($latestFile, json_encode($existingArticles, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
