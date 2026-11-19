@@ -224,7 +224,11 @@ function sg_scene_line($text, $max) {
         $at = mb_strrpos($cut, $sep, 0, 'UTF-8');
         if ($at !== false && $at >= $max * 0.5) { $cut = mb_substr($cut, 0, $at, 'UTF-8'); break; }
     }
-    if (mb_strlen($cut, 'UTF-8') === $max) {
+    // Still at the full budget only means a word MIGHT have been split; check the character
+    // right after the cut rather than assuming it. On 2026-11-10 "...και Τι Κάνεις" landed
+    // exactly on 48 with the next character a space (word intact), and this backed up to the
+    // previous space anyway, dropping "Κάνεις" for nothing and leaving the hook on "...και Τι.".
+    if (mb_strlen($cut, 'UTF-8') === $max && mb_substr($t, $max, 1, 'UTF-8') !== ' ') {
         $sp = mb_strrpos($cut, ' ', 0, 'UTF-8');
         if ($sp !== false && $sp >= $max * 0.5) $cut = mb_substr($cut, 0, $sp, 'UTF-8');
     }
